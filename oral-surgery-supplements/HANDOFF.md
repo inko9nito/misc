@@ -38,8 +38,8 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 
 | Item (product) | When | Dose / instruction | Source / notes |
 |---|---|---|---|
-| D3K2 (Quicksilver Scientific nanoemulsion) | Prep, before breakfast | 20,000 IU/day, hold in mouth 30 sec | Label: 1 pump (0.5 mL) = 2,500 IU D3 + 90 mcg K2, so 20,000 IU = 8 pumps. Label directions: empty stomach, at least 10 min before meals, hold 30–90 sec; label dose is 1 pump 1–2×/day. See open question 1. |
-| Methyl-B12 (Quicksilver Scientific liposomal spray) | Prep, before breakfast | Per bottle, hold in mouth 30 sec | Label: 1–2 pumps (some listings 2), empty stomach, at least 10 min before meals. Replenishes B12 depleted by nitrous oxide. |
+| D3K2 (Quicksilver Scientific nanoemulsion) | Prep, before breakfast | 8 pumps (20,000 IU)/day, hold in mouth 30 sec | Label: 1 pump (0.5 mL) = 2,500 IU D3 + 90 mcg K2, so 20,000 IU = 8 pumps. Label directions: empty stomach, at least 10 min before meals, hold 30–90 sec; label dose is 1 pump 1–2×/day. See open question 1. |
+| Methyl-B12 (Quicksilver Scientific liposomal spray) | Prep, before breakfast | 2 pumps, hold in mouth 30 sec | Label: 1–2 pumps (some listings 2), empty stomach, at least 10 min before meals. Replenishes B12 depleted by nitrous oxide. |
 | PhytoMulti with iron (Metagenics, 60 tablets) | Prep and recovery, with breakfast | Once a day | Label: 1–2 tablets once daily with food; 2 tablets = 1,000 IU vitamin D + 18 mg iron. Kept apart from Bone Builder (calcium reduces iron absorption; usual advice is 2 h apart). Vitamin C just before breakfast helps iron. |
 | Bio-D-Mulsion Forte (Biotics Research) | Prep, with breakfast | 2 drops (4,000 IU) | **Not on the office sheet.** Added at the user's request using the label serving size (2 drops = 100 mcg / 4,000 IU). Vitamin D absorbs better with a fat-containing meal (Dawson-Hughes 2015: +32% peak). |
 | Vitamin C (Quicksilver Scientific liposomal, 4 fl oz) | Prep, 1 tsp 10 min before each meal | 3 tsp/day | Label: 1 tsp (5 mL) = 1,000 mg (sodium ascorbate) + 125 mg sodium; 24 tsp a bottle; empty stomach, 10+ min before meals, hold 30–90 sec, repeat to desired dose; refrigerate, use within 60 days of opening. Split in 3 because absorption saturates at high doses. See open question 6. |
@@ -138,6 +138,6 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - **Out of date versus the app**: it predates Bio-D-Mulsion, the 50-tablet Intenzyme schedule (it shows 8 every-other-day boxes), the real product names and the dose dividers. If the user wants a new print, generate it from the same data as the app.
 
 ## Suggested next steps
-- Get answers to the open questions from the user or the office, then update the D3K2 row (for example, "8 pumps").
+- Get answers to the open questions from the user or the office, and build them into the app.
 - Pull the item data into one shared JSON so the app and the print version can't drift.
 - Add photos for the remaining items if the user sends them.
