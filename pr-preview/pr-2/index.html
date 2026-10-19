@@ -296,7 +296,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     { id: "vitc",  slot: "Breakfast", name: "Vitamin C", sub: "1 tsp · dose 1 of 3", icon: "spoon" },
     { id: "vitc2", slot: "Lunch", name: "Vitamin C", sub: "1 tsp · dose 2 of 3", icon: "spoon" },
     { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "300 µg · dose 1 of 2", icon: "capsule", img: "mag" },
-    { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "Per bottle", icon: "capsule", img: "bone" },
+    { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
     { id: "vitc3", slot: "Dinner", name: "Vitamin C", sub: "1 tsp · dose 3 of 3", icon: "spoon" },
     { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "300 µg · dose 2 of 2", icon: "capsule", img: "mag" }
   ];
@@ -318,7 +318,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
     sub: "10 tablets · " + (n === 15 ? "day after" : "every other day") + " · dose " + (2 + (n - 15) / 2) + " of 5" });
   const RECOVERY = [
     { id: "multi",  slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
-    { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "Per bottle", icon: "capsule", img: "bone" },
+    { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip around gums", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" }
@@ -497,7 +497,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         infoRow("drops", "Bio-D-Mulsion Forte", "2 drops (4,000 IU) with breakfast", "From the bottle label"),
         infoRow("spoon", "Vitamin C", "1 tsp with each meal (3.5 g a day)", "Refrigerate after opening"),
         infoRow("capsule", "Magnesium glycinate", "300 µg at lunch and bedtime", "Sheet says ug, likely mg"),
-        infoRow("capsule", "Bone Builder Plus", "Per bottle, with dinner", "Not with PhytoMulti")
+        infoRow("capsule", "Bone Builder Plus", "2 capsules with dinner", "Not with PhytoMulti")
       ]) +
       grp("Night before", fLong(dateOf(NIGHT_N)), [
         infoRow("pump", "GABA", "1 pump"),
@@ -517,7 +517,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
         infoRow("drops", "Lymph 3 Chronic", "Per bottle until empty"),
         infoRow("swab", "Renew silver gel", "Q-tip around gums", "Gently, don’t dislodge the clot"),
         infoRow("capsule", "PhytoMulti", "Once a day, with breakfast"),
-        infoRow("capsule", "Bone Builder Plus", "Per bottle, with dinner")
+        infoRow("capsule", "Bone Builder Plus", "2 capsules with dinner")
       ]) +
       '<p class="foot">Times follow the bottle labels. Calcium in Bone Builder blocks iron in PhytoMulti, so they go at different meals. Ask the office whether D3K2, vitamin C, magnesium and B12 continue after surgery.</p>';
   }
