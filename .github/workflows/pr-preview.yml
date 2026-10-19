@@ -1,5 +1,5 @@
 # Publishes each PR to GitHub Pages at /pr-preview/pr-<number>/ and removes it when the PR closes.
-# Needs Settings → Pages → Deploy from a branch → gh-pages / (root).
+# Previews are committed to main, which Pages serves: Settings → Pages → Deploy from a branch → main / (root).
 name: PR preview
 
 on:
@@ -13,7 +13,8 @@ permissions:
   contents: write
   pull-requests: write
 
-concurrency: preview-${{ github.ref }}
+# One run at a time, since every PR writes to main.
+concurrency: pr-preview
 
 jobs:
   preview:
@@ -31,3 +32,4 @@ jobs:
       - uses: rossjrw/pr-preview-action@v1
         with:
           source-dir: _preview
+          preview-branch: main
