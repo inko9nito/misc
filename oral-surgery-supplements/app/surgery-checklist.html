@@ -84,6 +84,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lbl{font-size:15px;color:var(--muted)}
 
 #day{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.app-foot{display:flex;justify-content:center;margin-top:18px}
+.refresh{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:12px;font-size:13px;font-weight:500;color:var(--muted)}
+.refresh:active{background:var(--band)}
+.refresh svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.refresh.busy svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .sec-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .sec-h{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted)}
 .sec-h:disabled{cursor:default;color:var(--muted)}
@@ -235,6 +241,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   </section>
   <section id="v-supps" aria-label="Supplements" hidden></section>
   <section id="v-progress" aria-label="Progress" hidden></section>
+  <!-- A Home Screen app can't pull to refresh, so this reloads it. -->
+  <footer class="app-foot"><button type="button" class="refresh" data-refresh>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>Refresh</button></footer>
 </div>
 
 <nav class="bar" aria-label="Views">
@@ -941,6 +950,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   /* ---------- Events ---------- */
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-today]")) { goToday(); return; }
+    const rf = e.target.closest("[data-refresh]");
+    if (rf) {
+      // Fetch the page past the browser's cache first (GitHub Pages lets it keep a copy for 10 minutes), then reload.
+      rf.classList.add("busy"); rf.disabled = true;
+      const reload = () => location.reload();
+      try { fetch(location.pathname + location.search, { cache: "reload" }).then(reload, reload); } catch (err) { reload(); }
+      return;
+    }
     const sec = e.target.closest("[data-sec-toggle]");
     if (sec) { if (!sec.disabled) toggleSection(sec.dataset.secToggle); return; }
     if (e.target.closest("[data-edit]")) { openEdit(); return; }
