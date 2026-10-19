@@ -133,7 +133,14 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lbl{font-size:15px;color:var(--muted)}
 
 #day{display:flex;flex-direction:column;gap:12px;margin-top:14px}
-.app-foot{display:flex;justify-content:center;margin-top:18px}
+.app-foot{display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:4px 8px;margin-top:18px}
+.changes-chip{display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:0 12px;border-radius:999px;font-size:13px;font-weight:600;
+  background:var(--accent-tint);color:var(--accent-ink)}
+.changes-chip svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chg{padding:11px 14px;font-size:15px}
+.chg-w{font-size:12px;font-weight:600;color:var(--muted)}
+.chg-old{margin-top:4px;color:var(--muted);text-decoration:line-through}
+.chg-new{margin-top:2px}
 .refresh{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:12px;font-size:13px;font-weight:500;color:var(--muted)}
 .refresh:active{background:var(--band)}
 .refresh svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -291,7 +298,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   <section id="v-supps" aria-label="Supplements" hidden></section>
   <section id="v-progress" aria-label="Progress" hidden></section>
   <!-- A Home Screen app can't pull to refresh, so this reloads it. -->
-  <footer class="app-foot"><button type="button" class="refresh" data-refresh>
+  <footer class="app-foot"><span id="changes-chip"></span><button type="button" class="refresh" data-refresh>
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>Refresh</button></footer>
 </div>
 
@@ -615,9 +622,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 
   /* ---------- Supplements view ---------- */
   const suppRows = [];   // what each Supplements row's details page shows
+  const SUPP_BASE = {};  // each Supplements row's original schedule and reminder, by row key
   // g: the phase group, so each row's own edits (schedule, reminder) are kept apart from the same supplement's other rows.
   function infoRow(g, icon, name, sub, pill) {
     const pk = NAME2P[name], rk = g + ":" + pk, base = { sub: sub, pill: pill };
+    SUPP_BASE[rk] = { g: g, p: pk, sub: sub, pill: pill };
     const row = Object.assign({ p: pk, rk: rk, icon: icon, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
     const i = suppRows.push(row) - 1;
     return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
@@ -761,11 +770,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       const n = +m[1], it = itemsFor(n).find((x) => x.id === m[2]);
       return it ? { row: it, dayCtx: { k: key(n, it), n: n }, base: "#d/" + n + "/" + m[2], edit: !!m[3] } : null;
     }
+    if (hash === "#changes") return { changes: true, base: "#changes", edit: false, dayCtx: null };
     m = /^#s\/(\d+)(\/edit)?$/.exec(hash);
     return m && suppRows[+m[1]] ? { row: suppRows[+m[1]], dayCtx: null, base: "#s/" + m[1], edit: !!m[2] } : null;
   }
   // A details link left in the address bar from before a reload has no list behind it to go back to.
-  if (useHistory && /^#[ds]\//.test(location.hash)) history.replaceState(history.state, "", location.pathname + location.search);
+  if (useHistory && (/^#[ds]\//.test(location.hash) || location.hash === "#changes")) history.replaceState(history.state, "", location.pathname + location.search);
 
   // instant: the browser already slid the pages across itself (a swipe back or forward), so
   // the page appears or goes in place rather than sliding a second time.
@@ -777,8 +787,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     els.forEach((el) => { el.style.transition = ""; });
   }
   function showDetail(r, from, instant) {
-    detailFor = r.dayCtx; detailRoute = routeOf(r.row, r.dayCtx); opener = from || null;
-    push.innerHTML = detailHTML(r.row, r.dayCtx);
+    detailFor = r.dayCtx; detailRoute = r.changes ? "#changes" : routeOf(r.row, r.dayCtx); opener = from || null;
+    push.innerHTML = r.changes ? changesHTML() : detailHTML(r.row, r.dayCtx);
     push.hidden = false; push.scrollTop = 0;
     lockScroll();
     const go = () => { push.classList.add("on"); document.documentElement.classList.add("push-open"); };
@@ -820,7 +830,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const isOpen = !push.hidden && push.classList.contains("on");
     if (r && !isOpen) { showDetail(r, opener, instant); if (r.edit) showEdit(true); }
     else if (r && isOpen) {
-      if (r.base !== detailRoute) { detailFor = r.dayCtx; detailRoute = r.base; push.innerHTML = detailHTML(r.row, r.dayCtx); }
+      if (r.base !== detailRoute) { detailFor = r.dayCtx; detailRoute = r.base; push.innerHTML = r.changes ? changesHTML() : detailHTML(r.row, r.dayCtx); }
       if (r.edit && !editOpen()) showEdit(instant);
       else if (!r.edit && editOpen()) hideEdit(instant);
     }
@@ -952,8 +962,97 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (view === "supps") renderSupps();
     if (!push.hidden) {
       const r = fromRoute(detailRoute), y = push.scrollTop;
-      if (r) { detailFor = r.dayCtx; push.innerHTML = detailHTML(r.row, r.dayCtx); push.scrollTop = y; }
+      if (r) { detailFor = r.dayCtx; push.innerHTML = r.changes ? changesHTML() : detailHTML(r.row, r.dayCtx); push.scrollTop = y; }
     }
+    renderChangesChip();
+  }
+
+  /* ---------- Local changes: what's been edited on this phone, to copy to Claude ---------- */
+  // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
+  // counts them and its page lists them, with a Copy for Claude button to build them into the app.
+  const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
+    sub: "Dose", slot: "When", pill: "Reminder" };
+  const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
+  const BASE_ITEMS = {};
+  BEFORE.concat(NIGHT, SURGERY, RECOVERY).forEach((it) => { BASE_ITEMS[it.id] = it; });
+  BASE_ITEMS.intz = Object.assign(intzDose(15), { sub: "10 tablets · (day and dose number vary)" });
+  const itemWhere = (id) => {
+    const it = BASE_ITEMS[id];
+    return it ? it.slot + (id.indexOf("n-") === 0 ? ", night before" : id.indexOf("s-") === 0 ? ", surgery day" : "") : "";
+  };
+  // Overrides that now match the app's own text are dropped (once Claude builds a change in, it stops counting).
+  function pruneEdits() {
+    if (!Object.keys(SUPP_BASE).length) renderSupps();
+    let changed = false;
+    const prune = (bucket, k, orig) => {
+      const o = bucket[k]; if (!o) return;
+      Object.keys(o).forEach((f) => { const d = orig ? orig[f] : undefined; if (o[f] === (d == null ? "" : d)) { delete o[f]; changed = true; } });
+      if (!Object.keys(o).length) { delete bucket[k]; changed = true; }
+    };
+    Object.keys(EDITS.p).forEach((pk) => prune(EDITS.p, pk, Object.assign({ name: PNAME[pk] }, PDETAILS[pk] || {})));
+    Object.keys(EDITS.i).forEach((id) => { if (id !== "intz") prune(EDITS.i, id, BASE_ITEMS[id]); });
+    Object.keys(EDITS.s).forEach((rk) => prune(EDITS.s, rk, SUPP_BASE[rk]));
+    if (changed) saveEdits();
+  }
+  function localChanges() {
+    if (!Object.keys(SUPP_BASE).length) renderSupps();
+    const out = [];
+    const add = (pk, where, field, from, to, keyText) => out.push({ pk: pk, name: prodInfo(pk).name, where: where, field: field, from: from == null ? "" : from, to: to, key: keyText });
+    Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
+      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], EDITS.p[pk][f], "supplement " + pk)));
+    Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
+      add(prodOf(id), "This dose (" + itemWhere(id) + ")", f, (BASE_ITEMS[id] || {})[f], EDITS.i[id][f], "dose " + id)));
+    Object.keys(EDITS.s).forEach((rk) => Object.keys(EDITS.s[rk]).forEach((f) => {
+      const b = SUPP_BASE[rk] || {}, g = rk.split(":")[0];
+      add(b.p || rk.split(":")[1], "Supplements tab (" + (GROUP_LABEL[g] || g) + ")", f === "sub" ? "schedule" : f, b[f], EDITS.s[rk][f], "row " + rk);
+    }));
+    return out;
+  }
+  const fieldName = (f) => f === "schedule" ? "Schedule" : (FIELD_LABEL[f] || f);
+  function renderChangesChip() {
+    const el = document.getElementById("changes-chip");
+    if (!el) return;
+    const n = localChanges().length;
+    el.innerHTML = n ? '<button type="button" class="changes-chip" data-changes aria-haspopup="dialog">' +
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="M13.5 6.5l4 4"/></svg>' +
+      n + ' local change' + (n === 1 ? '' : 's') + '</button>' : "";
+  }
+  function changesHTML() {
+    const list = localChanges(), byP = {};
+    list.forEach((c) => { (byP[c.pk] = byP[c.pk] || []).push(c); });
+    const show = (v) => v === "" ? '<i>empty</i>' : esc(v);
+    const cards = Object.keys(byP).map((pk) => '<div class="es-sec">' + esc(byP[pk][0].name) + '</div><div class="list">' +
+      byP[pk].map((c) => '<div class="chg"><div class="chg-w">' + esc(c.where) + ' · ' + fieldName(c.field) + '</div>' +
+        '<div class="chg-old">' + show(c.from) + '</div><div class="chg-new">' + show(c.to) + '</div></div>').join("") + '</div>').join("");
+    return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
+      '<div class="push-ht" aria-hidden="true">Local changes</div><span></span></div>' +
+      '<div class="push-b"><h2 class="sh-t" id="sh-t">Local changes</h2>' +
+      '<p class="sh-b">Saved only on this phone, and lost if the Home Screen app is deleted. Copy them and paste them to Claude to build them into the app.</p>' +
+      (list.length ? cards : '<p class="sh-b" style="margin-top:16px">No changes.</p>') + '</div>' +
+      (list.length ? '<div class="push-foot"><button type="button" class="sh-btn" data-copy-changes>Copy for Claude</button></div>' : '') + '</div>';
+  }
+  function changesText() {
+    const list = localChanges();
+    const q = (v) => v === "" ? "(empty)" : '"' + v + '"';
+    return "Surgery tracker: please build in these local changes (" + list.length + "), copied " + fLong(new Date()) + "\n" +
+      list.map((c) => "- " + c.name + " [" + c.key + "] · " + c.where + " · " + fieldName(c.field) + ": " + q(c.from) + " → " + q(c.to)).join("\n") + "\n";
+  }
+  function copyChanges(btn) {
+    const text = changesText();
+    const done = () => { btn.textContent = "Copied"; setTimeout(() => { if (btn.isConnected) btn.textContent = "Copy for Claude"; }, 2000); };
+    const fallback = () => {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.setAttribute("readonly", ""); ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+      try { document.execCommand("copy"); done(); } catch (e) {}
+      ta.remove();
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  }
+  function openChanges(from) {
+    if (!useHistory) { showDetail({ changes: true, dayCtx: null }, from, false); return; }
+    opener = from;
+    location.hash = "#changes";
   }
   esheet.addEventListener("input", markDirty);
   esheet.addEventListener("change", markDirty);
@@ -1010,6 +1109,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const sec = e.target.closest("[data-sec-toggle]");
     if (sec) { if (!sec.disabled) toggleSection(sec.dataset.secToggle); return; }
     if (e.target.closest("[data-edit]")) { openEdit(); return; }
+    const chip = e.target.closest("[data-changes]");
+    if (chip) { openChanges(chip); return; }
+    const cp = e.target.closest("[data-copy-changes]");
+    if (cp) { copyChanges(cp); return; }
     if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
     if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
     if (e.target.closest("[data-back]")) { closeDetail(); return; }
@@ -1092,9 +1195,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     }, () => { eref = null; });
   }
 
+  pruneEdits();
   renderCountdown();
   renderStrip();
   renderDay();
+  renderChangesChip();
   requestAnimationFrame(showWeek);
   connect();
 })();
