@@ -26,7 +26,14 @@ jobs:
         if: github.event.action != 'closed'
         run: |
           mkdir -p _preview
-          cp oral-surgery-supplements/app/surgery-checklist.html _preview/index.html
+          # The app file has no <head>: claude.ai adds one when it publishes. Add it here so phones get the viewport tag.
+          {
+            echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+            echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
+            echo '</head><body>'
+            cat oral-surgery-supplements/app/surgery-checklist.html
+            echo '</body></html>'
+          } > _preview/index.html
           cp -r oral-surgery-supplements/print _preview/print
 
       - uses: rossjrw/pr-preview-action@v1
