@@ -178,6 +178,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .body{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
 .nm{font-size:15px;font-weight:500;line-height:1.25}
 .sb{font-size:14px;color:var(--muted)}
+.nth{font-size:13px;font-weight:400;color:var(--muted);white-space:nowrap}
 .pill{align-self:flex-start;margin-top:5px;font-size:12px;font-weight:600;color:var(--ink2);border:1.5px solid var(--line);border-radius:999px;padding:2px 9px}
 .chk{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--chk);display:grid;place-items:center;transition:background-color .15s,border-color .15s}
 .chk svg{width:13px;height:13px;fill:none;stroke:var(--on-accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
@@ -376,13 +377,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "b12",   slot: "Before breakfast", name: "Methyl-B12", sub: "2 pumps · hold 30 sec", icon: "pump", img: "b12" },
     { id: "multi", slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
     { id: "biod",  slot: "Breakfast", name: "Bio-D-Mulsion Forte", sub: "2 drops · 4,000 IU", icon: "drops", img: "biod" },
-    { id: "vitc",  slot: "Before breakfast", name: "Vitamin C", sub: "1 tsp · dose 1 of 3", icon: "spoon", img: "vitc" },
-    { id: "vitc2", slot: "Lunch", name: "Vitamin C", sub: "1 tsp before eating · 2 of 3", icon: "spoon", img: "vitc" },
-    { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "100 mg · dose 1 of 3", icon: "capsule", img: "mag" },
+    { id: "vitc",  slot: "Before breakfast", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
+    { id: "vitc2", slot: "Lunch", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
+    { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" },
     { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
-    { id: "vitc3", slot: "Dinner", name: "Vitamin C", sub: "1 tsp before eating · 3 of 3", icon: "spoon", img: "vitc" },
-    { id: "mgdn",  slot: "Dinner", name: "Magnesium glycinate", sub: "100 mg · dose 2 of 3", icon: "capsule", img: "mag" },
-    { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "100 mg · dose 3 of 3", icon: "capsule", img: "mag" }
+    { id: "vitc3", slot: "Dinner", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
+    { id: "mgdn",  slot: "Dinner", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" },
+    { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" }
   ];
   const NIGHT = [
     { id: "n-gaba",  slot: "Bedtime", name: "GABA", sub: "1 pump · night before", icon: "pump" },
@@ -394,12 +395,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "s-cbd",     slot: "1 hour before", name: "CBD", sub: "1 pump", icon: "pump" },
     { id: "s-relax",   slot: "1 hour before", name: "Relax Milieu", sub: "1 pump", icon: "pump" },
     { id: "s-halcion", slot: "Also today", name: "Halcion", sub: "As directed by the office", icon: "tablet" },
-    { id: "s-intz",    slot: "Also today", name: "Intenzyme Forte", sub: "10 tablets · dose 1 of 5", icon: "tablet", img: "intz", pill: "Empty stomach" }
+    { id: "s-intz",    slot: "Also today", name: "Intenzyme Forte", sub: "10 tablets", icon: "tablet", img: "intz", pill: "Empty stomach", nth: [1, 5] }
   ];
   // 50-tablet bottle at 10 a dose = 5 doses: surgery day, day after, then Nov 5, 7, 9
   const INTZ_LAST_N = 21;
   const intzDose = (n) => ({ id: "intz", slot: "Between meals", name: "Intenzyme Forte", icon: "tablet", img: "intz",
-    sub: "10 tablets · " + (n === 15 ? "day after" : "every other day") + " · dose " + (2 + (n - 15) / 2) + " of 5" });
+    sub: "10 tablets", nth: [2 + (n - 15) / 2, 5] });
   const RECOVERY = [
     { id: "multi",  slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
     { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
@@ -465,7 +466,19 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: prodInfo(pk).name, base: it });
   }
-  const itemsFor = (n) => baseItemsFor(n).map(eff);
+  // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
+  // supplement taken more than once a day, in time order; Intenzyme's counts its 5-dose course instead.
+  function itemsFor(n) {
+    const items = baseItemsFor(n).map(eff), by = {};
+    items.forEach((it) => { (by[it.p] = by[it.p] || []).push(it); });
+    Object.keys(by).forEach((pk) => {
+      const g = by[pk];
+      if (g.length < 2) return;
+      g.slice().sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot)).forEach((it, i) => { it.nth = [i + 1, g.length]; });
+    });
+    return items;
+  }
+  const nthText = (it) => it.nth ? it.nth[0] + " of " + it.nth[1] : "";
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const special = (n) => n === NIGHT_N || n === SURG_N;
 
@@ -549,9 +562,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const at = ' data-k="' + k + '" data-n="' + n + '"';
     return '<div class="item' + (done ? ' done' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
-      '<span class="body"><span class="nm">' + esc(it.name) + '</span><span class="sb">' + esc(it.sub) + '</span>' +
+      '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') + '</span></button>' +
-      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + ', ' + it.sub) + '"' + at + '>' +
+      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
   // Each time of day is its own card. Once everything in it is taken it folds down to its header
@@ -731,7 +744,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
     // Supplement details first, then this dose (or row), as in the Edit sheet.
     const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
-      (dayCtx ? kv("Today", row.sub) + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
+      (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const foot = dayCtx ? '<div class="push-foot"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
       (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
@@ -975,7 +988,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(NIGHT, SURGERY, RECOVERY).forEach((it) => { BASE_ITEMS[it.id] = it; });
-  BASE_ITEMS.intz = Object.assign(intzDose(15), { sub: "10 tablets · (day and dose number vary)" });
+  BASE_ITEMS.intz = intzDose(15);
   const itemWhere = (id) => {
     const it = BASE_ITEMS[id];
     return it ? it.slot + (id.indexOf("n-") === 0 ? ", night before" : id.indexOf("s-") === 0 ? ", surgery day" : "") : "";
