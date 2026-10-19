@@ -1,0 +1,32 @@
+# Publishes each PR to GitHub Pages at /pr-preview/pr-<number>/ and removes it when the PR closes.
+# Previews are committed to main, which Pages serves: Settings → Pages → Deploy from a branch → main / (root).
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "oral-surgery-supplements/**"
+      - ".github/workflows/pr-preview.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# One run at a time across both Pages workflows, since they all write to main.
+concurrency: pages-main
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build preview
+        if: github.event.action != 'closed'
+        run: bash oral-surgery-supplements/web/build.sh _preview
+
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: _preview
+          preview-branch: main
