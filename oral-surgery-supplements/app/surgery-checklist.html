@@ -207,7 +207,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 .ef select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
 .ef input:focus,.ef textarea:focus,.ef select:focus{outline:none;border-color:var(--accent)}
-.es-foot{margin:12px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .es-reset{display:block;margin:14px auto 0;padding:10px 14px;border-radius:12px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 
 @media (prefers-reduced-motion: reduce){ .ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
@@ -754,21 +754,23 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
-    const mine = dayCtx
-      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
-        field("slot", "When", row.slot, { options: SLOTS }) + field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>'
-      : '<div class="es-sec">This row</div><div class="es-card">' + field("sub", "Schedule", row.sub) +
-        field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>';
+    // Each section says what its changes affect, under its own card.
     const prod = '<div class="es-sec">Supplement</div><div class="es-card">' + field("name", "Name", d.name, { required: true }) +
       field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
-      field("note", "Note", d.note || "", { long: true }) + '</div>';
+      field("note", "Note", d.note || "", { long: true }) + '</div>' +
+      '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
+    const mine = dayCtx
+      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
+        field("slot", "When", row.slot, { options: SLOTS }) + field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
+        '<p class="es-note">Changes here apply to this dose on every day.</p>'
+      : '<div class="es-sec">This row</div><div class="es-card">' + field("sub", "Schedule", row.sub) +
+        field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
+        '<p class="es-note">Changes here apply only to this row on the Supplements tab.</p>';
     return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
       '<div class="es-tt"><div id="es-t">Edit</div><div class="es-st">' + esc(row.name) + '</div></div>' +
       '<button type="submit" form="es-form" class="es-btn es-save" data-save disabled>Save</button></div>' +
-      '<div class="es-b"><form id="es-form" novalidate>' + mine + prod +
-      '<p class="es-foot">' + (dayCtx ? "Dose changes apply to this dose on every day." : "Schedule changes apply to this row.") +
-      ' Supplement changes apply everywhere it appears.</p>' +
+      '<div class="es-b"><form id="es-form" novalidate>' + prod + mine +
       '<button type="button" class="es-reset" data-reset>Restore original</button></form></div>';
   }
   const formValues = () => { const f = document.getElementById("es-form"); return f ? JSON.stringify(Array.from(new FormData(f).entries())) : ""; };
