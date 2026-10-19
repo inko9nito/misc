@@ -613,8 +613,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const d = prodInfo(row.p);
     const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
-    const rows = (dayCtx ? kv("Today", row.sub) + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub)) +
-      kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". "));
+    // Supplement details first, then this dose (or row), as in the Edit sheet.
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
+      (dayCtx ? kv("Today", row.sub) + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const foot = dayCtx ? '<div class="push-foot"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
       (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
