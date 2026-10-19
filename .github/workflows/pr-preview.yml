@@ -13,8 +13,8 @@ permissions:
   contents: write
   pull-requests: write
 
-# One run at a time, since every PR writes to main.
-concurrency: pr-preview
+# One run at a time across both Pages workflows, since they all write to main.
+concurrency: pages-main
 
 jobs:
   preview:
@@ -24,17 +24,7 @@ jobs:
 
       - name: Build preview
         if: github.event.action != 'closed'
-        run: |
-          mkdir -p _preview
-          # The app file has no <head>: claude.ai adds one when it publishes. Add it here so phones get the viewport tag.
-          {
-            echo '<!doctype html><html lang="en"><head><meta charset="utf-8">'
-            echo '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
-            echo '</head><body>'
-            cat oral-surgery-supplements/app/surgery-checklist.html
-            echo '</body></html>'
-          } > _preview/index.html
-          cp -r oral-surgery-supplements/print _preview/print
+        run: bash oral-surgery-supplements/web/build.sh _preview
 
       - uses: rossjrw/pr-preview-action@v1
         with:

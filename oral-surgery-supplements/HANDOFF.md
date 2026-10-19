@@ -22,6 +22,7 @@ Ground rules from the user: **no prices and no appointment time** anywhere. Sent
 |---|---|
 | Live tracker (private claude.ai artifact, version 5) | https://claude.ai/artifact/KsLmVdpucy41jiiH6B1jhY |
 | Tracker source | `app/surgery-checklist.html` (one file; CSS, JS and base64 WebP images inline) |
+| Home Screen app (GitHub Pages) | https://inko9nito.github.io/misc/surgery/ once merged to main; PR previews at `/misc/pr-preview/pr-<n>/`. Source in `web/`. |
 | Print source and PDF | `print/checklist.html` → `print/Surgery-Supplement-Checklist.pdf` |
 | Unused empty Design canvas (doesn't open in the iOS Claude app) | https://claude.ai/artifact/4YQ4D5DCp1WAxjCmfPRnXy — safe to delete if the user agrees |
 | Product photos (originals) | Not in the repo (they show hands). Put new ones in `thumbnails/source-photos/`, which is gitignored. |
@@ -86,6 +87,15 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 - One self-contained file. Stylesheets only from Google Fonts. Scripts only from allowlisted CDNs (none are used). Images as data URIs.
 - No `alert`/`confirm`/`print`. Keep the `<meta name="claude:viewport-fit-sides" content="cover">` + `max(16px, env(safe-area-inset-*))` gutters and the safe-area padding on the fixed bottom bar.
 - Light and dark themes are defined as tokens on `:root`, with the dark block under `prefers-color-scheme` and again under `[data-theme="dark"]`.
+
+## Home Screen app (GitHub Pages)
+
+The same app file, served from GitHub Pages so it can be added to the iPhone Home Screen with its own icon.
+
+- `web/build.sh <out>` wraps `app/surgery-checklist.html` in `web/head.html` (viewport, safe-area padding that claude.ai normally adds, manifest, icons, launch images) and copies the images and `print/`.
+- `web/generate.mjs` renders the icons from `web/icon.svg` and the launch images (app background, light and dark) from `web/devices.json`, and writes the launch `<link>`s into `head.html`. Re-run it after changing either file.
+- Workflows: `.github/workflows/pr-preview.yml` builds each PR to `main:pr-preview/pr-<n>/`; `.github/workflows/pages.yml` builds main to `main:surgery/`. Pages serves `main` / root.
+- Off claude.ai there's no `window.claude`, so checkmarks save to `localStorage` only. iOS keeps the Home Screen app's storage separate from Safari's, and a different URL is a different app, so install from `/misc/surgery/`, not a PR preview.
 
 ## Design direction (the user's feedback, in order)
 

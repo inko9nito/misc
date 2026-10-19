@@ -1,0 +1,35 @@
+# Publishes the tracker to GitHub Pages at /surgery/ whenever main changes it.
+# This is the stable address for the Home Screen app; PR previews come and go.
+# Pages serves main, so the built site is committed to main's surgery/ folder.
+name: Publish tracker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "oral-surgery-supplements/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+# Shared with the PR preview workflow, since both write to main.
+concurrency: pages-main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build
+        run: bash oral-surgery-supplements/web/build.sh _site
+
+      # Commits made with the workflow token don't start workflows, so this can't loop.
+      - uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: main
+          folder: _site
+          target-folder: surgery
+          commit-message: Publish tracker to /surgery/
