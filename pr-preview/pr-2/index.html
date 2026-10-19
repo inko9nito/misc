@@ -578,7 +578,7 @@ html.push-open .push-dim{opacity:.1}
   /* ---------- Details page (pushed from the right) ---------- */
   const push = document.getElementById("push");
   const BACK = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>';
-  let detailFor = null, opener = null, pushedState = false, closingByUs = false;   // detailFor: { k, n } when opened from a day
+  let detailFor = null, detailRoute = "", opener = null;   // detailFor: { k, n } when opened from a day
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
   function toggle(k, n) {
@@ -614,94 +614,98 @@ html.push-open .push-dim{opacity:.1}
     window.scrollTo(0, lockY);
   }
 
-  function openDetail(row, dayCtx, from) {
-    detailFor = dayCtx; opener = from;
-    push.innerHTML = detailHTML(row, dayCtx);
+  // Each details page is its own history entry (#d/<day>/<id> or #s/<row>), as the HPDE app's pages
+  // are: Safari's swipe back then slides the list back in by itself, and Back steps back through history.
+  // Inside claude.ai's frame there's no history to use, so it just opens and closes.
+  const useHistory = !inFrame;
+  function routeOf(row, dayCtx) {
+    if (dayCtx) return "#d/" + dayCtx.n + "/" + dayCtx.k.split(":")[1];
+    const i = suppRows.indexOf(row);
+    return i >= 0 ? "#s/" + i : "";
+  }
+  function fromRoute(hash) {
+    let m = /^#d\/(\d+)\/([\w-]+)$/.exec(hash);
+    if (m) {
+      const n = +m[1], it = itemsFor(n).find((x) => x.id === m[2]);
+      return it ? { row: it, dayCtx: { k: key(n, it), n: n } } : null;
+    }
+    m = /^#s\/(\d+)$/.exec(hash);
+    return m && suppRows[+m[1]] ? { row: suppRows[+m[1]], dayCtx: null } : null;
+  }
+  // A details link left in the address bar from before a reload has no list behind it to go back to.
+  if (useHistory && /^#[ds]\//.test(location.hash)) history.replaceState(history.state, "", location.pathname + location.search);
+
+  // instant: the browser already slid the pages across itself (a swipe back or forward), so
+  // the page appears or goes in place rather than sliding a second time.
+  function instantly(fn) {
+    const els = [push, dim].concat(under());
+    els.forEach((el) => { el.style.transition = "none"; });
+    fn();
+    void push.offsetWidth;
+    els.forEach((el) => { el.style.transition = ""; });
+  }
+  function showDetail(r, from, instant) {
+    detailFor = r.dayCtx; detailRoute = routeOf(r.row, r.dayCtx); opener = from || null;
+    push.innerHTML = detailHTML(r.row, r.dayCtx);
     push.hidden = false; push.scrollTop = 0;
     lockScroll();
-    // A history entry, so Safari's swipe back and the browser's Back close it (not inside claude.ai's frame).
-    if (!inFrame) { try { history.pushState({ detail: true }, ""); pushedState = true; } catch (e) { pushedState = false; } }
-    void push.offsetWidth;   // start from off-screen so the slide runs
-    push.classList.add("on");
-    document.documentElement.classList.add("push-open");
+    const go = () => { push.classList.add("on"); document.documentElement.classList.add("push-open"); };
+    if (instant) instantly(go); else { void push.offsetWidth; go(); }   // from off-screen, so the slide runs
     push.focus({ preventScroll: true });
   }
-  function finishClose() {
-    if (push.classList.contains("on")) return;
-    push.hidden = true; push.innerHTML = "";
-    push.style.transition = push.style.transform = "";
-  }
-  // instant: the browser already animated it away (Safari's swipe back).
-  function closeDetail(instant) {
-    if (push.hidden || !push.classList.contains("on")) return;
-    if (pushedState && !instant) { closingByUs = true; history.back(); }
-    pushedState = false;
-    const ctx = detailFor; let back = opener; detailFor = opener = null;
-    if (instant) push.style.transition = "none";
-    push.classList.remove("on");
-    document.documentElement.classList.remove("push-open");
+  function hideDetail(instant) {
+    if (push.hidden) return;
+    const ctx = detailFor; let back = opener; detailFor = opener = null; detailRoute = "";
+    const go = () => { push.classList.remove("on"); document.documentElement.classList.remove("push-open"); };
+    if (instant) instantly(go); else go();
     unlockScroll();
     if (instant) finishClose(); else setTimeout(finishClose, 520);
     // Hand focus back for keyboard users only; after a tap it would leave a focus ring on the row.
     if (back && !back.isConnected && ctx) back = document.querySelector('.open[data-k="' + ctx.k + '"]');
     if (usingKeys && back && back.isConnected) back.focus({ preventScroll: true });
   }
-  window.addEventListener("popstate", () => {
-    if (closingByUs) { closingByUs = false; return; }
-    if (!push.hidden && push.classList.contains("on")) { pushedState = false; closeDetail(true); }
+  function finishClose() {
+    if (push.classList.contains("on")) return;
+    push.hidden = true; push.innerHTML = "";
+  }
+  function openDetail(row, dayCtx, from) {
+    const route = routeOf(row, dayCtx);
+    if (!useHistory || !route) { showDetail({ row: row, dayCtx: dayCtx }, from, false); return; }
+    opener = from;
+    location.hash = route;   // hashchange shows it
+  }
+  function closeDetail() {
+    if (push.hidden || !push.classList.contains("on")) return;
+    if (useHistory && detailRoute && location.hash === detailRoute) history.back();   // hashchange hides it
+    else hideDetail(false);
+  }
+  // A history move fires popstate, then hashchange. hasUAVisualTransition says Safari already animated it.
+  let swiped = false;
+  window.addEventListener("popstate", (e) => { swiped = e.hasUAVisualTransition === true; });
+  window.addEventListener("hashchange", () => {
+    if (!useHistory) return;
+    const r = fromRoute(location.hash), instant = swiped; swiped = false;
+    const isOpen = !push.hidden && push.classList.contains("on");
+    if (r && !isOpen) showDetail(r, opener, instant);
+    else if (r && isOpen) { detailFor = r.dayCtx; detailRoute = location.hash; push.innerHTML = detailHTML(r.row, r.dayCtx); }
+    else if (!r && isOpen) hideDetail(instant);
   });
   push.addEventListener("scroll", () => {
     const h = push.querySelector(".push-h"), t = push.querySelector(".sh-t");
     if (h && t) h.classList.toggle("scrolled", t.getBoundingClientRect().bottom < h.getBoundingClientRect().bottom);
   }, { passive: true });
 
-  // Swipe right anywhere on the page to go back, following the finger, as on iOS.
   const under = () => [document.querySelector(".wrap"), document.querySelector(".bar")];
   const dim = document.querySelector(".push-dim");
-  let sw = null;
-  push.addEventListener("touchstart", (e) => {
-    if (e.touches.length !== 1 || !push.classList.contains("on")) { sw = null; return; }
-    const t = e.touches[0];
-    sw = { x: t.clientX, y: t.clientY, dx: 0, v: 0, px: t.clientX, pt: e.timeStamp, horiz: null, w: push.clientWidth };
-  }, { passive: true });
-  push.addEventListener("touchmove", (e) => {
-    if (!sw) return;
-    const t = e.touches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y;
-    if (sw.horiz === null) {
-      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-      sw.horiz = dx > 0 && Math.abs(dx) > Math.abs(dy) * 1.2;
-      if (!sw.horiz) { sw = null; return; }
-      [push, dim].concat(under()).forEach((el) => { el.style.transition = "none"; });
-    }
-    e.preventDefault();
-    sw.dx = Math.max(0, dx);
-    // Finger speed in px/ms, smoothed over the last few moves: a flick closes it even when short.
-    const v = (t.clientX - sw.px) / Math.max(1, e.timeStamp - sw.pt);
-    sw.v = 0.6 * v + 0.4 * sw.v; sw.px = t.clientX; sw.pt = e.timeStamp;
-    const f = sw.dx / sw.w;
-    push.style.transform = "translateX(" + sw.dx + "px)";
-    dim.style.opacity = String(0.1 * (1 - f));
-    under().forEach((el) => { el.style.transform = "translateX(" + (-30 * (1 - f)) + "%)"; });
-  }, { passive: false });
-  function endSwipe() {
-    if (!sw || !sw.horiz) { sw = null; return; }
-    const go = sw.v > 0.5 || sw.dx > sw.w * 0.35;
-    sw = null;
-    // Hand back to the CSS transitions, from where the finger left it.
-    [push, dim].concat(under()).forEach((el) => { el.style.transition = ""; el.style.transform = ""; el.style.opacity = ""; });
-    if (go) closeDetail(false);
-  }
-  push.addEventListener("touchend", endSwipe);
-  push.addEventListener("touchcancel", endSwipe);
 
   let usingKeys = false;
   document.addEventListener("pointerdown", () => { usingKeys = false; }, true);
-  document.addEventListener("keydown", (e) => { usingKeys = true; if (e.key === "Escape") closeDetail(false); });
+  document.addEventListener("keydown", (e) => { usingKeys = true; if (e.key === "Escape") closeDetail(); });
 
   /* ---------- Events ---------- */
   document.addEventListener("click", (e) => {
-    if (e.target.closest("[data-back]")) { closeDetail(false); return; }
-    if (e.target.closest("[data-mark]")) { if (detailFor) toggle(detailFor.k, detailFor.n); closeDetail(false); return; }
+    if (e.target.closest("[data-back]")) { closeDetail(); return; }
+    if (e.target.closest("[data-mark]")) { if (detailFor) toggle(detailFor.k, detailFor.n); closeDetail(); return; }
     const t = e.target.closest(".tab, .tick, .open, .d");
     if (!t) return;
     if (t.classList.contains("tab")) { showView(t.dataset.view); return; }
