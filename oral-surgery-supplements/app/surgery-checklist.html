@@ -84,6 +84,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .lbl{font-size:15px;color:var(--muted)}
 
 #day{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.app-foot{display:flex;justify-content:center;margin-top:18px}
+.refresh{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:12px;font-size:13px;font-weight:500;color:var(--muted)}
+.refresh:active{background:var(--band)}
+.refresh svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.refresh.busy svg{animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .sec-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .sec-h{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted)}
 .sec-h:disabled{cursor:default;color:var(--muted)}
@@ -235,6 +241,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   </section>
   <section id="v-supps" aria-label="Supplements" hidden></section>
   <section id="v-progress" aria-label="Progress" hidden></section>
+  <!-- A Home Screen app can't pull to refresh, so this reloads it. -->
+  <footer class="app-foot"><button type="button" class="refresh" data-refresh>
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.6"/><path d="M20 4v7h-7"/></svg>Refresh</button></footer>
 </div>
 
 <nav class="bar" aria-label="Views">
@@ -303,7 +312,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // slot = the divider an item sits under; dividers show on days with more than one slot.
   // Times follow the bottle labels: the Quicksilver products (D3K2, B12, vitamin C) on an empty stomach,
   // held in the mouth, with vitamin C split before each meal; PhytoMulti (iron) and Bone Builder (calcium)
-  // with food and at different meals, since calcium blocks iron; magnesium glycinate's second dose at bedtime;
+  // with food and at different meals, since calcium blocks iron; magnesium glycinate 3 times a day, away from the iron at breakfast;
   // Intenzyme between meals so it isn't spent digesting food.
   const SLOTS = ["Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Anytime", "1 hour before", "Also today"];
   const BEFORE = [
@@ -313,10 +322,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "biod",  slot: "Breakfast", name: "Bio-D-Mulsion Forte", sub: "2 drops · 4,000 IU", icon: "drops", img: "biod" },
     { id: "vitc",  slot: "Before breakfast", name: "Vitamin C", sub: "1 tsp · dose 1 of 3", icon: "spoon", img: "vitc" },
     { id: "vitc2", slot: "Lunch", name: "Vitamin C", sub: "1 tsp before eating · 2 of 3", icon: "spoon", img: "vitc" },
-    { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "300 µg · dose 1 of 2", icon: "capsule", img: "mag" },
+    { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "100 mg · dose 1 of 3", icon: "capsule", img: "mag" },
     { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
     { id: "vitc3", slot: "Dinner", name: "Vitamin C", sub: "1 tsp before eating · 3 of 3", icon: "spoon", img: "vitc" },
-    { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "300 µg · dose 2 of 2", icon: "capsule", img: "mag" }
+    { id: "mgdn",  slot: "Dinner", name: "Magnesium glycinate", sub: "100 mg · dose 2 of 3", icon: "capsule", img: "mag" },
+    { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "100 mg · dose 3 of 3", icon: "capsule", img: "mag" }
   ];
   const NIGHT = [
     { id: "n-gaba",  slot: "Bedtime", name: "GABA", sub: "1 pump · night before", icon: "pump" },
@@ -350,7 +360,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "PhytoMulti": { brand: "Metagenics · multivitamin with iron", how: "With breakfast. Not with Bone Builder: its calcium blocks iron.", label: "1–2 tablets once a day with food. 2 tablets have 18 mg iron and 1,000 IU vitamin D." },
     "Bio-D-Mulsion Forte": { brand: "Biotics Research · emulsified vitamin D3", how: "With breakfast. Vitamin D absorbs better with some fat.", label: "2 drops = 4,000 IU.", note: "Not on the office sheet." },
     "Vitamin C": { brand: "Quicksilver Scientific · liposomal, 4 fl oz", how: "Empty stomach, at least 10 minutes before each meal. Hold in your mouth 30 seconds, then swallow.", label: "1 tsp (5 mL) = 1,000 mg vitamin C and 125 mg sodium. 24 tsp a bottle.", why: "Split into 3 because smaller doses absorb better.", note: "The sheet says 3 tsp (3.5 g); 3 tsp of this bottle is 3 g. Refrigerate after opening and use within 60 days." },
-    "Magnesium glycinate": { brand: "Metagenics · 120 tablets", how: "Lunch and bedtime. Glycinate can help you sleep.", label: "100 mg per tablet.", note: "Sheet says 300 ug twice a day, likely mg. Confirm tablets per dose with the office." },
+    "Magnesium glycinate": { brand: "Metagenics · 120 tablets", how: "1 tablet at lunch, dinner and bedtime. Not with breakfast, which has the iron. Glycinate can help you sleep.", label: "100 mg per tablet, 1 tablet 3 times a day." },
     "Bone Builder Plus": { brand: "Metagenics · 90 capsules", how: "With dinner. Not with PhytoMulti: calcium blocks iron.", label: "2 capsules once a day: 420 mg calcium, 2,000 IU vitamin D.", why: "Helps bone grow back after the extraction." },
     "GABA": { brand: "Pump bottle", how: PUMP3 },
     "CBD": { brand: "Pump bottle", how: PUMP3 },
@@ -378,7 +388,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver" };
   const PNAME = {}, PDETAILS = {};
   Object.keys(NAME2P).forEach((nm) => { PNAME[NAME2P[nm]] = nm; PDETAILS[NAME2P[nm]] = DETAILS[nm] || {}; });
-  const prodOf = (id) => ({ vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgpm: "mag" })[id] || id.replace(/^[ns]-/, "");
+  const prodOf = (id) => ({ vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgdn: "mag", mgpm: "mag" })[id] || id.replace(/^[ns]-/, "");
   // What's been changed, over the defaults above: p = a supplement's fields, i = one dose's (by item id, on
   // every day it appears), s = one Supplements row's. A field that's present overrides, even when empty.
   const LSE = "surgery-tracker-edits-v1";
@@ -578,7 +588,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("before", "capsule", "PhytoMulti", "Once a day, with breakfast", "Not with Bone Builder"),
         infoRow("before", "drops", "Bio-D-Mulsion Forte", "2 drops (4,000 IU) with breakfast", "From the bottle label"),
         infoRow("before", "spoon", "Vitamin C", "1 tsp before each meal, 3 a day", "Hold in mouth 30 sec"),
-        infoRow("before", "capsule", "Magnesium glycinate", "300 µg at lunch and bedtime", "Sheet says ug, likely mg"),
+        infoRow("before", "capsule", "Magnesium glycinate", "100 mg at lunch, dinner and bedtime"),
         infoRow("before", "capsule", "Bone Builder Plus", "2 capsules with dinner", "Not with PhytoMulti")
       ]) +
       grp("Night before", fLong(dateOf(NIGHT_N)), [
@@ -940,6 +950,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   /* ---------- Events ---------- */
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-today]")) { goToday(); return; }
+    const rf = e.target.closest("[data-refresh]");
+    if (rf) {
+      // Fetch the page past the browser's cache first (GitHub Pages lets it keep a copy for 10 minutes), then reload.
+      rf.classList.add("busy"); rf.disabled = true;
+      const reload = () => location.reload();
+      try { fetch(location.pathname + location.search, { cache: "reload" }).then(reload, reload); } catch (err) { reload(); }
+      return;
+    }
     const sec = e.target.closest("[data-sec-toggle]");
     if (sec) { if (!sec.disabled) toggleSection(sec.dataset.secToggle); return; }
     if (e.target.closest("[data-edit]")) { openEdit(); return; }

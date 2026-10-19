@@ -43,7 +43,7 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 | PhytoMulti with iron (Metagenics, 60 tablets) | Prep and recovery, with breakfast | Once a day | Label: 1–2 tablets once daily with food; 2 tablets = 1,000 IU vitamin D + 18 mg iron. Kept apart from Bone Builder (calcium reduces iron absorption; usual advice is 2 h apart). Vitamin C just before breakfast helps iron. |
 | Bio-D-Mulsion Forte (Biotics Research) | Prep, with breakfast | 2 drops (4,000 IU) | **Not on the office sheet.** Added at the user's request using the label serving size (2 drops = 100 mcg / 4,000 IU). Vitamin D absorbs better with a fat-containing meal (Dawson-Hughes 2015: +32% peak). |
 | Vitamin C (Quicksilver Scientific liposomal, 4 fl oz) | Prep, 1 tsp 10 min before each meal | 3 tsp/day | Label: 1 tsp (5 mL) = 1,000 mg (sodium ascorbate) + 125 mg sodium; 24 tsp a bottle; empty stomach, 10+ min before meals, hold 30–90 sec, repeat to desired dose; refrigerate, use within 60 days of opening. Split in 3 because absorption saturates at high doses. See open question 6. |
-| Magnesium glycinate (Metagenics, 120 tablets) | Prep, lunch + bedtime | "300ug" twice daily | Almost certainly mg. US label: 100 mg per tablet, 1 tablet 3×/day. Bedtime because glycinate is calming; lunch rather than breakfast or dinner to stay apart from the iron and calcium. See open question 2. |
+| Magnesium glycinate (Metagenics, 120 tablets) | Prep, lunch + dinner + bedtime | 100 mg (1 tablet) 3 times a day | Set by the user, matching the US label (100 mg per tablet, 1 tablet 3×/day). The office sheet said "300ug" twice daily. Kept off breakfast, which has PhytoMulti's iron. Items `mgam`, `mgdn`, `mgpm`. |
 | Bone Builder Plus (Metagenics, 90 caps) | Start ASAP; daily in prep and recovery, with dinner | 2 capsules (label) | US label: 2 capsules once daily = 420 mg calcium (MCHC) + 2,000 IU vitamin D. Sheet: "start as soon as possible… helps bone growth after surgery." Continuing after surgery is inferred. |
 | GABA, CBD, Relax Milieu (blue bottle) | Night before (bedtime) **and** 1 hour before surgery | 1 pump each | |
 | Halcion (prescription) | Surgery day | As directed by the office | Office calls it in. |
@@ -57,7 +57,7 @@ App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Betwee
 ### Open questions (don't resolve these by guessing)
 
 1. **Vitamin D total.** The sheet says D3K2 at 20,000 IU/day, and the user also has Bio-D-Mulsion. It's unknown whether Bio-D counts toward the 20,000 or is in addition to it. Bone Builder Plus (2,000 IU per 2 caps) and PhytoMulti (1,000 IU per 2 tablets) also contain vitamin D, so as listed the daily total is about 27,000 IU. The app lists each separately.
-2. **Magnesium unit and tablet count** (µg vs mg; tablets per dose). If it's 300 mg twice daily, that's 3 tablets a dose and 600 mg a day, twice the label's 300 mg a day and above the 350 mg/day upper limit for supplemental magnesium.
+2. ~~Magnesium unit and tablet count~~ Resolved by the user: 100 mg, 3 times a day.
 3. **Whether D3K2, vitamin C, magnesium and B12 continue after surgery.** The sheet only says "2 weeks before." The app's Supplements view tells the user to ask the office.
 4. **CBD with Halcion.** CBD inhibits CYP3A4, which metabolizes triazolam (Halcion) and can increase sedation. Already flagged to the user as something to confirm with the office. Don't add medical advice to the UI.
 5. How long the recovery tinctures last ("until empty"). The app shows them daily through Nov 22.
@@ -70,6 +70,7 @@ App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Betwee
 - **Edit** (top right of a details page): a page sheet slides up from the bottom, as HPDE's Edit details does. It stops below the status bar, the details page shrinks into a dimmed card on black, and it has Cancel, title and Save (disabled until something changes) across the top. It closes by dragging down from its toolbar (or from the form once scrolled to the top), with Cancel, or with back; it's a history entry of its own (`.../edit`). Fields: *Supplement* first (Name, Brand, How to take it, Label, Why, Note), then *This dose* (Dose, When, Reminder; from Today) or *This row* (Schedule, Reminder; from Supplements). Each section has its own note under its card saying what its changes affect. Restore original refills the defaults, and Save then clears the override. Edits are stored as overrides (`EDITS = { p: by product key, i: by item id, s: by Supplements row }`) in `localStorage` key `surgery-tracker-edits-v1`, and on claude.ai in the `tracker/edits` db doc. All shown text is HTML-escaped.
 - **Supplements**: the full protocol by phase (2 weeks before / Night before / Surgery day / Recovery) with dates and notes. This replaces the paper sheet. Its rows open the same details page, without the mark button.
 - **Progress**: "X / Y doses so far" plus a 5-week ring calendar. Tapping a day opens it in Today.
+- A subtle Refresh button sits at the bottom of every tab, because the Home Screen app can't pull to refresh. It re-fetches the page with `cache: "reload"` (GitHub Pages lets browsers cache it for 10 minutes), then reloads.
 - Bottom bar: Today / Supplements / Progress.
 
 ### Schedule model
@@ -136,6 +137,6 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - **Out of date versus the app**: it predates Bio-D-Mulsion, the 50-tablet Intenzyme schedule (it shows 8 every-other-day boxes), the real product names and the dose dividers. If the user wants a new print, generate it from the same data as the app.
 
 ## Suggested next steps
-- Get answers to the open questions from the user or the office, then update the D3K2 row (for example, "8 pumps") and the magnesium unit.
+- Get answers to the open questions from the user or the office, then update the D3K2 row (for example, "8 pumps").
 - Pull the item data into one shared JSON so the app and the print version can't drift.
 - Add photos for the remaining items if the user sends them.
