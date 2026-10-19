@@ -65,8 +65,8 @@ App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Betwee
 ## The app (`app/surgery-checklist.html`)
 
 ### Structure
-- **Today** (default): surgery countdown card → swipeable week strip with progress rings (5 weeks, scroll-snap, dots below) → date line with phase ("Prep day 3 of 14", "Night before surgery", "Surgery day", "Recovery day 4") → "2 / 8 done today" counter → **To do** and **Done** lists. Tapping a row toggles it and moves it between the lists.
-- **Supplements**: the full protocol by phase (2 weeks before / Night before / Surgery day / Recovery) with dates and notes. This replaces the paper sheet.
+- **Today** (default): surgery countdown card → swipeable week strip with progress rings (5 weeks, scroll-snap, dots below) → date line with phase ("Prep day 3 of 14", "Night before surgery", "Surgery day", "Recovery day 4") → "2 / 8 done today" counter → **To do** and **Done** lists. Tapping the circle marks a dose taken and moves it between the lists. Tapping anywhere else on the row opens a details sheet: a large photo (`IMG_L`), today's dose and time, how to take it, label facts and notes (`DETAILS`, keyed by name), and a "Mark as taken" button. The user asked for this split after tapping rows by accident when they wanted details.
+- **Supplements**: the full protocol by phase (2 weeks before / Night before / Surgery day / Recovery) with dates and notes. This replaces the paper sheet. Its rows open the same details sheet, without the mark button.
 - **Progress**: "X / Y doses so far" plus a 5-week ring calendar. Tapping a day opens it in Today.
 - Bottom bar: Today / Supplements / Progress.
 
@@ -123,7 +123,7 @@ Photos are of a hand holding each bottle on a white counter, with fingers wrappe
    - On white bottles (`intz`, `biod`, `silver`) it treats any warm saturated pixel as hand. `silver` also has a loose bounding box to drop the palm.
    - Straightens the bottle from its clean left edge and builds a **symmetric silhouette** around the bottle axis. Half-width is the narrower clean side, and straight body sides come from a line fit. The real top 14% is kept so the D3K2 pump spout survives.
    - Fills pixels hidden by fingers from their mirror twin across the axis, with inpainting for the rest. Feathers the edge and crops.
-3. `3_export.py`: 180-px WebP data URIs → the `IMG` map in the app (about 5–7 KB each).
+3. `3_export.py`: WebP data URIs → the app's `IMG` map (180 px, about 5–7 KB each) and `IMG_L` map (420 px, for the details sheet).
 
 Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`, `b12`. `multi` and `b12` came from retailer product shots on a plain background, cut out with `4_product_shots.py` instead of steps 1–2. Items with no photo yet (Vitamin C, GABA, CBD, Relax Milieu, Halcion) use stroke icons. The user may send more photos. Run them through the same pipeline and check edges on light and dark tiles.
 
