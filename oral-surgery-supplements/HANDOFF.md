@@ -40,9 +40,9 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 |---|---|---|---|
 | D3K2 (Quicksilver Scientific nanoemulsion) | Prep, before breakfast | 20,000 IU/day, hold in mouth 30 sec | Label: 1 pump (0.5 mL) = 2,500 IU D3 + 90 mcg K2, so 20,000 IU = 8 pumps. Label directions: empty stomach, at least 10 min before meals, hold 30–90 sec; label dose is 1 pump 1–2×/day. See open question 1. |
 | Methyl-B12 (Quicksilver Scientific liposomal spray) | Prep, before breakfast | Per bottle, hold in mouth 30 sec | Label: 1–2 pumps (some listings 2), empty stomach, at least 10 min before meals. Replenishes B12 depleted by nitrous oxide. |
-| PhytoMulti with iron (Metagenics, 60 tablets) | Prep and recovery, with breakfast | Once a day | Label: 1–2 tablets once daily with food; 2 tablets = 1,000 IU vitamin D + 18 mg iron. Kept apart from Bone Builder (calcium reduces iron absorption; usual advice is 2 h apart). Vitamin C at the same meal helps iron. |
+| PhytoMulti with iron (Metagenics, 60 tablets) | Prep and recovery, with breakfast | Once a day | Label: 1–2 tablets once daily with food; 2 tablets = 1,000 IU vitamin D + 18 mg iron. Kept apart from Bone Builder (calcium reduces iron absorption; usual advice is 2 h apart). Vitamin C just before breakfast helps iron. |
 | Bio-D-Mulsion Forte (Biotics Research) | Prep, with breakfast | 2 drops (4,000 IU) | **Not on the office sheet.** Added at the user's request using the label serving size (2 drops = 100 mcg / 4,000 IU). Vitamin D absorbs better with a fat-containing meal (Dawson-Hughes 2015: +32% peak). |
-| Vitamin C, liposomal | Prep, 1 tsp with each meal | 3.5 g/day (3 tsp) | Split because intestinal absorption saturates at high doses and big single doses upset the stomach. Refrigerate after opening. |
+| Vitamin C (Quicksilver Scientific liposomal, 4 fl oz) | Prep, 1 tsp 10 min before each meal | 3 tsp/day | Label: 1 tsp (5 mL) = 1,000 mg (sodium ascorbate) + 125 mg sodium; 24 tsp a bottle; empty stomach, 10+ min before meals, hold 30–90 sec, repeat to desired dose; refrigerate, use within 60 days of opening. Split in 3 because absorption saturates at high doses. See open question 6. |
 | Magnesium glycinate (Metagenics, 120 tablets) | Prep, lunch + bedtime | "300ug" twice daily | Almost certainly mg. US label: 100 mg per tablet, 1 tablet 3×/day. Bedtime because glycinate is calming; lunch rather than breakfast or dinner to stay apart from the iron and calcium. See open question 2. |
 | Bone Builder Plus (Metagenics, 90 caps) | Start ASAP; daily in prep and recovery, with dinner | 2 capsules (label) | US label: 2 capsules once daily = 420 mg calcium (MCHC) + 2,000 IU vitamin D. Sheet: "start as soon as possible… helps bone growth after surgery." Continuing after surgery is inferred. |
 | GABA, CBD, Relax Milieu (blue bottle) | Night before (bedtime) **and** 1 hour before surgery | 1 pump each | |
@@ -61,6 +61,7 @@ App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Betwee
 3. **Whether D3K2, vitamin C, magnesium and B12 continue after surgery.** The sheet only says "2 weeks before." The app's Supplements view tells the user to ask the office.
 4. **CBD with Halcion.** CBD inhibits CYP3A4, which metabolizes triazolam (Halcion) and can increase sedation. Already flagged to the user as something to confirm with the office. Don't add medical advice to the UI.
 5. How long the recovery tinctures last ("until empty"). The app shows them daily through Nov 22.
+6. **Vitamin C grams.** The sheet says "3.5 g/day (3 tsp)", but this bottle is 1,000 mg per tsp, so 3 tsp = 3 g. The app follows the teaspoon count. At 3 tsp a day a 24-tsp bottle lasts 8 days, so the 14-day prep needs 2 bottles.
 
 ## The app (`app/surgery-checklist.html`)
 
@@ -125,7 +126,7 @@ Photos are of a hand holding each bottle on a white counter, with fingers wrappe
    - Fills pixels hidden by fingers from their mirror twin across the axis, with inpainting for the rest. Feathers the edge and crops.
 3. `3_export.py`: WebP data URIs → the app's `IMG` map (180 px, about 5–7 KB each) and `IMG_L` map (420 px, for the details sheet).
 
-Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`, `b12`. `multi` and `b12` came from retailer product shots on a plain background, cut out with `4_product_shots.py` instead of steps 1–2. Items with no photo yet (Vitamin C, GABA, CBD, Relax Milieu, Halcion) use stroke icons. The user may send more photos. Run them through the same pipeline and check edges on light and dark tiles.
+Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`, `b12`, `vitc`. `multi` and `b12` came from retailer product shots on a plain background, cut out with `4_product_shots.py` instead of steps 1–2. `vitc` too. Items with no photo yet (GABA, CBD, Relax Milieu, Halcion) use stroke icons. The user may send more photos. Run them through the same pipeline and check edges on light and dark tiles.
 
 ## Print checklist (`print/`)
 

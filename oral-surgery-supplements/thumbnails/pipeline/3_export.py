@@ -2,7 +2,7 @@
 # IMG (180 px, list thumbnails) and IMG_L (420 px, the details sheet) in the app.
 from PIL import Image
 import base64, io, json
-names = ["mag","bone","d3k2","lymph","drain","silver","intz","biod","multi","b12"]
+names = ["mag","bone","d3k2","lymph","drain","silver","intz","biod","multi","b12","vitc"]
 def uri(n, size, q):
     im = Image.open(f"cut_{n}.png").convert("RGBA")
     im.thumbnail((size, size), Image.LANCZOS)
