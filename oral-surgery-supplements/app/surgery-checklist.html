@@ -323,8 +323,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Intenzyme between meals so it isn't spent digesting food.
   const SLOTS = ["Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Anytime", "1 hour before", "Also today"];
   const BEFORE = [
-    { id: "d3k2",  slot: "Before breakfast", name: "D3K2", sub: "20,000 IU · hold 30 sec", icon: "capsule", img: "d3k2" },
-    { id: "b12",   slot: "Before breakfast", name: "Methyl-B12", sub: "Per bottle · hold 30 sec", icon: "pump", img: "b12" },
+    { id: "d3k2",  slot: "Before breakfast", name: "D3K2", sub: "8 pumps · hold 30 sec", icon: "capsule", img: "d3k2" },
+    { id: "b12",   slot: "Before breakfast", name: "Methyl-B12", sub: "2 pumps · hold 30 sec", icon: "pump", img: "b12" },
     { id: "multi", slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
     { id: "biod",  slot: "Breakfast", name: "Bio-D-Mulsion Forte", sub: "2 drops · 4,000 IU", icon: "drops", img: "biod" },
     { id: "vitc",  slot: "Before breakfast", name: "Vitamin C", sub: "1 tsp · dose 1 of 3", icon: "spoon", img: "vitc" },
@@ -592,8 +592,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     document.getElementById("v-supps").innerHTML =
       '<h1 class="vt">Supplements</h1>' +
       grp("2 weeks before", fShort(DAY1) + " – " + fShort(dateOf(NIGHT_N)), [
-        infoRow("before", "capsule", "D3K2", "20,000 IU before breakfast", "Hold in mouth 30 sec"),
-        infoRow("before", "pump", "Methyl-B12", "Per bottle, before breakfast", "Hold in mouth 30 sec"),
+        infoRow("before", "capsule", "D3K2", "8 pumps (20,000 IU) before breakfast", "Hold in mouth 30 sec"),
+        infoRow("before", "pump", "Methyl-B12", "2 pumps before breakfast", "Hold in mouth 30 sec"),
         infoRow("before", "capsule", "PhytoMulti", "Once a day, with breakfast", "Not with Bone Builder"),
         infoRow("before", "drops", "Bio-D-Mulsion Forte", "2 drops (4,000 IU) with breakfast", "From the bottle label"),
         infoRow("before", "spoon", "Vitamin C", "1 tsp before each meal, 3 a day", "Hold in mouth 30 sec"),
