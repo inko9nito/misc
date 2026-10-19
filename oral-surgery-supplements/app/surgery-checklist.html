@@ -145,14 +145,15 @@ html.push-open .wrap,html.push-open .bar{transform:translateX(-30%)}
 .push-dim{position:fixed;inset:0;z-index:39;background:#000;opacity:0;pointer-events:none;transition:opacity 500ms var(--push-ease)}
 html.push-open .push-dim{opacity:.1}
 .push{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
-  transform:translateX(100%);transition:transform 500ms var(--push-ease);box-shadow:-8px 0 32px -8px rgba(0,0,0,.18)}
+  transform:translateX(100%);transition:transform 500ms var(--push-ease),border-radius 500ms var(--push-ease);box-shadow:-8px 0 32px -8px rgba(0,0,0,.18)}
 .push.on{transform:none}
 .push:focus{outline:none}
 .push-in{min-height:100%;display:flex;flex-direction:column;max-width:520px;margin:0 auto}
-.push-h{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:44px 1fr 44px;align-items:center;
+.push-h{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:64px 1fr 64px;align-items:center;
   padding:env(safe-area-inset-top,0px) max(6px,env(safe-area-inset-right,0px)) 0 max(6px,env(safe-area-inset-left,0px));min-height:calc(48px + env(safe-area-inset-top,0px));
   background:var(--bg);border-bottom:1px solid transparent;transition:border-color .15s}
 .push-h.scrolled{border-bottom-color:var(--line)}
+.edit-btn{justify-self:end;min-width:44px;height:44px;padding:0 10px;border-radius:12px;font-size:16px;font-weight:600;color:var(--accent-ink);text-align:center}
 .back{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;color:var(--accent-ink)}
 .back svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.25;stroke-linecap:round;stroke-linejoin:round}
 .push-ht{text-align:center;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:0;transform:translateY(4px);transition:opacity .2s,transform .2s}
@@ -171,7 +172,45 @@ html.push-open .push-dim{opacity:.1}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
-@media (prefers-reduced-motion: reduce){ .ring .p,.chk,.wrap,.bar,.push,.push-dim{transition:none} }
+/* Edit sheet: slides up and stops below the status bar, as HPDE's page sheets do. The details page under it
+   shrinks back into a dimmed card on black (92%, 8px under the status bar). */
+html{transition:background-color 500ms cubic-bezier(.32,.6,.05,.98)}
+html.sheet-open{background:#000}
+html.sheet-open body{background:transparent}
+html.sheet-open .wrap,html.sheet-open .bar,html.sheet-open .push-dim{visibility:hidden}
+.push{transform-origin:50% 0}
+html.sheet-up .push{transform:translateY(calc(env(safe-area-inset-top,0px) + 8px)) scale(.92);border-radius:10.87px;overflow:hidden}
+.sheet-dim{position:fixed;inset:0;z-index:45;background:#000;opacity:0;pointer-events:none;transition:opacity 500ms var(--push-ease)}
+html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
+.esheet{position:fixed;left:0;right:0;bottom:0;top:calc(env(safe-area-inset-top,0px) + 18px);z-index:46;max-width:520px;margin:0 auto;
+  display:flex;flex-direction:column;background:var(--bg);border-radius:12px 12px 0 0;overflow:hidden;
+  transform:translateY(100%);transition:transform 500ms var(--push-ease);box-shadow:0 -8px 32px -8px rgba(0,0,0,.18)}
+.esheet.on{transform:none}
+.esheet:focus{outline:none}
+.es-h{flex:none;display:grid;grid-template-columns:minmax(76px,1fr) minmax(0,max-content) minmax(76px,1fr);align-items:center;gap:8px;
+  height:56px;padding:0 8px;background:var(--card);border-bottom:1px solid var(--line)}
+.es-btn{justify-self:start;padding:8px;border-radius:10px;font-size:17px;color:var(--accent-ink)}
+.es-save{justify-self:end;font-weight:600}
+.es-save:disabled{color:var(--track);cursor:default}
+.es-tt{min-width:0;text-align:center;line-height:1.2}
+.es-tt #es-t{font-size:17px;font-weight:600}
+.es-st{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.es-b{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:4px max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.es-sec{margin:18px 4px 8px;font-size:13px;font-weight:700;color:var(--muted)}
+.es-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:4px 14px 14px}
+.ef{margin-top:12px}
+.ef label{display:block;font-size:12px;font-weight:600;color:var(--ink2)}
+.ef label span{font-weight:400;color:var(--muted)}
+.ef input,.ef textarea,.ef select{display:block;width:100%;margin-top:6px;padding:9px 12px;border:1px solid var(--track);border-radius:12px;
+  background:var(--card);color:var(--ink);font:inherit;font-size:16px;line-height:1.35;-webkit-appearance:none;appearance:none}
+.ef textarea{resize:vertical;min-height:72px}
+.ef select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
+  background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
+.ef input:focus,.ef textarea:focus,.ef select:focus{outline:none;border-color:var(--accent)}
+.es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.es-reset{display:block;margin:14px auto 0;padding:10px 14px;border-radius:12px;font-size:15px;font-weight:600;color:var(--accent-ink)}
+
+@media (prefers-reduced-motion: reduce){ .ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
 </style>
 
 <div class="wrap">
@@ -201,6 +240,8 @@ html.push-open .push-dim{opacity:.1}
 
 <div class="push-dim" aria-hidden="true"></div>
 <div class="push" id="push" role="dialog" aria-modal="true" aria-labelledby="sh-t" tabindex="-1" hidden></div>
+<div class="sheet-dim" aria-hidden="true"></div>
+<div class="esheet" id="esheet" role="dialog" aria-modal="true" aria-labelledby="es-t" hidden></div>
 
 <script>
 (function () {
@@ -308,7 +349,7 @@ html.push-open .push-dim{opacity:.1}
     "Renew silver gel": { brand: "ameo life · extra strength", how: "Q-tip around the gums." }
   };
 
-  function itemsFor(n) {
+  function baseItemsFor(n) {
     if (n < NIGHT_N) return BEFORE;
     if (n === NIGHT_N) return BEFORE.concat(NIGHT);
     if (n === SURG_N) return SURGERY;
@@ -316,6 +357,37 @@ html.push-open .push-dim{opacity:.1}
     if (n <= INTZ_LAST_N && (n - 15) % 2 === 0) out.push(intzDose(n));
     return out.concat(RECOVERY);
   }
+
+  /* ---------- Edits (Edit on a details page) ---------- */
+  // Each supplement has a product key; its doses (items) and Supplements rows point at it.
+  const NAME2P = { "D3K2": "d3k2", "Methyl-B12": "b12", "PhytoMulti": "multi", "Bio-D-Mulsion Forte": "biod", "Vitamin C": "vitc",
+    "Magnesium glycinate": "mag", "Bone Builder Plus": "bone", "GABA": "gaba", "CBD": "cbd", "Relax Milieu": "relax", "Halcion": "halcion",
+    "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver" };
+  const PNAME = {}, PDETAILS = {};
+  Object.keys(NAME2P).forEach((nm) => { PNAME[NAME2P[nm]] = nm; PDETAILS[NAME2P[nm]] = DETAILS[nm] || {}; });
+  const prodOf = (id) => ({ vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgpm: "mag" })[id] || id.replace(/^[ns]-/, "");
+  // What's been changed, over the defaults above: p = a supplement's fields, i = one dose's (by item id, on
+  // every day it appears), s = one Supplements row's. A field that's present overrides, even when empty.
+  const LSE = "surgery-tracker-edits-v1";
+  const normEdits = (v) => ({ p: (v && v.p) || {}, i: (v && v.i) || {}, s: (v && v.s) || {} });
+  let EDITS = (function () { try { return normEdits(JSON.parse(localStorage.getItem(LSE) || "{}")); } catch (e) { return normEdits(null); } })();
+  let eref = null;
+  function saveEdits() {
+    try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
+    if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
+  }
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note"];
+  function prodInfo(pk) {
+    const out = Object.assign({ name: PNAME[pk] || pk }, PDETAILS[pk] || {}, EDITS.p[pk] || {});
+    if (!out.name) out.name = PNAME[pk] || pk;   // a name can't be blank
+    return out;
+  }
+  function eff(it) {
+    const pk = prodOf(it.id);
+    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: prodInfo(pk).name, base: it });
+  }
+  const itemsFor = (n) => baseItemsFor(n).map(eff);
+  const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const special = (n) => n === NIGHT_N || n === SURG_N;
 
   /* ---------- State ---------- */
@@ -398,9 +470,9 @@ html.push-open .push-dim{opacity:.1}
     const at = ' data-k="' + k + '" data-n="' + n + '"';
     return '<div class="item' + (done ? ' done' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
-      '<span class="body"><span class="nm">' + it.name + '</span><span class="sb">' + it.sub + '</span>' +
-      (it.pill && !done ? '<span class="pill">' + it.pill + '</span>' : '') + '</span></button>' +
-      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + it.name + ', ' + it.sub + '"' + at + '>' +
+      '<span class="body"><span class="nm">' + esc(it.name) + '</span><span class="sb">' + esc(it.sub) + '</span>' +
+      (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') + '</span></button>' +
+      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
   function listHTML(n, items, banded) {
@@ -435,15 +507,15 @@ html.push-open .push-dim{opacity:.1}
   }
 
   /* ---------- Supplements view ---------- */
-  const IMG_OF = { "Bone Builder Plus": "bone", "D3K2": "d3k2", "Magnesium glycinate": "mag", "Intenzyme Forte": "intz",
-    "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver", "Bio-D-Mulsion Forte": "biod",
-    "PhytoMulti": "multi", "Methyl-B12": "b12", "Vitamin C": "vitc" };
   const suppRows = [];   // what each Supplements row's details page shows
-  function infoRow(icon, name, sub, pill) {
-    const i = suppRows.push({ name: name, sub: sub, pill: pill, icon: icon, img: IMG_OF[name] }) - 1;
-    return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(IMG_OF[name], icon) +
-      '<span class="body"><span class="nm">' + name + '</span><span class="sb">' + sub + '</span>' +
-      (pill ? '<span class="pill">' + pill + '</span>' : '') + '</span></button></div>';
+  // g: the phase group, so each row's own edits (schedule, reminder) are kept apart from the same supplement's other rows.
+  function infoRow(g, icon, name, sub, pill) {
+    const pk = NAME2P[name], rk = g + ":" + pk, base = { sub: sub, pill: pill };
+    const row = Object.assign({ p: pk, rk: rk, icon: icon, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
+    const i = suppRows.push(row) - 1;
+    return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
+      '<span class="body"><span class="nm">' + esc(row.name) + '</span><span class="sb">' + esc(row.sub) + '</span>' +
+      (row.pill ? '<span class="pill">' + esc(row.pill) + '</span>' : '') + '</span></button></div>';
   }
   function grp(title, when, rows, sp) {
     return '<div class="grp"><div class="gh' + (sp ? " sp" : "") + '"><b>' + title + '</b><span>' + when + '</span></div><div class="list">' + rows.join("") + '</div></div>';
@@ -453,33 +525,33 @@ html.push-open .push-dim{opacity:.1}
     document.getElementById("v-supps").innerHTML =
       '<h1 class="vt">Supplements</h1>' +
       grp("2 weeks before", fShort(DAY1) + " – " + fShort(dateOf(NIGHT_N)), [
-        infoRow("capsule", "D3K2", "20,000 IU before breakfast", "Hold in mouth 30 sec"),
-        infoRow("pump", "Methyl-B12", "Per bottle, before breakfast", "Hold in mouth 30 sec"),
-        infoRow("capsule", "PhytoMulti", "Once a day, with breakfast", "Not with Bone Builder"),
-        infoRow("drops", "Bio-D-Mulsion Forte", "2 drops (4,000 IU) with breakfast", "From the bottle label"),
-        infoRow("spoon", "Vitamin C", "1 tsp before each meal, 3 a day", "Hold in mouth 30 sec"),
-        infoRow("capsule", "Magnesium glycinate", "300 µg at lunch and bedtime", "Sheet says ug, likely mg"),
-        infoRow("capsule", "Bone Builder Plus", "2 capsules with dinner", "Not with PhytoMulti")
+        infoRow("before", "capsule", "D3K2", "20,000 IU before breakfast", "Hold in mouth 30 sec"),
+        infoRow("before", "pump", "Methyl-B12", "Per bottle, before breakfast", "Hold in mouth 30 sec"),
+        infoRow("before", "capsule", "PhytoMulti", "Once a day, with breakfast", "Not with Bone Builder"),
+        infoRow("before", "drops", "Bio-D-Mulsion Forte", "2 drops (4,000 IU) with breakfast", "From the bottle label"),
+        infoRow("before", "spoon", "Vitamin C", "1 tsp before each meal, 3 a day", "Hold in mouth 30 sec"),
+        infoRow("before", "capsule", "Magnesium glycinate", "300 µg at lunch and bedtime", "Sheet says ug, likely mg"),
+        infoRow("before", "capsule", "Bone Builder Plus", "2 capsules with dinner", "Not with PhytoMulti")
       ]) +
       grp("Night before", fLong(dateOf(NIGHT_N)), [
-        infoRow("pump", "GABA", "1 pump"),
-        infoRow("pump", "CBD", "1 pump"),
-        infoRow("pump", "Relax Milieu", "1 pump · blue bottle")
+        infoRow("night", "pump", "GABA", "1 pump"),
+        infoRow("night", "pump", "CBD", "1 pump"),
+        infoRow("night", "pump", "Relax Milieu", "1 pump · blue bottle")
       ], true) +
       grp("Surgery day", fLong(dateOf(SURG_N)), [
-        infoRow("pump", "GABA", "1 pump, 1 hour before"),
-        infoRow("pump", "CBD", "1 pump, 1 hour before"),
-        infoRow("pump", "Relax Milieu", "1 pump, 1 hour before"),
-        infoRow("tablet", "Halcion", "As directed by the office"),
-        infoRow("tablet", "Intenzyme Forte", "10 tablets, empty stomach")
+        infoRow("surgery", "pump", "GABA", "1 pump, 1 hour before"),
+        infoRow("surgery", "pump", "CBD", "1 pump, 1 hour before"),
+        infoRow("surgery", "pump", "Relax Milieu", "1 pump, 1 hour before"),
+        infoRow("surgery", "tablet", "Halcion", "As directed by the office"),
+        infoRow("surgery", "tablet", "Intenzyme Forte", "10 tablets, empty stomach")
       ], true) +
       grp("Recovery", "From " + fShort(dateOf(SURG_N + 1)), [
-        infoRow("tablet", "Intenzyme Forte", "10 tablets between meals, the day after, then every other day until gone", "50 tablets: last dose " + fShort(dateOf(INTZ_LAST_N))),
-        infoRow("drops", "Drainage Milieu", "Per bottle until empty"),
-        infoRow("drops", "Lymph 3 Chronic", "Per bottle until empty"),
-        infoRow("swab", "Renew silver gel", "Q-tip around gums", "Gently, don’t dislodge the clot"),
-        infoRow("capsule", "PhytoMulti", "Once a day, with breakfast"),
-        infoRow("capsule", "Bone Builder Plus", "2 capsules with dinner")
+        infoRow("recovery", "tablet", "Intenzyme Forte", "10 tablets between meals, the day after, then every other day until gone", "50 tablets: last dose " + fShort(dateOf(INTZ_LAST_N))),
+        infoRow("recovery", "drops", "Drainage Milieu", "Per bottle until empty"),
+        infoRow("recovery", "drops", "Lymph 3 Chronic", "Per bottle until empty"),
+        infoRow("recovery", "swab", "Renew silver gel", "Q-tip around gums", "Gently, don’t dislodge the clot"),
+        infoRow("recovery", "capsule", "PhytoMulti", "Once a day, with breakfast"),
+        infoRow("recovery", "capsule", "Bone Builder Plus", "2 capsules with dinner")
       ]) +
       '<p class="foot">Times follow the bottle labels. Calcium in Bone Builder blocks iron in PhytoMulti, so they go at different meals. Ask the office whether D3K2, vitamin C, magnesium and B12 continue after surgery.</p>';
   }
@@ -538,17 +610,19 @@ html.push-open .push-dim{opacity:.1}
     renderDay(); updateRings(n);
   }
   function detailHTML(row, dayCtx) {
-    const d = DETAILS[row.name] || {};
-    const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>' : "";
+    const d = prodInfo(row.p);
+    const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
-    const rows = (dayCtx ? kv("Today", row.sub) + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub)) +
-      kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". "));
+    // Supplement details first, then this dose (or row), as in the Edit sheet.
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
+      (dayCtx ? kv("Today", row.sub) + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const foot = dayCtx ? '<div class="push-foot"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
       (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
-      '<div class="push-ht" aria-hidden="true">' + row.name + '</div><span></span></div>' +
-      '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + row.name + '</h2>' +
-      (d.brand ? '<p class="sh-b">' + d.brand + '</p>' : '') +
+      '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
+      '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
+      '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + esc(row.name) + '</h2>' +
+      (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
       '<div class="list" style="margin-top:12px">' + rows + '</div></div>' + foot + '</div>';
   }
 
@@ -573,14 +647,15 @@ html.push-open .push-dim{opacity:.1}
     const i = suppRows.indexOf(row);
     return i >= 0 ? "#s/" + i : "";
   }
+  // A details page's route, with /edit while its Edit sheet is up (a history entry of its own, as in HPDE).
   function fromRoute(hash) {
-    let m = /^#d\/(\d+)\/([\w-]+)$/.exec(hash);
+    let m = /^#d\/(\d+)\/([\w-]+)(\/edit)?$/.exec(hash);
     if (m) {
       const n = +m[1], it = itemsFor(n).find((x) => x.id === m[2]);
-      return it ? { row: it, dayCtx: { k: key(n, it), n: n } } : null;
+      return it ? { row: it, dayCtx: { k: key(n, it), n: n }, base: "#d/" + n + "/" + m[2], edit: !!m[3] } : null;
     }
-    m = /^#s\/(\d+)$/.exec(hash);
-    return m && suppRows[+m[1]] ? { row: suppRows[+m[1]], dayCtx: null } : null;
+    m = /^#s\/(\d+)(\/edit)?$/.exec(hash);
+    return m && suppRows[+m[1]] ? { row: suppRows[+m[1]], dayCtx: null, base: "#s/" + m[1], edit: !!m[2] } : null;
   }
   // A details link left in the address bar from before a reload has no list behind it to go back to.
   if (useHistory && /^#[ds]\//.test(location.hash)) history.replaceState(history.state, "", location.pathname + location.search);
@@ -636,9 +711,13 @@ html.push-open .push-dim{opacity:.1}
     if (!useHistory) return;
     const r = fromRoute(location.hash), instant = swiped; swiped = false;
     const isOpen = !push.hidden && push.classList.contains("on");
-    if (r && !isOpen) showDetail(r, opener, instant);
-    else if (r && isOpen) { detailFor = r.dayCtx; detailRoute = location.hash; push.innerHTML = detailHTML(r.row, r.dayCtx); }
-    else if (!r && isOpen) hideDetail(instant);
+    if (r && !isOpen) { showDetail(r, opener, instant); if (r.edit) showEdit(true); }
+    else if (r && isOpen) {
+      if (r.base !== detailRoute) { detailFor = r.dayCtx; detailRoute = r.base; push.innerHTML = detailHTML(r.row, r.dayCtx); }
+      if (r.edit && !editOpen()) showEdit(instant);
+      else if (!r.edit && editOpen()) hideEdit(instant);
+    }
+    else if (!r && isOpen) { if (editOpen()) hideEdit(true); hideDetail(instant); }
   });
   push.addEventListener("scroll", () => {
     const h = push.querySelector(".push-h"), t = push.querySelector(".sh-t");
@@ -650,11 +729,172 @@ html.push-open .push-dim{opacity:.1}
 
   let usingKeys = false;
   document.addEventListener("pointerdown", () => { usingKeys = false; }, true);
-  document.addEventListener("keydown", (e) => { usingKeys = true; if (e.key === "Escape") closeDetail(); });
+  document.addEventListener("keydown", (e) => { usingKeys = true; if (e.key === "Escape") { if (editOpen()) closeEdit(); else closeDetail(); } });
+
+  /* ---------- Edit sheet: slides up over the details page, Cancel and Save across its top (as HPDE's Edit details) ---------- */
+  const esheet = document.getElementById("esheet");
+  const editOpen = () => !esheet.hidden && esheet.classList.contains("on");
+  let editCtx = null, editStart = "";
+  // The row the details page is showing, as it is now (after any edits).
+  function currentRow() {
+    const r = fromRoute(detailRoute);
+    return r ? r.row : null;
+  }
+  function field(name, label, value, opts) {
+    opts = opts || {};
+    const id = "ef-" + name;
+    let control;
+    if (opts.options) {
+      control = '<select id="' + id + '" name="' + name + '">' + opts.options.map((o) => '<option' + (o === value ? ' selected' : '') + '>' + esc(o) + '</option>').join("") + '</select>';
+    } else if (opts.long) {
+      control = '<textarea id="' + id + '" name="' + name + '" rows="3">' + esc(value) + '</textarea>';
+    } else {
+      control = '<input id="' + id + '" name="' + name + '" value="' + esc(value) + '" autocomplete="off"' + (opts.required ? ' required' : '') + '>';
+    }
+    return '<div class="ef"><label for="' + id + '">' + label + (opts.hint ? ' <span>' + opts.hint + '</span>' : '') + '</label>' + control + '</div>';
+  }
+  function editHTML(row, dayCtx) {
+    const d = prodInfo(row.p);
+    // Each section says what its changes affect, under its own card.
+    const prod = '<div class="es-sec">Supplement</div><div class="es-card">' + field("name", "Name", d.name, { required: true }) +
+      field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
+      field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
+      field("note", "Note", d.note || "", { long: true }) + '</div>' +
+      '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
+    const mine = dayCtx
+      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
+        field("slot", "When", row.slot, { options: SLOTS }) + field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
+        '<p class="es-note">Changes here apply to this dose on every day.</p>'
+      : '<div class="es-sec">This row</div><div class="es-card">' + field("sub", "Schedule", row.sub) +
+        field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
+        '<p class="es-note">Changes here apply only to this row on the Supplements tab.</p>';
+    return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
+      '<div class="es-tt"><div id="es-t">Edit</div><div class="es-st">' + esc(row.name) + '</div></div>' +
+      '<button type="submit" form="es-form" class="es-btn es-save" data-save disabled>Save</button></div>' +
+      '<div class="es-b"><form id="es-form" novalidate>' + prod + mine +
+      '<button type="button" class="es-reset" data-reset>Restore original</button></form></div>';
+  }
+  const formValues = () => { const f = document.getElementById("es-form"); return f ? JSON.stringify(Array.from(new FormData(f).entries())) : ""; };
+  function markDirty() { const b = esheet.querySelector("[data-save]"); if (b) b.disabled = formValues() === editStart; }
+  function showEdit(instant) {
+    const row = currentRow();
+    if (!row) return;
+    editCtx = { row: row, dayCtx: detailFor };
+    esheet.innerHTML = editHTML(row, detailFor);
+    editStart = formValues();
+    esheet.hidden = false; esheet.style.transform = esheet.style.transition = "";
+    document.documentElement.classList.add("sheet-open");
+    const go = () => { esheet.classList.add("on"); document.documentElement.classList.add("sheet-up"); };
+    if (instant) instantlyEdit(go); else { void esheet.offsetWidth; go(); }
+    esheet.querySelector(".es-b").scrollTop = 0;
+  }
+  function hideEdit(instant) {
+    if (esheet.hidden) return;
+    editCtx = null;
+    const go = () => { esheet.classList.remove("on"); document.documentElement.classList.remove("sheet-up"); esheet.style.transform = ""; };
+    if (instant) instantlyEdit(go); else go();
+    const done = () => { if (esheet.classList.contains("on")) return; esheet.hidden = true; esheet.innerHTML = ""; document.documentElement.classList.remove("sheet-open"); };
+    if (instant) done(); else setTimeout(done, 520);
+  }
+  function instantlyEdit(fn) {
+    const els = [esheet, push, document.querySelector(".sheet-dim")];
+    els.forEach((el) => { el.style.transition = "none"; });
+    fn(); void esheet.offsetWidth;
+    els.forEach((el) => { el.style.transition = ""; });
+  }
+  function openEdit() {
+    if (!detailRoute && !detailFor) return;
+    if (useHistory && detailRoute && location.hash === detailRoute) location.hash = detailRoute + "/edit";   // hashchange shows it
+    else showEdit(false);
+  }
+  function closeEdit() {
+    if (!editOpen()) return;
+    if (useHistory && location.hash === detailRoute + "/edit") history.back();   // hashchange hides it
+    else hideEdit(false);
+  }
+  // Only what differs from the original is kept, so Restore original (then Save) clears it.
+  function setOverride(bucket, k, field, value, original) {
+    const o = Object.assign({}, bucket[k] || {});
+    if (value === (original == null ? "" : original)) delete o[field]; else o[field] = value;
+    if (Object.keys(o).length) bucket[k] = o; else delete bucket[k];
+  }
+  function saveEdit() {
+    const f = document.getElementById("es-form");
+    if (!f || !editCtx) return;
+    const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
+    const row = editCtx.row, pk = row.p, base = row.base || {};
+    PFIELDS.forEach((n) => setOverride(EDITS.p, pk, n, n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n), n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]));
+    if (editCtx.dayCtx) ["sub", "slot", "pill"].forEach((n) => setOverride(EDITS.i, row.id, n, v(n), base[n]));
+    else ["sub", "pill"].forEach((n) => setOverride(EDITS.s, row.rk, n, v(n), base[n]));
+    saveEdits();
+    refreshEdited();
+    closeEdit();
+  }
+  function restoreOriginal() {
+    const f = document.getElementById("es-form");
+    if (!f || !editCtx) return;
+    const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
+    const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
+    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note"].forEach((n) => set(n, d[n]));
+    set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
+    markDirty();
+  }
+  // Everything that shows a supplement's text, drawn again with the edits.
+  function refreshEdited() {
+    renderDay();
+    if (view === "supps") renderSupps();
+    if (!push.hidden) {
+      const r = fromRoute(detailRoute), y = push.scrollTop;
+      if (r) { detailFor = r.dayCtx; push.innerHTML = detailHTML(r.row, r.dayCtx); push.scrollTop = y; }
+    }
+  }
+  esheet.addEventListener("input", markDirty);
+  esheet.addEventListener("change", markDirty);
+  esheet.addEventListener("submit", (e) => { e.preventDefault(); if (!esheet.querySelector("[data-save]").disabled) saveEdit(); });
+
+  // Drag the sheet down by its toolbar, or by its form once that's scrolled to the top, to cancel (as HPDE's sheets).
+  let ed = null;
+  esheet.addEventListener("touchstart", (e) => {
+    if (e.touches.length !== 1 || !editOpen()) { ed = null; return; }
+    const t = e.touches[0];
+    ed = { x: t.clientX, y: t.clientY, mode: "deciding", off: 0, v: 0, ly: t.clientY, lt: e.timeStamp };
+  }, { passive: true });
+  esheet.addEventListener("touchmove", (e) => {
+    if (!ed || ed.mode === "native") return;
+    const t = e.touches[0], dx = t.clientX - ed.x, dy = t.clientY - ed.y;
+    if (ed.mode === "deciding") {
+      if (Math.abs(dx) < 4 && Math.abs(dy) < 4) return;
+      const target = e.target, body = esheet.querySelector(".es-b");
+      const inField = target.closest && target.closest("input, textarea, select");
+      const grab = dy > 0 && Math.abs(dy) >= Math.abs(dx) && (target.closest("[data-grab]") || (body && body.scrollTop <= 0));
+      ed.mode = grab && !inField ? "drag" : "native";
+      if (ed.mode === "native") return;
+      esheet.style.transition = "none";
+    }
+    e.preventDefault();
+    ed.off = Math.max(0, dy - 8);
+    const dt = e.timeStamp - ed.lt; if (dt > 0) ed.v = (t.clientY - ed.ly) / dt;
+    ed.ly = t.clientY; ed.lt = e.timeStamp;
+    esheet.style.transform = "translateY(" + ed.off + "px)";
+  }, { passive: false });
+  function endEditDrag(e) {
+    if (!ed || ed.mode !== "drag") { ed = null; return; }
+    const flick = e.timeStamp - ed.lt < 100 && ed.v > 0.5 && ed.off > 0;
+    const away = e.type === "touchend" && (ed.off > esheet.offsetHeight / 3 || flick);
+    ed = null;
+    esheet.style.transition = "";
+    if (away) closeEdit();   // slides the rest of the way down from here
+    else esheet.style.transform = "";
+  }
+  esheet.addEventListener("touchend", endEditDrag);
+  esheet.addEventListener("touchcancel", endEditDrag);
 
   /* ---------- Events ---------- */
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-today]")) { goToday(); return; }
+    if (e.target.closest("[data-edit]")) { openEdit(); return; }
+    if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
+    if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
     if (e.target.closest("[data-back]")) { closeDetail(); return; }
     if (e.target.closest("[data-mark]")) { if (detailFor) toggle(detailFor.k, detailFor.n); closeDetail(); return; }
     const t = e.target.closest(".tab, .tick, .open, .d");
@@ -720,6 +960,19 @@ html.push-open .push-dim{opacity:.1}
       state = remote || {};
       saveLocal(); refreshAll();
     }, () => { ref = null; setSync("Checkmarks are saved on this device."); });
+    // Edits sync in their own document; the first time, this device's edits seed it.
+    try { eref = db.doc("tracker/edits"); } catch (e) { eref = null; return; }
+    let firstEdits = true;
+    eref.onSnapshot((snap) => {
+      const remote = snap.exists ? snap.data() : null;
+      if (firstEdits) {
+        firstEdits = false;
+        if (!remote && (Object.keys(EDITS.p).length || Object.keys(EDITS.i).length || Object.keys(EDITS.s).length)) { saveEdits(); return; }
+      }
+      EDITS = normEdits(remote);
+      try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
+      if (!editOpen()) refreshEdited();
+    }, () => { eref = null; });
   }
 
   renderCountdown();
