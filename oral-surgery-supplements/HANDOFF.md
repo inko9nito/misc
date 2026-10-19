@@ -38,33 +38,36 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 
 | Item (product) | When | Dose / instruction | Source / notes |
 |---|---|---|---|
-| Bone Builder Plus (Metagenics, 90 caps) | Start ASAP; daily in prep and recovery | Per bottle | Sheet: "start as soon as possible… helps bone growth after surgery." Continuing after surgery is inferred. |
-| D3K2 (Quicksilver Scientific nanoemulsion) | Prep, daily | 20,000 IU/day | Label: 1 pump (0.5 mL) = 2,500 IU D3 + 90 mcg K2, so 20,000 IU = 8 pumps. See open question 1. |
-| Bio-D-Mulsion Forte (Biotics Research) | Prep, daily | 2 drops (4,000 IU) | **Not on the office sheet.** Added at the user's request using the label serving size (2 drops = 100 mcg / 4,000 IU). The directions panel wasn't in the photo. |
-| Vitamin C, liposomal | Prep, daily | 3.5 g/day (3 tsp) | Refrigerate after opening. |
-| Magnesium glycinate (Metagenics, 120 tablets) | Prep, morning + evening | "300ug" twice daily | Almost certainly mg, not µg. App shows "300 µg · dose 1 of 2 / 2 of 2" with a "Sheet says ug, likely mg" note. Tablets per dose unknown (label side not photographed). |
-| Methyl-B12 | Prep, daily | Per bottle | Replenishes B12 depleted by nitrous oxide. |
-| PhytoMulti | Prep and recovery, daily | Once a day | Sheet: "take daily." |
-| GABA, CBD, Relax Milieu (blue bottle) | Night before **and** 1 hour before surgery | 1 pump each | |
+| D3K2 (Quicksilver Scientific nanoemulsion) | Prep, before breakfast | 20,000 IU/day, hold in mouth 30 sec | Label: 1 pump (0.5 mL) = 2,500 IU D3 + 90 mcg K2, so 20,000 IU = 8 pumps. Label directions: empty stomach, at least 10 min before meals, hold 30–90 sec; label dose is 1 pump 1–2×/day. See open question 1. |
+| Methyl-B12 (Quicksilver Scientific liposomal spray) | Prep, before breakfast | Per bottle, hold in mouth 30 sec | Label: 1–2 pumps (some listings 2), empty stomach, at least 10 min before meals. Replenishes B12 depleted by nitrous oxide. |
+| PhytoMulti with iron (Metagenics, 60 tablets) | Prep and recovery, with breakfast | Once a day | Label: 1–2 tablets once daily with food; 2 tablets = 1,000 IU vitamin D + 18 mg iron. Kept apart from Bone Builder (calcium reduces iron absorption; usual advice is 2 h apart). Vitamin C just before breakfast helps iron. |
+| Bio-D-Mulsion Forte (Biotics Research) | Prep, with breakfast | 2 drops (4,000 IU) | **Not on the office sheet.** Added at the user's request using the label serving size (2 drops = 100 mcg / 4,000 IU). Vitamin D absorbs better with a fat-containing meal (Dawson-Hughes 2015: +32% peak). |
+| Vitamin C (Quicksilver Scientific liposomal, 4 fl oz) | Prep, 1 tsp 10 min before each meal | 3 tsp/day | Label: 1 tsp (5 mL) = 1,000 mg (sodium ascorbate) + 125 mg sodium; 24 tsp a bottle; empty stomach, 10+ min before meals, hold 30–90 sec, repeat to desired dose; refrigerate, use within 60 days of opening. Split in 3 because absorption saturates at high doses. See open question 6. |
+| Magnesium glycinate (Metagenics, 120 tablets) | Prep, lunch + bedtime | "300ug" twice daily | Almost certainly mg. US label: 100 mg per tablet, 1 tablet 3×/day. Bedtime because glycinate is calming; lunch rather than breakfast or dinner to stay apart from the iron and calcium. See open question 2. |
+| Bone Builder Plus (Metagenics, 90 caps) | Start ASAP; daily in prep and recovery, with dinner | 2 capsules (label) | US label: 2 capsules once daily = 420 mg calcium (MCHC) + 2,000 IU vitamin D. Sheet: "start as soon as possible… helps bone growth after surgery." Continuing after surgery is inferred. |
+| GABA, CBD, Relax Milieu (blue bottle) | Night before (bedtime) **and** 1 hour before surgery | 1 pump each | |
 | Halcion (prescription) | Surgery day | As directed by the office | Office calls it in. |
-| Intenzyme Forte (Biotics, **50 tablets**) | Surgery day, day after, then every other day until gone | 10 tablets | 50 tablets = 5 doses: **Nov 2, 3, 5, 7, 9**. App labels them dose 1–5 of 5. |
-| Drainage Milieu (Physica, 2 fl oz tincture) | Recovery | Per bottle until empty | Sheet groups it with Lymph 3 as the "blue bottles." |
-| Lymph 3 Chronic (Physica, 2 fl oz tincture) | Recovery | Per bottle until empty | |
-| Renew silver gel (ameo life, extra strength) | Recovery | Q-tip around gums | "Gently, don't dislodge the clot." |
+| Intenzyme Forte (Biotics, **50 tablets**) | Surgery day, day after, then every other day until gone; between meals | 10 tablets | 50 tablets = 5 doses: **Nov 2, 3, 5, 7, 9**. Biotics: take proteolytic enzymes on an empty stomach for their systemic effect; with food they act as a digestive aid. |
+| Drainage Milieu (Physica, 2 fl oz tincture) | Recovery, anytime | Per bottle until empty | Sheet groups it with Lymph 3 as the "blue bottles." Label directions not found online. |
+| Lymph 3 Chronic (Physica, 2 fl oz tincture) | Recovery, anytime | Per bottle until empty | Label directions not found online. |
+| Renew silver gel (ameo life, extra strength) | Recovery, anytime | Q-tip around gums | "Gently, don't dislodge the clot." |
+
+App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Between meals, Anytime, 1 hour before, Also today.
 
 ### Open questions (don't resolve these by guessing)
 
-1. **Vitamin D total.** The sheet says D3K2 at 20,000 IU/day, and the user also has Bio-D-Mulsion. It's unknown whether Bio-D counts toward the 20,000 or is in addition to it. The app currently lists both separately.
-2. **Magnesium unit and tablet count** (µg vs mg; tablets per dose).
+1. **Vitamin D total.** The sheet says D3K2 at 20,000 IU/day, and the user also has Bio-D-Mulsion. It's unknown whether Bio-D counts toward the 20,000 or is in addition to it. Bone Builder Plus (2,000 IU per 2 caps) and PhytoMulti (1,000 IU per 2 tablets) also contain vitamin D, so as listed the daily total is about 27,000 IU. The app lists each separately.
+2. **Magnesium unit and tablet count** (µg vs mg; tablets per dose). If it's 300 mg twice daily, that's 3 tablets a dose and 600 mg a day, twice the label's 300 mg a day and above the 350 mg/day upper limit for supplemental magnesium.
 3. **Whether D3K2, vitamin C, magnesium and B12 continue after surgery.** The sheet only says "2 weeks before." The app's Supplements view tells the user to ask the office.
 4. **CBD with Halcion.** CBD inhibits CYP3A4, which metabolizes triazolam (Halcion) and can increase sedation. Already flagged to the user as something to confirm with the office. Don't add medical advice to the UI.
 5. How long the recovery tinctures last ("until empty"). The app shows them daily through Nov 22.
+6. **Vitamin C grams.** The sheet says "3.5 g/day (3 tsp)", but this bottle is 1,000 mg per tsp, so 3 tsp = 3 g. The app follows the teaspoon count. At 3 tsp a day a 24-tsp bottle lasts 8 days, so the 14-day prep needs 2 bottles.
 
 ## The app (`app/surgery-checklist.html`)
 
 ### Structure
-- **Today** (default): surgery countdown card → swipeable week strip with progress rings (5 weeks, scroll-snap, dots below) → date line with phase ("Prep day 3 of 14", "Night before surgery", "Surgery day", "Recovery day 4") → "2 / 8 done today" counter → **To do** and **Done** lists. Tapping a row toggles it and moves it between the lists.
-- **Supplements**: the full protocol by phase (2 weeks before / Night before / Surgery day / Recovery) with dates and notes. This replaces the paper sheet.
+- **Today** (default): surgery countdown card → swipeable week strip with progress rings (5 weeks, scroll-snap, dots below) → date line with phase ("Prep day 3 of 14", "Night before surgery", "Surgery day", "Recovery day 4") → "2 / 8 done today" counter → one **To do** list. Tapping the circle marks a dose taken; it stays in place, faded, with its check (the user asked not to move taken doses to a separate Done list). Tapping anywhere else on the row pushes a details page in from the right, as the user's HPDE app opens an event: a large photo (`IMG_L`), today's dose and time, how to take it, label facts and notes (`DETAILS`, keyed by name), and a "Mark as taken" button pinned at the bottom. The page under it slides 30% left and dims, on iOS's push spring. As in HPDE, each details page is a history entry (`#d/<day>/<id>`, `#s/<row>`): the Back chevron steps back through history, and Safari's own swipe back and forward slide the pages; when `popstate` says the browser already animated it (`hasUAVisualTransition`), the page shows or goes instantly instead of sliding twice. There is no custom swipe gesture: an earlier one fought Safari's and doubled the screens. Inside claude.ai's frame it skips history and only opens and closes. The user asked for the row/circle split after tapping rows by accident, and for the push page after a bottom sheet clipped its close button on long entries.
+- **Supplements**: the full protocol by phase (2 weeks before / Night before / Surgery day / Recovery) with dates and notes. This replaces the paper sheet. Its rows open the same details page, without the mark button.
 - **Progress**: "X / Y doses so far" plus a 5-week ring calendar. Tapping a day opens it in Today.
 - Bottom bar: Today / Supplements / Progress.
 
@@ -72,9 +75,9 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 - `DAY1 = Oct 19 2026`, `DAYS = 35`, day index `n` = days since DAY1. `NIGHT_N = 13` (Nov 1), `SURG_N = 14` (Nov 2), `INTZ_LAST_N = 21` (Nov 9).
 - `itemsFor(n)` returns the day's items: BEFORE for n < 13; BEFORE + NIGHT for n = 13; SURGERY for n = 14; RECOVERY (plus Intenzyme on n = 15, 17, 19, 21) after that.
 - Each item has `id`, `slot`, `name`, `sub`, `icon` (SVG fallback), optional `img` (key into `IMG`) and optional `pill` note.
-- **Slots / dividers**: `Anytime`, `Morning`, `Evening`, `1 hour before`, `Also today`. Band dividers render only when a day uses more than one slot. The user asked for this so the two magnesium doses don't look like duplicates. On Nov 1 the night-before pumps sit under Evening.
+- **Slots / dividers**: `Before breakfast`, `Breakfast`, `Lunch`, `Dinner`, `Bedtime`, `Between meals`, `Anytime`, `1 hour before`, `Also today`, chosen from the bottle labels (see the protocol table). Band dividers render only when a day uses more than one slot. On Nov 1 the night-before pumps sit under Bedtime. Vitamin C is three items (`vitc`, `vitc2`, `vitc3`).
 - **Special days**: Nov 1 and Nov 2 get amber rings and numbers plus a marker under the ring (moon for night before, tooth for surgery day), in the week strip and the Progress calendar. The date line names them in amber.
-- **Countdown card**: "15 days until surgery" → "Surgery is tomorrow" → "Surgery is today" → "N days since surgery". Based on the device's real date.
+- **Countdown card** (sage, matching the nav; the user asked to drop its amber): "15 days until surgery" → "Surgery is tomorrow" → "Surgery is today" → "N days since surgery". Based on the device's real date.
 
 ### State and sync
 - Checkmarks are stored as a flat map: `{ "YYYY-MM-DD:<itemId>": true }`. Unchecking deletes the key.
@@ -121,9 +124,9 @@ Photos are of a hand holding each bottle on a white counter, with fingers wrappe
    - On white bottles (`intz`, `biod`, `silver`) it treats any warm saturated pixel as hand. `silver` also has a loose bounding box to drop the palm.
    - Straightens the bottle from its clean left edge and builds a **symmetric silhouette** around the bottle axis. Half-width is the narrower clean side, and straight body sides come from a line fit. The real top 14% is kept so the D3K2 pump spout survives.
    - Fills pixels hidden by fingers from their mirror twin across the axis, with inpainting for the rest. Feathers the edge and crops.
-3. `3_export.py`: 180-px WebP data URIs → the `IMG` map in the app (about 5–7 KB each).
+3. `3_export.py`: WebP data URIs → the app's `IMG` map (180 px, about 5–7 KB each) and `IMG_L` map (420 px, for the details sheet).
 
-Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`. Items with no photo yet (Vitamin C, Methyl-B12, PhytoMulti, GABA, CBD, Relax Milieu, Halcion) use stroke icons. The user may send more photos. Run them through the same pipeline and check edges on light and dark tiles.
+Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`, `b12`, `vitc`. `multi` and `b12` came from retailer product shots on a plain background, cut out with `4_product_shots.py` instead of steps 1–2. `vitc` too. Items with no photo yet (GABA, CBD, Relax Milieu, Halcion) use stroke icons. The user may send more photos. Run them through the same pipeline and check edges on light and dark tiles.
 
 ## Print checklist (`print/`)
 
