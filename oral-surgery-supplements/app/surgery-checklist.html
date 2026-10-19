@@ -83,13 +83,26 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .of b{color:var(--muted);font-weight:600}
 .lbl{font-size:15px;color:var(--muted)}
 
-#day .list{margin-top:14px}
+#day{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.sec-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.sec-h{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted)}
+.sec-h:disabled{cursor:default;color:var(--muted)}
+.sec-h:not(:disabled):active{background:var(--line)}
+.sec-t{flex:1;min-width:0}
+.sec-c{font-weight:500}
+.sec-done{display:inline-flex;align-items:center;gap:4px;color:var(--accent-ink)}
+.sec-done svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.chev{display:grid;place-items:center;width:18px;height:18px;transition:transform .3s var(--push-ease)}
+.chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.sec-card:not(.collapsed) .chev{transform:rotate(180deg)}
+.sec-body{display:grid;grid-template-rows:1fr;transition:grid-template-rows .35s var(--push-ease)}
+.sec-card.collapsed .sec-body{grid-template-rows:0fr}
+.sec-in{min-height:0;overflow:hidden}
+.sec-in > .item{border-top:1px solid var(--line)}
 
 /* Lists */
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .list > * + *{border-top:1px solid var(--line)}
-.band{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:7px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted)}
-.band span{font-weight:500}
 /* A row is two targets: .open (tile and text) shows details; .tick (the circle) marks it taken. */
 .item{display:flex;align-items:stretch;width:100%;min-height:64px}
 .open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 0 10px 14px}
@@ -210,7 +223,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 .es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .es-reset{display:block;margin:14px auto 0;padding:10px 14px;border-radius:12px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 
-@media (prefers-reduced-motion: reduce){ .ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
+@media (prefers-reduced-motion: reduce){ .sec-body,.chev,.ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
 </style>
 
 <div class="wrap">
@@ -475,15 +488,49 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
+  // Each time of day is its own card. Once everything in it is taken it folds down to its header
+  // ("Done"); tapping the header opens it again. sectionsShown remembers how each card was last drawn,
+  // so a card that has just been finished folds away instead of vanishing.
+  const sectionsOpened = new Set(), sectionsShown = new Map();
+  const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+  let sectionsNext = [];
   function listHTML(n, items, banded) {
     if (!banded) return '<div class="list">' + items.map((it) => itemHTML(n, it)).join("") + '</div>';
     let html = "";
+    sectionsNext = [];
     SLOTS.forEach((s) => {
       const group = items.filter((it) => it.slot === s);
       if (!group.length) return;
-      html += '<div class="band">' + s + '</div>' + group.map((it) => itemHTML(n, it)).join("");
+      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length;
+      if (!all) sectionsOpened.delete(id);
+      const fold = all && !sectionsOpened.has(id);
+      const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
+      sectionsNext.push([id, fold]);
+      html += '<section class="sec-card' + (drawn ? ' collapsed' : '') + '" data-sec="' + esc(id) + '">' +
+        '<button type="button" class="sec-h" data-sec-toggle="' + esc(id) + '" aria-expanded="' + !fold + '"' + (all ? '' : ' disabled') + '>' +
+        '<span class="sec-t">' + esc(s) + '</span>' +
+        (all ? '<span class="sec-done">' + CHECK + 'Done</span><span class="chev">' + CHEV + '</span>'
+             : (taken ? '<span class="sec-c">' + taken + ' of ' + group.length + '</span>' : '')) +
+        '</button><div class="sec-body"><div class="sec-in">' + group.map((it) => itemHTML(n, it)).join("") + '</div></div></section>';
     });
-    return '<div class="list">' + html + '</div>';
+    return html;
+  }
+  // After drawing, move each card to where it belongs, so the fold animates.
+  function settleSections() {
+    const next = sectionsNext;
+    requestAnimationFrame(() => next.forEach(([id, fold]) => {
+      const el = document.querySelector('.sec-card[data-sec="' + id + '"]');
+      if (el) el.classList.toggle("collapsed", fold);
+      sectionsShown.set(id, fold);
+    }));
+  }
+  function toggleSection(id) {
+    if (sectionsOpened.has(id)) sectionsOpened.delete(id); else sectionsOpened.add(id);
+    const fold = !sectionsOpened.has(id), el = document.querySelector('.sec-card[data-sec="' + id + '"]');
+    if (!el) return;
+    el.classList.toggle("collapsed", fold);
+    el.querySelector(".sec-h").setAttribute("aria-expanded", String(!fold));
+    sectionsShown.set(id, fold);
   }
 
   function renderDay() {
@@ -491,6 +538,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const banded = new Set(items.map((it) => it.slot)).size > 1;
     // Taken doses stay where they are, faded with their check, so the list doesn't reshuffle under a tap.
     document.getElementById("day").innerHTML = listHTML(n, items, banded);
+    settleSections();
   }
 
   // The calendar button: select today (or the nearest tracked day) and slide the strip to its week.
@@ -892,6 +940,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   /* ---------- Events ---------- */
   document.addEventListener("click", (e) => {
     if (e.target.closest("[data-today]")) { goToday(); return; }
+    const sec = e.target.closest("[data-sec-toggle]");
+    if (sec) { if (!sec.disabled) toggleSection(sec.dataset.secToggle); return; }
     if (e.target.closest("[data-edit]")) { openEdit(); return; }
     if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
     if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
