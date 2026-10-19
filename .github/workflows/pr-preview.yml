@@ -1,0 +1,33 @@
+# Publishes each PR to GitHub Pages at /pr-preview/pr-<number>/ and removes it when the PR closes.
+# Needs Settings → Pages → Deploy from a branch → gh-pages / (root).
+name: PR preview
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "oral-surgery-supplements/**"
+      - ".github/workflows/pr-preview.yml"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency: preview-${{ github.ref }}
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build preview
+        if: github.event.action != 'closed'
+        run: |
+          mkdir -p _preview
+          cp oral-surgery-supplements/app/surgery-checklist.html _preview/index.html
+          cp -r oral-surgery-supplements/print _preview/print
+
+      - uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: _preview
