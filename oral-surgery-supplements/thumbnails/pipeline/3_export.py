@@ -1,7 +1,7 @@
 # Turns cutouts (cut_<name>.png from 2_cutouts.py) into small WebP data URIs for the app's IMG map.
 from PIL import Image
 import base64, io, json
-names = ["mag","bone","d3k2","lymph","drain","silver","intz","biod"]
+names = ["mag","bone","d3k2","lymph","drain","silver","intz","biod","multi","b12"]
 out = {}
 for n in names:
     im = Image.open(f"cut_{n}.png").convert("RGBA")
