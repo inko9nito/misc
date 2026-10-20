@@ -376,12 +376,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const BEFORE = [
     { id: "d3k2",  slot: "Before breakfast", name: "D3K2", sub: "8 pumps · hold 30 sec", icon: "capsule", img: "d3k2" },
     { id: "b12",   slot: "Before breakfast", name: "Methyl-B12", sub: "2 pumps · hold 30 sec", icon: "pump", img: "b12" },
-    { id: "multi", slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
-    { id: "biod",  slot: "Breakfast", name: "Bio-D-Mulsion Forte", sub: "2 drops · 4,000 IU", icon: "drops", img: "biod" },
+    { id: "multi", slot: "Breakfast", name: "PhytoMulti", sub: "2 tablets", icon: "capsule", img: "multi" },
+    { id: "biod",  slot: "Breakfast", name: "Bio-D-Mulsion Forte", sub: "2 drops", icon: "drops", img: "biod" },
     { id: "vitc",  slot: "Before breakfast", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
     { id: "vitc2", slot: "Lunch", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
     { id: "mgam",  slot: "Lunch", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" },
-    { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
+    { id: "bone",  slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone", pill: "2+ hrs away from multivitamin" },
     { id: "vitc3", slot: "Dinner", name: "Vitamin C", sub: "1 tsp before eating", icon: "spoon", img: "vitc" },
     { id: "mgdn",  slot: "Dinner", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" },
     { id: "mgpm",  slot: "Bedtime", name: "Magnesium glycinate", sub: "100 mg", icon: "capsule", img: "mag" }
@@ -403,8 +403,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const intzDose = (n) => ({ id: "intz", slot: "Between meals", name: "Intenzyme Forte", icon: "tablet", img: "intz",
     sub: "10 tablets", nth: [2 + (n - 15) / 2, 5] });
   const RECOVERY = [
-    { id: "multi",  slot: "Breakfast", name: "PhytoMulti", sub: "Multivitamin", icon: "capsule", img: "multi" },
-    { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone" },
+    { id: "multi",  slot: "Breakfast", name: "PhytoMulti", sub: "2 tablets", icon: "capsule", img: "multi" },
+    { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone", pill: "2+ hrs away from multivitamin" },
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip around gums", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" }
@@ -419,7 +419,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Bio-D-Mulsion Forte": { brand: "Biotics Research · emulsified vitamin D3", how: "With breakfast. Vitamin D absorbs better with some fat.", label: "2 drops = 4,000 IU.", note: "Not on the office sheet." },
     "Vitamin C": { brand: "Quicksilver Scientific · liposomal, 4 fl oz", how: "Empty stomach, at least 10 minutes before each meal. Hold in your mouth 30 seconds, then swallow.", label: "1 tsp (5 mL) = 1,000 mg vitamin C and 125 mg sodium. 24 tsp a bottle.", why: "Split into 3 because smaller doses absorb better.", note: "The sheet says 3 tsp (3.5 g); 3 tsp of this bottle is 3 g. Refrigerate after opening and use within 60 days." },
     "Magnesium glycinate": { brand: "Metagenics · 120 tablets", how: "1 tablet at lunch, dinner and bedtime. Not with breakfast, which has the iron. Glycinate can help you sleep.", label: "100 mg per tablet, 1 tablet 3 times a day." },
-    "Bone Builder Plus": { brand: "Metagenics · 90 capsules", how: "With dinner. Not with PhytoMulti: calcium blocks iron.", label: "2 capsules once a day: 420 mg calcium, 2,000 IU vitamin D.", why: "Helps bone grow back after the extraction." },
+    "Bone Builder Plus": { brand: "Metagenics · 90 capsules", how: "With dinner. At least 2 hours away from PhytoMulti (calcium blocks iron).", label: "2 capsules once a day: 420 mg calcium, 2,000 IU vitamin D.", why: "Helps bone grow back after the extraction." },
     "GABA": { brand: "Pump bottle", how: PUMP3 },
     "CBD": { brand: "Pump bottle", how: PUMP3 },
     "Relax Milieu": { brand: "Blue pump bottle", how: PUMP3 },
