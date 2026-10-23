@@ -72,7 +72,13 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .d.sp .ring .t{stroke:var(--special-tint)}
 .d.sp .ring .p{stroke:var(--special)}
 .d.sp .n{color:var(--special);font-weight:800}
-.dots{display:flex;justify-content:center;gap:5px;margin-top:4px}
+/* In the strip the marker sits on the ring's bottom edge instead of in a row of its own,
+   so days without one don't carry empty space at the bottom of their card. */
+.week .d{position:relative;padding:9px 0 12px}
+.week .mk{position:absolute;left:50%;bottom:4px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--bg)}
+.week .d[aria-pressed="true"] .mk{background:var(--card)}
+.week .mk:empty{display:none}
+.dots{display:flex;justify-content:center;gap:5px;margin-top:10px}
 .dots i{width:5px;height:5px;border-radius:50%;background:var(--track)}
 .dots i.on{background:var(--muted)}
 

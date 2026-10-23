@@ -79,7 +79,7 @@ App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Betwee
 - `itemsFor(n)` returns the day's items: BEFORE for n < 13; BEFORE + NIGHT for n = 13; SURGERY for n = 14; RECOVERY (plus Intenzyme on n = 15, 17, 19, 21) after that.
 - Each item has `id`, `slot`, `name`, `sub`, `icon` (SVG fallback), optional `img` (key into `IMG`) and optional `pill` note.
 - **Slots / cards**: `Before breakfast`, `Breakfast`, `Lunch`, `Dinner`, `Bedtime`, `Between meals`, `Anytime`, `1 hour before`, `Also today`, chosen from the bottle labels (see the protocol table). Each slot is its own card when a day uses more than one slot. On Nov 1 the night-before pumps sit under Bedtime. Vitamin C is three items (`vitc`, `vitc2`, `vitc3`).
-- **Special days**: Nov 1 and Nov 2 get amber rings and numbers plus a marker under the ring (moon for night before, tooth for surgery day), in the week strip and the Progress calendar. The date line names them in amber.
+- **Special days**: Nov 1 and Nov 2 get amber rings and numbers plus a marker (moon for night before, tooth for surgery day): under the ring in the Progress calendar, and on the ring's bottom edge in the week strip, so the strip's day cards don't reserve an empty row at the bottom (issue #12). The date line names them in amber.
 - **Countdown card** (sage, matching the nav; the user asked to drop its amber): "15 days until surgery" → "Surgery is tomorrow" → "Surgery is today" → "N days since surgery". Based on the device's real date.
 
 ### State and sync
