@@ -105,7 +105,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .refresh.busy svg{animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .sec-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
-.sec-h{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted)}
+.sec-h{display:flex;align-items:center;gap:8px;width:100%;min-height:36px;padding:8px 14px;background:var(--band);font-size:12px;font-weight:700;color:var(--muted);transition:background-color .3s}
 .sec-h:disabled{cursor:default;color:var(--muted)}
 .sec-h:not(:disabled):active{background:var(--line)}
 .sec-t{flex:1;min-width:0}
@@ -119,6 +119,15 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sec-card.collapsed .sec-body{grid-template-rows:0fr}
 .sec-in{min-height:0;overflow:hidden}
 .sec-in > .item{border-top:1px solid var(--line)}
+/* A card that has just been finished holds open for a moment (sage header, "Done" springs in), then folds with a bounce. */
+.sec-card.held .sec-h{background:var(--accent-tint)}
+.sec-card.just-done .sec-done{animation:done-pop .5s cubic-bezier(.34,1.7,.6,1) both}
+.sec-card.just-done .chev{animation:fade-in .3s .15s both}
+@keyframes done-pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:scale(1)}}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+/* The circle just tapped springs as it fills. */
+.item.pop .chk{animation:chk-pop .45s cubic-bezier(.3,1.5,.55,1)}
+@keyframes chk-pop{0%{transform:scale(.72)}55%{transform:scale(1.14)}100%{transform:scale(1)}}
 
 /* Lists */
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
@@ -244,7 +253,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 .es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .es-reset{display:block;margin:14px auto 0;padding:10px 14px;border-radius:12px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 
-@media (prefers-reduced-motion: reduce){ .sec-body,.chev,.ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
+@media (prefers-reduced-motion: reduce){ .item.pop .chk,.sec-card.just-done .sec-done,.sec-card.just-done .chev{animation:none} .sec-body,.chev,.ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
 </style>
 
 <div class="wrap">
@@ -518,7 +527,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function itemHTML(n, it) {
     const k = key(n, it), done = on(k);
     const at = ' data-k="' + k + '" data-n="' + n + '"';
-    return '<div class="item' + (done ? ' done' : '') + '">' +
+    return '<div class="item' + (done ? ' done' : '') + (k === popKey ? ' pop' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') + '</span></button>' +
@@ -529,6 +538,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // ("Done"); tapping the header opens it again. sectionsShown remembers how each card was last drawn,
   // so a card that has just been finished folds away instead of vanishing.
   const sectionsOpened = new Set(), sectionsShown = new Map();
+  // A card that has just been finished stays open for HOLD_MS so the last tap can be seen, then folds.
+  const HOLD_MS = 850, holding = new Map();   // holding: card id -> timer
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let popKey = null;                           // the dose just ticked, so its circle springs
   const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
   let sectionsNext = [];
   function listHTML(n, items, banded) {
@@ -543,7 +556,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       const fold = all && !sectionsOpened.has(id);
       const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
       sectionsNext.push([id, fold]);
-      html += '<section class="sec-card' + (drawn ? ' collapsed' : '') + '" data-sec="' + esc(id) + '">' +
+      html += '<section class="sec-card' + (drawn ? ' collapsed' : '') + (holding.has(id) ? ' held' : '') + '" data-sec="' + esc(id) + '">' +
         '<button type="button" class="sec-h" data-sec-toggle="' + esc(id) + '" aria-expanded="' + !fold + '"' + (all ? '' : ' disabled') + '>' +
         '<span class="sec-t">' + esc(s) + '</span>' +
         (all ? '<span class="sec-done">' + CHECK + 'Done</span><span class="chev">' + CHEV + '</span>'
@@ -552,16 +565,56 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     });
     return html;
   }
-  // After drawing, move each card to where it belongs, so the fold animates.
+  const secEl = (id) => document.querySelector('.sec-card[data-sec="' + id + '"]');
+  function stopHold(id) {
+    if (!holding.has(id)) return;
+    clearTimeout(holding.get(id)); holding.delete(id);
+    const el = secEl(id); if (el) el.classList.remove("held", "just-done");
+  }
+  // After drawing, move each card to where it belongs. A card that has just been finished holds, then folds.
   function settleSections() {
     const next = sectionsNext;
     requestAnimationFrame(() => next.forEach(([id, fold]) => {
-      const el = document.querySelector('.sec-card[data-sec="' + id + '"]');
-      if (el) el.classList.toggle("collapsed", fold);
-      sectionsShown.set(id, fold);
+      const el = secEl(id), wasFolded = sectionsShown.get(id);
+      if (!fold) { stopHold(id); if (el) el.classList.remove("collapsed"); sectionsShown.set(id, false); return; }
+      if (holding.has(id)) return;
+      if (wasFolded === false && el) {
+        el.classList.add("held", "just-done");
+        holding.set(id, setTimeout(() => { holding.delete(id); bounceFold(id); }, HOLD_MS));
+        return;
+      }
+      if (el) el.classList.add("collapsed");
+      sectionsShown.set(id, true);
     }));
   }
+  // Fold a card's body to nothing, rebound a little, and settle shut.
+  function bounceFold(id) {
+    sectionsShown.set(id, true);
+    const el = secEl(id);
+    if (!el) return;
+    el.classList.remove("held");
+    const body = el.querySelector(".sec-body"), h = body.offsetHeight;
+    const finish = () => {
+      el.classList.remove("just-done");
+      body.style.transition = "none";
+      el.classList.add("collapsed");
+      if (anim) anim.cancel();
+      void body.offsetHeight;
+      body.style.transition = "";
+    };
+    let anim = null;
+    if (reduceMotion.matches || !body.animate || !h) { finish(); return; }
+    el.querySelector(".chev").style.transform = "rotate(0deg)";
+    anim = body.animate([
+      { height: h + "px", easing: "cubic-bezier(.45,0,.75,.5)" },
+      { height: "0px", offset: .62, easing: "cubic-bezier(.2,.7,.4,1)" },
+      { height: Math.min(12, h) + "px", offset: .8, easing: "cubic-bezier(.6,0,.8,.5)" },
+      { height: "0px" }
+    ], { duration: 620, fill: "forwards" });
+    anim.onfinish = () => { el.querySelector(".chev").style.transform = ""; finish(); };
+  }
   function toggleSection(id) {
+    stopHold(id);
     if (sectionsOpened.has(id)) sectionsOpened.delete(id); else sectionsOpened.add(id);
     const fold = !sectionsOpened.has(id), el = document.querySelector('.sec-card[data-sec="' + id + '"]');
     if (!el) return;
@@ -575,6 +628,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const banded = new Set(items.map((it) => it.slot)).size > 1;
     // Taken doses stay where they are, faded with their check, so the list doesn't reshuffle under a tap.
     document.getElementById("day").innerHTML = listHTML(n, items, banded);
+    popKey = null;
     settleSections();
   }
 
@@ -691,7 +745,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
   function toggle(k, n) {
-    if (on(k)) delete state[k]; else state[k] = true;
+    if (on(k)) delete state[k]; else { state[k] = true; popKey = k; }
     if (!synced) early[k] = on(k);
     saveLocal(); queueSync();
     renderDay(); updateRings(n);
