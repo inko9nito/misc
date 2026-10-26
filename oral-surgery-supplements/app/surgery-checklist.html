@@ -119,7 +119,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .sec-card.collapsed .sec-body{grid-template-rows:0fr}
 .sec-in{min-height:0;overflow:hidden}
 .sec-in > .item{border-top:1px solid var(--line)}
-/* A card that has just been finished holds open for a moment (sage header, "Done" springs in), then folds with a bounce. */
+/* A card that has just been finished holds open for a moment (sage header, "Done" springs in), then folds. */
 .sec-card.held .sec-h{background:var(--accent-tint)}
 .sec-card.just-done .sec-done{animation:done-pop .5s cubic-bezier(.34,1.7,.6,1) both}
 .sec-card.just-done .chev{animation:fade-in .3s .15s both}
@@ -539,7 +539,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // so a card that has just been finished folds away instead of vanishing.
   const sectionsOpened = new Set(), sectionsShown = new Map();
   // A card that has just been finished stays open for HOLD_MS so the last tap can be seen, then folds.
-  const HOLD_MS = 850, holding = new Map();   // holding: card id -> timer
+  const HOLD_MS = 500, holding = new Map();   // holding: card id -> timer
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let popKey = null;                           // the dose just ticked, so its circle springs
   const CHEV = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
@@ -580,38 +580,18 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (holding.has(id)) return;
       if (wasFolded === false && el) {
         el.classList.add("held", "just-done");
-        holding.set(id, setTimeout(() => { holding.delete(id); bounceFold(id); }, HOLD_MS));
+        holding.set(id, setTimeout(() => { holding.delete(id); foldSection(id); }, HOLD_MS));
         return;
       }
       if (el) el.classList.add("collapsed");
       sectionsShown.set(id, true);
     }));
   }
-  // Fold a card's body to nothing, rebound a little, and settle shut.
-  function bounceFold(id) {
+  // Fold a finished card shut; the .sec-body transition animates it.
+  function foldSection(id) {
     sectionsShown.set(id, true);
     const el = secEl(id);
-    if (!el) return;
-    el.classList.remove("held");
-    const body = el.querySelector(".sec-body"), h = body.offsetHeight;
-    const finish = () => {
-      el.classList.remove("just-done");
-      body.style.transition = "none";
-      el.classList.add("collapsed");
-      if (anim) anim.cancel();
-      void body.offsetHeight;
-      body.style.transition = "";
-    };
-    let anim = null;
-    if (reduceMotion.matches || !body.animate || !h) { finish(); return; }
-    el.querySelector(".chev").style.transform = "rotate(0deg)";
-    anim = body.animate([
-      { height: h + "px", easing: "cubic-bezier(.45,0,.75,.5)" },
-      { height: "0px", offset: .62, easing: "cubic-bezier(.2,.7,.4,1)" },
-      { height: Math.min(12, h) + "px", offset: .8, easing: "cubic-bezier(.6,0,.8,.5)" },
-      { height: "0px" }
-    ], { duration: 620, fill: "forwards" });
-    anim.onfinish = () => { el.querySelector(".chev").style.transform = ""; finish(); };
+    if (el) el.classList.remove("held", "just-done"), el.classList.add("collapsed");
   }
   function toggleSection(id) {
     stopHold(id);
