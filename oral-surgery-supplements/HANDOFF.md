@@ -145,5 +145,5 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 ## Post-op additions (from the office's implant post-op sheet and checklist email)
 - Recovery days add **homeopathic pellets** (6 remedies, 30C; the sheet says 4 of each every 3 hours, the email says 3 every hour — open question for the office), **jaw exercises** 3×/day through Nov 8 (`JAW`, ids jaw1–3), and a **salt water rinse** 2×/day Nov 5–9 (`SALT`, ids salt1–2). Silver gel is 3–5 times a day.
 - The Supplements tab has a **Recovery care** card (`CARE`): first-24-hours rules, soft foods, foods to avoid, pain medicine, retainer, rest. The office's address and phone numbers are left out of the public repo on purpose.
-- Pre-op items (Valium, antibiotic 3 days before, ibuprofen 2 hours before) were past by the time the sheet arrived, so they aren't in the app.
+- From the checklist email: **antibiotic** 3×/day from Oct 30 (`ABX`, ids abx1–3), and on surgery day the antibiotic and **ibuprofen 800 mg** 2 hours before (new slots "2 hours before" and "After surgery"); silver gel, pellets and jaw exercises start after surgery. The email names Valium; the office called in Halcion, so Halcion stays and its note mentions the difference. How long the antibiotic continues after surgery is an open question.
 
