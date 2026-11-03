@@ -141,3 +141,9 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - Get answers to the open questions from the user or the office, and build them into the app.
 - Pull the item data into one shared JSON so the app and the print version can't drift.
 - Add photos for the remaining items if the user sends them.
+
+## Post-op additions (from the office's implant post-op sheet and checklist email)
+- Recovery days add **homeopathic pellets** (6 remedies, 30C; the sheet says 4 of each every 3 hours, the email says 3 every hour — open question for the office), **jaw exercises** 3×/day through Nov 8 (`JAW`, ids jaw1–3), and a **salt water rinse** 2×/day Nov 5–9 (`SALT`, ids salt1–2). Silver gel is 3–5 times a day.
+- The Supplements tab has a **Recovery care** card (`CARE`): first-24-hours rules, soft foods, foods to avoid, pain medicine, retainer, rest. The office's address and phone numbers are left out of the public repo on purpose.
+- Pre-op items (Valium, antibiotic 3 days before, ibuprofen 2 hours before) were past by the time the sheet arrived, so they aren't in the app.
+

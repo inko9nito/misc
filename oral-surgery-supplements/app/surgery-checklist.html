@@ -212,6 +212,7 @@ html.push-open .push-dim{opacity:.1}
 .kv{display:flex;gap:12px;padding:11px 14px;font-size:15px}
 .kv .k{flex:none;width:64px;font-size:13px;font-weight:600;color:var(--muted);padding-top:1px}
 .kv .v{flex:1;min-width:0}
+.care .kv .k{width:78px}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
@@ -321,6 +322,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     drops: '<path d="M8 11h8v9.5a1.5 1.5 0 0 1-1.5 1.5h-5A1.5 1.5 0 0 1 8 20.5Z"/><path d="M10 11V8h4v3"/><path d="M11 8V4.5a1 1 0 0 1 2 0V8"/>',
     swab: '<path d="M8 16 16 8"/><ellipse cx="17.5" cy="6.5" rx="1.9" ry="3" transform="rotate(45 17.5 6.5)"/><ellipse cx="6.5" cy="17.5" rx="1.9" ry="3" transform="rotate(45 6.5 17.5)"/>',
     tooth: '<path d="M8 3.5C5.5 3.5 4 5.4 4 8c0 2 .8 3.4 1.3 5.3.6 2.3.8 7.2 2.7 7.2 1.7 0 1.6-4.6 4-4.6s2.3 4.6 4 4.6c1.9 0 2.1-4.9 2.7-7.2.5-1.9 1.3-3.3 1.3-5.3 0-2.6-1.5-4.5-4-4.5-1.8 0-2.6 1-4 1s-2.2-1-4-1Z"/>',
+    cup: '<path d="M6 4h12l-1.4 15a2 2 0 0 1-2 1.8H9.4a2 2 0 0 1-2-1.8Z"/><path d="M6.6 10h10.8"/>',
+    pellets: '<circle cx="7.5" cy="15" r="3"/><circle cx="16" cy="16" r="3"/><circle cx="12" cy="8" r="3"/>',
     moon: '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'
   };
   const svg = (k) => '<svg viewBox="0 0 24 24" aria-hidden="true">' + IC[k] + '</svg>';
@@ -373,7 +376,20 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "bone",   slot: "Dinner", name: "Bone Builder Plus", sub: "2 capsules", icon: "capsule", img: "bone", pill: "2+ hrs away from multivitamin" },
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
-    { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip around gums", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" }
+    { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
+    { id: "pellets", slot: "Anytime", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
+  ];
+  // From the office's post-op sheet: jaw exercises 3 times a day for the first week (surgery day is past, so
+  // from the day after through Nov 8), then warm salt water rinses 2–3 times a day for 5 days after the first 3.
+  const JAW_LAST_N = SURG_N + 6, SALT_FIRST_N = SURG_N + 3, SALT_LAST_N = SURG_N + 7;   // Nov 8; Nov 5 – Nov 9
+  const JAW = [
+    { id: "jaw1", slot: "Breakfast", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" },
+    { id: "jaw2", slot: "Lunch", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" },
+    { id: "jaw3", slot: "Dinner", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" }
+  ];
+  const SALT = [
+    { id: "salt1", slot: "Breakfast", name: "Salt water rinse", sub: "1 tsp salt in 8 oz warm water", icon: "cup" },
+    { id: "salt2", slot: "Dinner", name: "Salt water rinse", sub: "1 tsp salt in 8 oz warm water", icon: "cup" }
   ];
 
   // What the details page shows for each supplement, keyed by name. From the bottle labels and the office sheet.
@@ -393,7 +409,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Intenzyme Forte": { brand: "Biotics Research · 50 tablets", how: "Empty stomach, between meals. With food it only helps digestion.", label: "10 tablets a dose, 5 doses: Nov 2, 3, 5, 7 and 9." },
     "Drainage Milieu": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Lymph 3 Chronic": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
-    "Renew silver gel": { brand: "ameo life · extra strength", how: "Q-tip around the gums." }
+    "Renew silver gel": { brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
+    "Homeopathic pellets": { brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
+      how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
+      note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
+    "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
+      why: "Keeping the jaw closed after surgery can shorten and tighten the muscles." },
+    "Salt water rinse": { brand: "From the office’s post-op sheet", how: "1 teaspoon of salt in 8 oz of warm water, 2–3 times a day for 5 days, starting 3 days after surgery. Rinse gently.",
+      why: "Flushes out food caught around the surgery site and helps it heal." }
   };
 
   function baseItemsFor(n) {
@@ -402,17 +425,21 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (n === SURG_N) return SURGERY;
     const out = [];
     if (n <= INTZ_LAST_N && (n - 15) % 2 === 0) out.push(intzDose(n));
-    return out.concat(RECOVERY);
+    out.push.apply(out, RECOVERY);
+    if (n <= JAW_LAST_N) out.push.apply(out, JAW);
+    if (n >= SALT_FIRST_N && n <= SALT_LAST_N) out.push.apply(out, SALT);
+    return out;
   }
 
   /* ---------- Edits (Edit on a details page) ---------- */
   // Each supplement has a product key; its doses (items) and Supplements rows point at it.
   const NAME2P = { "D3K2": "d3k2", "Methyl-B12": "b12", "PhytoMulti": "multi", "Bio-D-Mulsion Forte": "biod", "Vitamin C": "vitc",
     "Magnesium glycinate": "mag", "Bone Builder Plus": "bone", "GABA": "gaba", "CBD": "cbd", "Relax Milieu": "relax", "Halcion": "halcion",
-    "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver" };
+    "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
+    "Homeopathic pellets": "pellets", "Jaw exercises": "jaw", "Salt water rinse": "salt" };
   const PNAME = {}, PDETAILS = {};
   Object.keys(NAME2P).forEach((nm) => { PNAME[NAME2P[nm]] = nm; PDETAILS[NAME2P[nm]] = DETAILS[nm] || {}; });
-  const prodOf = (id) => ({ vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgdn: "mag", mgpm: "mag" })[id] || id.replace(/^[ns]-/, "");
+  const prodOf = (id) => ({ vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgdn: "mag", mgpm: "mag", jaw1: "jaw", jaw2: "jaw", jaw3: "jaw", salt1: "salt", salt2: "salt" })[id] || id.replace(/^[ns]-/, "");
   // What's been changed, over the defaults above: p = a supplement's fields, i = one dose's (by item id, on
   // every day it appears), s = one Supplements row's. A field that's present overrides, even when empty.
   const LSE = "surgery-tracker-edits-v1";
@@ -641,6 +668,19 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function grp(title, when, rows, sp) {
     return '<div class="grp"><div class="gh' + (sp ? " sp" : "") + '"><b>' + title + '</b><span>' + when + '</span></div><div class="list">' + rows.join("") + '</div></div>';
   }
+  // Care after surgery, from the office's post-op sheet and checklist email.
+  const CARE = [
+    ["First 24 hours", "No straws, smoking, alcohol, fizzy drinks or vigorous rinsing: they can dislodge or dissolve the clot. A little oozing is normal."],
+    ["Eating", "Very soft foods for about a week: soups and broth, eggs, yogurt, oatmeal, mashed potatoes, soft fruit and smoothies. Chew on the other side."],
+    ["Avoid", "Hard, crunchy, chewy, sticky, spicy and acidic foods (nuts, chips, jerky, caramel, tomato, citrus) until it heals. Don’t bite hard things on the implant side."],
+    ["Pain", "Eat something before any pain medicine. The office prefers to avoid ice and ibuprofen, which slow healing. For mild pain: 2 Tylenol, then 2 ibuprofen 4–6 hours later."],
+    ["Retainer", "After an implant, wear the retainer 24/7 for 6 months, until the crown goes on. Take it out to eat."],
+    ["Rest", "Rest as much as you can so your body puts its energy into healing."]
+  ];
+  function careHTML() {
+    return '<div class="grp"><div class="gh"><b>Recovery care</b><span>From the office</span></div><div class="list care">' +
+      CARE.map((c) => '<div class="kv"><span class="k">' + esc(c[0]) + '</span><span class="v">' + esc(c[1]) + '</span></div>').join("") + '</div></div>';
+  }
   function renderSupps() {
     suppRows.length = 0;
     document.getElementById("v-supps").innerHTML =
@@ -670,10 +710,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("recovery", "tablet", "Intenzyme Forte", "10 tablets between meals, the day after, then every other day until gone", "50 tablets: last dose " + fShort(dateOf(INTZ_LAST_N))),
         infoRow("recovery", "drops", "Drainage Milieu", "Per bottle until empty"),
         infoRow("recovery", "drops", "Lymph 3 Chronic", "Per bottle until empty"),
-        infoRow("recovery", "swab", "Renew silver gel", "Q-tip around gums", "Gently, don’t dislodge the clot"),
+        infoRow("recovery", "swab", "Renew silver gel", "Q-tip on the site, 3–5 times a day", "Gently, don’t dislodge the clot"),
+        infoRow("recovery", "pellets", "Homeopathic pellets", "4 of each under the tongue, every 3 hours, until gone"),
+        infoRow("recovery", "tooth", "Jaw exercises", "3 times a day, through " + fShort(dateOf(JAW_LAST_N))),
+        infoRow("recovery", "cup", "Salt water rinse", "2–3 times a day, " + fShort(dateOf(SALT_FIRST_N)) + " – " + fShort(dateOf(SALT_LAST_N))),
         infoRow("recovery", "capsule", "PhytoMulti", "Once a day, with breakfast"),
         infoRow("recovery", "capsule", "Bone Builder Plus", "2 capsules with dinner")
       ]) +
+      careHTML() +
       '<p class="foot">Times follow the bottle labels. Calcium in Bone Builder blocks iron in PhytoMulti, so they go at different meals. Ask the office whether D3K2, vitamin C, magnesium and B12 continue after surgery.</p>';
   }
 
@@ -979,7 +1023,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     sub: "Dose", slot: "When", pill: "Reminder" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
-  BEFORE.concat(NIGHT, SURGERY, RECOVERY).forEach((it) => { BASE_ITEMS[it.id] = it; });
+  BEFORE.concat(NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
   BASE_ITEMS.intz = intzDose(15);
   const itemWhere = (id) => {
     const it = BASE_ITEMS[id];
