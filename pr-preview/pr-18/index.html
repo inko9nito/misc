@@ -182,7 +182,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .list > * + *{border-top:1px solid var(--line)}
 /* A row is two targets: .open (tile and text) shows details; .tick (the circle) marks it taken. */
-.item{display:flex;align-items:stretch;width:100%;min-height:64px}
+.item{position:relative;display:flex;align-items:stretch;width:100%;min-height:64px;overflow:hidden;touch-action:pan-y}
+.item > .open,.item > .tick{position:relative;z-index:1;background:var(--card);transform:translateX(var(--sx,0px));transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.item.swiping > .open,.item.swiping > .tick{transition:none}
+.swipe-act{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;background:var(--ink2);color:var(--bg);font-size:15px;font-weight:600}
+.swipe-act span{width:96px;text-align:center}
 .open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 0 10px 14px}
 .open:last-child{padding-right:14px}
 .open:active,.tick:active{background:var(--band)}
@@ -721,7 +725,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function itemHTML(n, it) {
     const k = key(n, it), done = on(k);
     const at = ' data-k="' + k + '" data-n="' + n + '"';
-    return '<div class="item' + (done ? ' done' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' +
+    // Behind the row: the action a left swipe reveals (Skip, or Undo skip on a skipped dose).
+    const act = done ? "" : '<button type="button" class="swipe-act" data-swipe' + at + ' tabindex="-1" aria-hidden="true"><span>' +
+      (skipped(k) ? "Undo skip" : "Skip") + '</span></button>';
+    return '<div class="item' + (done ? ' done' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' + act +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
@@ -968,6 +975,69 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     renderDay(); updateRings(n);
     if (it) showToast(k, n, it, t);
   }
+
+  /* ---------- Swipe a row left to skip it ---------- */
+  // Drag a not-yet-taken row left: past halfway it skips (or un-skips) straight away; a shorter drag
+  // leaves the button showing, to tap. Only horizontal drags are taken; vertical ones still scroll.
+  const SW_OPEN = 96;
+  let sw = null, swOpen = null, swEatClick = false;
+  const dayEl = document.getElementById("day");
+  const setSx = (item, x, animate) => { item.classList.toggle("swiping", !animate); item.style.setProperty("--sx", x + "px"); };
+  function closeSwipe(animate) {
+    if (!swOpen) return;
+    setSx(swOpen, 0, animate !== false); swOpen.classList.remove("swiped"); swOpen = null;
+  }
+  dayEl.addEventListener("touchstart", (e) => {
+    const item = e.target.closest(".item");
+    if (swOpen && swOpen !== item) closeSwipe();
+    if (!item || e.touches.length !== 1 || !item.querySelector(".swipe-act") || e.target.closest(".swipe-act")) { sw = null; return; }
+    const t = e.touches[0];
+    sw = { item: item, x: t.clientX, y: t.clientY, dir: null, base: item === swOpen ? -SW_OPEN : 0, off: 0, w: item.offsetWidth };
+  }, { passive: true });
+  dayEl.addEventListener("touchmove", (e) => {
+    if (!sw || e.touches.length !== 1) return;
+    const t = e.touches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y;
+    if (!sw.dir) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      sw.dir = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    }
+    if (sw.dir !== "h") return;
+    e.preventDefault();
+    let off = sw.base + dx;
+    if (off > 0) off = off / 4;            // a little give to the right, like iOS
+    sw.off = off;
+    setSx(sw.item, off, false);
+  }, { passive: false });
+  function endSwipe() {
+    const g = sw; sw = null;
+    if (!g || g.dir !== "h") return;
+    swEatClick = true; setTimeout(() => { swEatClick = false; }, 350);
+    const btn = g.item.querySelector(".swipe-act");
+    if (g.off < -g.w * 0.5 && btn) {
+      setSx(g.item, -g.w, true);
+      setTimeout(() => runSwipe(btn), 180);
+      swOpen = null;
+    } else if (g.off < -SW_OPEN / 2) {
+      setSx(g.item, -SW_OPEN, true); g.item.classList.add("swiped"); swOpen = g.item;
+    } else {
+      setSx(g.item, 0, true); g.item.classList.remove("swiped"); if (swOpen === g.item) swOpen = null;
+    }
+  }
+  dayEl.addEventListener("touchend", endSwipe);
+  dayEl.addEventListener("touchcancel", endSwipe);
+  function runSwipe(btn) {
+    const k = btn.dataset.k, n = +btn.dataset.n;
+    swOpen = null;
+    setSkip(k, n, !skipped(k));
+  }
+  // A drag isn't a tap: swallow the click that follows it, and close an open row on the next tap.
+  document.addEventListener("click", (e) => {
+    if (swEatClick) { e.stopPropagation(); e.preventDefault(); return; }
+    const act = e.target.closest("[data-swipe]");
+    if (act) { e.stopPropagation(); runSwipe(act); return; }
+    if (swOpen) { e.stopPropagation(); e.preventDefault(); closeSwipe(); }
+  }, true);
+  window.addEventListener("scroll", () => closeSwipe(), { passive: true });
 
   /* ---------- Logged toast ---------- */
   // After a dose is logged, a toast shows its time for a few seconds. The time is a native time
