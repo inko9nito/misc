@@ -148,3 +148,7 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - From the checklist email: **antibiotic** 3×/day from Oct 30 (`ABX`, ids abx1–3), and on surgery day the antibiotic and **ibuprofen 800 mg** 2 hours before (new slots "2 hours before" and "After surgery"); silver gel, pellets and jaw exercises start after surgery. The email names Valium; the office called in Halcion, so Halcion stays and its note mentions the difference. How long the antibiotic continues after surgery is an open question.
 - **Supplements continue after surgery.** The post-op sheet says "Make sure to take all of your supplements as per protocol till it is gone", so the whole daily stack (`BEFORE`) is on surgery day and every recovery day, along with the antibiotic 3×/day (until the prescription is finished; the end date is unknown) and Drainage, Lymph, silver gel and pellets (from after surgery on surgery day). Surgery-day slots come first in `SLOTS` ("2 hours before", "1 hour before"), then the usual meal slots, then "After surgery".
 
+## Logged times
+- Ticking a dose stores the time it was logged: `state["YYYY-MM-DD:id"] = "HH:MM"` (24-hour, local). `true` still means taken with no time (the time was cleared, or it was ticked before times existed). `on(k)` accepts either; `timeOf(k)` returns the time or "".
+- A taken row shows "Taken 8:14 AM" under its dose. The details page has a "Taken at" time field above Mark as not taken: changing it saves at once, and Clear removes the time but keeps the dose taken. Sync (`clean`) keeps both kinds of value.
+

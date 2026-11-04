@@ -213,6 +213,12 @@ html.push-open .push-dim{opacity:.1}
 .kv .k{flex:none;width:64px;font-size:13px;font-weight:600;color:var(--muted);padding-top:1px}
 .kv .v{flex:1;min-width:0}
 .care .kv .k{width:78px}
+.at{font-size:13px;color:var(--accent-ink);font-variant-numeric:tabular-nums;margin-top:1px}
+.taken-at{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:6px 6px 6px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+.taken-at label{flex:1;font-size:15px;font-weight:600}
+.taken-at input{font:inherit;font-size:16px;color:var(--ink);background:var(--tile);border:0;border-radius:10px;padding:8px 10px;min-height:40px;font-variant-numeric:tabular-nums}
+.clear-time{font-size:15px;font-weight:600;color:var(--accent-ink);padding:8px 10px;min-height:40px;border-radius:10px}
+.clear-time[hidden]{display:none}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
@@ -510,7 +516,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   let state = (function () { try { const v = JSON.parse(localStorage.getItem(LS) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } })();
   const saveLocal = () => { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} };
   const key = (n, it) => iso(dateOf(n)) + ":" + it.id;
-  const on = (k) => state[k] === true;
+  // A taken dose is stored as the time it was logged ("14:05"), or true when its time was cleared
+  // (and for checkmarks saved before times existed).
+  const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
+  const valid = (v) => v === true || (typeof v === "string" && HM.test(v));
+  const on = (k) => valid(state[k]);
+  const timeOf = (k) => typeof state[k] === "string" && HM.test(state[k]) ? state[k] : "";
+  const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
+  const fmtHM = (hm) => { const [h, m] = hm.split(":").map(Number); return ((h + 11) % 12 + 1) + ":" + String(m).padStart(2, "0") + (h < 12 ? " AM" : " PM"); };
   const doneCount = (n) => itemsFor(n).filter((it) => on(key(n, it))).length;
 
   /* ---------- Countdown ---------- */
@@ -586,7 +599,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return '<div class="item' + (done ? ' done' : '') + (k === popKey ? ' pop' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
-      (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') + '</span></button>' +
+      (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
+      (done && timeOf(k) ? '<span class="at">Taken ' + fmtHM(timeOf(k)) + '</span>' : '') + '</span></button>' +
       '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
@@ -812,10 +826,22 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
   function toggle(k, n) {
-    if (on(k)) delete state[k]; else { state[k] = true; popKey = k; }
-    if (!synced) early[k] = on(k);
-    saveLocal(); queueSync();
+    if (on(k)) delete state[k]; else { state[k] = nowHM(); popKey = k; }
+    stateChanged(k);
     renderDay(); updateRings(n);
+  }
+  function stateChanged(k) {
+    if (!synced) early[k] = on(k) ? state[k] : false;
+    saveLocal(); queueSync();
+  }
+  // The time on the details page: change it, or clear it (the dose stays taken, just without a time).
+  function setTime(k, hm) {
+    if (!on(k)) return;
+    state[k] = HM.test(hm) ? hm : true;
+    stateChanged(k);
+    renderDay();
+    const clr = push.querySelector("[data-clear-time]");
+    if (clr) clr.hidden = !timeOf(k);
   }
   function detailHTML(row, dayCtx) {
     const d = prodInfo(row.p);
@@ -824,7 +850,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     // Supplement details first, then this dose (or row), as in the Edit sheet.
     const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
-    const foot = dayCtx ? '<div class="push-foot"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
+    const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
+    const at = t === null ? "" : '<div class="taken-at"><label for="taken-time">Taken at</label>' +
+      '<input type="time" id="taken-time" data-time value="' + t + '">' +
+      '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
+    const foot = dayCtx ? '<div class="push-foot">' + at + '<button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
       (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
       '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
@@ -1146,6 +1176,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     opener = from;
     location.hash = "#changes";
   }
+  // Typing or picking a new time on the details page saves it right away.
+  const onTime = (e) => { if (e.target.matches("[data-time]") && detailFor) setTime(detailFor.k, e.target.value); };
+  push.addEventListener("change", onTime);
+  push.addEventListener("input", onTime);
   esheet.addEventListener("input", markDirty);
   esheet.addEventListener("change", markDirty);
   esheet.addEventListener("submit", (e) => { e.preventDefault(); if (!esheet.querySelector("[data-save]").disabled) saveEdit(); });
@@ -1208,6 +1242,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
     if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
     if (e.target.closest("[data-back]")) { closeDetail(); return; }
+    if (e.target.closest("[data-clear-time]")) {
+      if (detailFor) { const inp = push.querySelector("[data-time]"); if (inp) inp.value = ""; setTime(detailFor.k, ""); }
+      return;
+    }
     if (e.target.closest("[data-mark]")) { if (detailFor) toggle(detailFor.k, detailFor.n); closeDetail(); return; }
     const t = e.target.closest(".tab, .tick, .open, .d");
     if (!t) return;
@@ -1245,7 +1283,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       pending = false; setSync("Couldn’t sync just now. Checkmarks are saved on this device.");
     }
   }
-  const clean = (o) => { const out = {}; if (o) Object.keys(o).forEach((k) => { if (o[k] === true) out[k] = true; }); return out; };
+  const clean = (o) => { const out = {}; if (o) Object.keys(o).forEach((k) => { if (valid(o[k])) out[k] = o[k]; }); return out; };
   function refreshAll() {
     for (let n = 0; n < DAYS; n++) updateRings(n);
     renderDay();
@@ -1262,7 +1300,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (!synced) {
         synced = true;
         state = remote || clean(state);
-        Object.keys(early).forEach((k) => { if (early[k]) state[k] = true; else delete state[k]; });
+        Object.keys(early).forEach((k) => { if (early[k]) state[k] = early[k]; else delete state[k]; });
         saveLocal(); refreshAll();
         setSync("Checkmarks sync across your devices.");
         if (!remote || Object.keys(early).length) queueSync();
