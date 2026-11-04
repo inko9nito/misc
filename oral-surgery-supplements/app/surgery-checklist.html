@@ -227,6 +227,13 @@ html.push-open .push-dim{opacity:.1}
 .clear-time{font-size:15px;font-weight:600;color:var(--accent-ink);padding:8px 10px;min-height:40px;border-radius:10px}
 .clear-time[hidden]{display:none}
 .at.due{color:var(--muted)}
+.segs{display:flex;gap:3px;margin:6px 0 3px;max-width:180px}
+.segs i{flex:1;height:6px;border-radius:3px;background:var(--track)}
+.segs i.on{background:var(--accent)}
+.seg-big{display:flex;align-items:center;gap:12px;margin:0 2px 10px}
+.seg-big .segs{flex:1;max-width:none;margin:0}
+.seg-big .segs i{height:8px;border-radius:4px}
+.seg-big span{font-size:15px;font-weight:600;font-variant-numeric:tabular-nums}
 .toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;max-width:420px;z-index:30;display:flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;
   border-radius:16px;background:var(--ink);color:var(--bg);box-shadow:0 6px 24px rgba(0,0,0,.18);
   transform:translateY(12px);opacity:0;transition:transform .25s cubic-bezier(.32,.72,0,1),opacity .2s;pointer-events:none}
@@ -239,6 +246,10 @@ html.push-open .push-dim{opacity:.1}
   background:color-mix(in srgb,var(--bg) 18%,transparent);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
 .toast-time input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0;font-size:16px;-webkit-appearance:none;appearance:none}
 .item.rep.done .tile,.item.rep.done .body{opacity:1}
+.item.part .chk{border-color:var(--accent);position:relative}
+.item.part .chk::before,.item.part .chk::after{content:"";position:absolute;background:var(--accent);border-radius:1px}
+.item.part .chk::before{width:10px;height:2px}
+.item.part .chk::after{width:2px;height:10px}
 .next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .skip-btn{display:block;width:100%;min-height:44px;margin-top:6px;border-radius:12px;font-size:16px;font-weight:600;text-align:center;color:var(--accent-ink)}
@@ -460,8 +471,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Intenzyme Forte": { brand: "Biotics Research · 50 tablets", how: "Empty stomach, between meals. With food it only helps digestion.", label: "10 tablets a dose, 5 doses: Nov 2, 3, 5, 7 and 9." },
     "Drainage Milieu": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Lymph 3 Chronic": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
-    "Renew silver gel": { every: "4", brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
-    "Homeopathic pellets": { every: "3", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
+    "Renew silver gel": { every: "4", perDay: "4", brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
+    "Homeopathic pellets": { every: "3", perDay: "6", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
     "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
@@ -507,7 +518,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every"];
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay"];
   function prodInfo(pk) {
     const out = Object.assign({ name: PNAME[pk] || pk }, PDETAILS[pk] || {}, EDITS.p[pk] || {});
     if (!out.name) out.name = PNAME[pk] || pk;   // a name can't be blank
@@ -517,7 +528,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     const info = prodInfo(pk);
     // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, base: it });
+    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0, base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
   // supplement taken more than once a day, in time order; Intenzyme's counts its 5-dose course instead.
@@ -654,14 +665,29 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function markDots(w) { Array.prototype.forEach.call(dots.children, (d, i) => d.classList.toggle("on", i === w)); }
   strip.addEventListener("scroll", () => { if (strip.clientWidth) markDots(Math.round(strip.scrollLeft / strip.clientWidth)); }, { passive: true });
 
+  // Whether a row counts as finished for its card: a dose with a daily target needs all its times.
+  function complete(n, it) {
+    const k = key(n, it);
+    if (skipped(k)) return true;
+    return it.repeat && it.perDay ? timesOf(k).length >= it.perDay : on(k);
+  }
+  // A row of segments for a dose taken several times a day: one per time, filled as they're logged.
+  function segsHTML(count, goal) {
+    const n = Math.min(goal, 12);
+    let h = '<span class="segs" aria-hidden="true">';
+    for (let i = 0; i < n; i++) h += '<i' + (i < count ? ' class="on"' : '') + '></i>';
+    return h + '</span>';
+  }
   // What a row says about times: when it was taken, and for timed doses when the next one is due.
   function timeLine(n, it, k) {
     if (skipped(k)) return '<span class="at due">Skipped</span>';
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
-      if (!times.length) return due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
-      return '<span class="at">' + (times.length > 1 ? times.length + " times today · last " : "Taken ") + fmtHM(times[times.length - 1]) +
-        (due ? ' · ' + dueText(n, due) : "") + '</span>';
+      const goal = it.perDay, bits = [];
+      if (goal) bits.push(times.length + " of " + goal);
+      if (times.length) bits.push((goal ? "last " : times.length > 1 ? times.length + " times today · last " : "Taken ") + fmtHM(times[times.length - 1]));
+      if (due) bits.push(dueText(n, due));
+      return (goal ? segsHTML(times.length, goal) : "") + (bits.length ? '<span class="at' + (times.length ? '' : ' due') + '">' + cap(bits.join(" · ")) + '</span>' : "");
     }
     if (!on(k)) {
       // Only the first not-yet-taken dose of the day shows when it's due.
@@ -674,17 +700,19 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return '<span class="at">Taken ' + fmtHM(times[0]) + (latest && due ? ' · ' + dueText(n, due) : "") + '</span>';
   }
   function itemHTML(n, it) {
-    const k = key(n, it), done = on(k);
+    const k = key(n, it), count = timesOf(k).length, goal = it.repeat ? it.perDay : 0;
+    // A dose with a daily target shows a plus (log another) until the target is reached, then the check.
+    const done = goal ? count >= goal : on(k), part = goal && count > 0 && !done;
     const at = ' data-k="' + k + '" data-n="' + n + '"';
     // Behind the row: the action a left swipe reveals (Skip, or Undo skip on a skipped dose).
-    const act = done ? "" : '<button type="button" class="swipe-act" data-swipe' + at + ' tabindex="-1" aria-hidden="true"><span>' +
+    const act = on(k) ? "" : '<button type="button" class="swipe-act" data-swipe' + at + ' tabindex="-1" aria-hidden="true"><span>' +
       (skipped(k) ? "Undo skip" : "Skip") + '</span></button>';
-    return '<div class="item' + (done ? ' done' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' + act +
+    return '<div class="item' + (done ? ' done' : '') + (part ? ' part' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' + act +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
-      (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
+      (it.pill && !on(k) ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
       timeLine(n, it, k) + '</span></button>' +
-      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub + (skipped(k) ? ', skipped' : '')) + '"' + at + '>' +
+      '<button type="button" class="tick" role="checkbox" aria-checked="' + (part ? 'mixed' : done) + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub + (skipped(k) ? ', skipped' : '')) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
   // Each time of day is its own card. Once everything in it is taken it folds down to its header
@@ -704,7 +732,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     SLOTS.forEach((s) => {
       const group = items.filter((it) => it.slot === s);
       if (!group.length) return;
-      const id = n + ":" + s, taken = group.filter((it) => resolved(key(n, it))).length, all = taken === group.length && !group.some((it) => it.repeat && !skipped(key(n, it)));
+      const id = n + ":" + s, taken = group.filter((it) => complete(n, it)).length, all = taken === group.length && !group.some((it) => it.repeat && !skipped(key(n, it)));
       if (!all) sectionsOpened.delete(id);
       const fold = all && !sectionsOpened.has(id);
       const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
@@ -1076,7 +1104,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // A repeating dose's page lists each logged time (change one, or × to remove it) and logs another.
   function repeatListHTML(row, dayCtx) {
     const times = timesOf(dayCtx.k), due = nextDue(dayCtx.n, row);
-    return (due ? '<p class="next-due">' + cap(dueText(dayCtx.n, due).replace("next ", "next dose ")) + '</p>' : '') +
+    const goal = row.perDay;
+    return (goal ? '<div class="seg-big">' + segsHTML(times.length, goal) + '<span>' + times.length + ' of ' + goal + ' today</span></div>' : '') +
+      (due ? '<p class="next-due">' + cap(dueText(dayCtx.n, due).replace("next ", "next dose ")) + '</p>' : '') +
       times.map((tm, i) => '<div class="taken-at"><label for="rt-' + i + '">Dose ' + (i + 1) + '</label>' +
         '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
         '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("");
@@ -1235,6 +1265,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return '<div class="ef"><label for="' + id + '">' + label + (opts.hint ? ' <span>' + opts.hint + '</span>' : '') + '</label>' + control + '</div>';
   }
   const EVERY_OPTS = [["", "No set times"]].concat([1, 2, 3, 4, 6, 8, 12, 24].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
+  const PERDAY_OPTS = [["", "Not set"]].concat([1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((x) => [String(x), String(x)]));
   const everyText = (v) => { const h = Number(v); return h ? "Every " + (h === 1 ? "hour" : h + " hours") : ""; };
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
@@ -1243,7 +1274,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
       field("note", "Note", d.note || "", { long: true }) +
-      field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) + '</div>' +
+      field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
+      field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
       ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
@@ -1319,7 +1351,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!f || !editCtx) return;
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
-    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every"].forEach((n) => set(n, d[n]));
+    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay"].forEach((n) => set(n, d[n]));
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
   }
@@ -1338,7 +1370,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
-    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)" };
+    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
