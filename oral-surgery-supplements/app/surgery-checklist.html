@@ -66,11 +66,12 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .ring .t{fill:none;stroke:var(--track);stroke-width:3}
 .ring .p{fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;transition:stroke-dasharray .25s}
+.ring .s{fill:none;stroke:var(--accent);stroke-opacity:.35;stroke-width:3;stroke-linecap:round;transition:stroke-dasharray .25s,stroke-dashoffset .25s}
 .ring .n{position:absolute;inset:0;display:grid;place-items:center;font-size:14px;font-weight:600;font-variant-numeric:tabular-nums}
 .mk{height:12px;display:grid;place-items:center;color:var(--special)}
 .mk svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .d.sp .ring .t{stroke:var(--special-tint)}
-.d.sp .ring .p{stroke:var(--special)}
+.d.sp .ring .p,.d.sp .ring .s{stroke:var(--special)}
 .d.sp .n{color:var(--special);font-weight:800}
 /* In the strip the marker sits on the ring's bottom edge instead of in a row of its own,
    so days without one don't carry empty space at the bottom of their card. */
@@ -633,6 +634,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const doneCount = (n) => itemsFor(n).filter((it) => on(key(n, it))).length;
   // Doses still expected that day: skipped ones drop out, so a day can still fill its ring.
   const dueCount = (n) => itemsFor(n).filter((it) => !skipped(key(n, it))).length;
+  const skipCount = (n) => itemsFor(n).filter((it) => skipped(key(n, it))).length;
 
   /* ---------- Countdown ---------- */
   function renderCountdown() {
@@ -652,25 +654,36 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
 
   /* ---------- Rings ---------- */
+  // A day's ring: taken doses in full green, then skipped ones in a lighter green, out of all the day's doses.
+  function ringArcs(n, C) {
+    const tot = itemsFor(n).length, dn = doneCount(n), sk = skipCount(n);
+    const a = tot ? dn / tot * C : 0, b = tot ? sk / tot * C : 0;
+    return { p: { dash: a.toFixed(2) + " " + C.toFixed(2), off: "0", show: a > 0 },
+             s: { dash: b.toFixed(2) + " " + C.toFixed(2), off: (-a).toFixed(2), show: b > 0 } };
+  }
   function ring(n, r) {
-    const C = 2 * Math.PI * r, tot = dueCount(n), dn = doneCount(n), p = tot ? dn / tot : 0;
-    const box = 2 * r + 4, c = box / 2;
+    const C = 2 * Math.PI * r, box = 2 * r + 4, c = box / 2, g = ringArcs(n, C);
+    const arc = (cls, x) => '<circle class="' + cls + '" data-c="' + C.toFixed(2) + '" cx="' + c + '" cy="' + c + '" r="' + r + '" stroke-dasharray="' + x.dash +
+      '" stroke-dashoffset="' + x.off + '"' + (x.show ? '' : ' style="opacity:0"') + '/>';
     return '<span class="ring"><svg viewBox="0 0 ' + box + ' ' + box + '" aria-hidden="true">' +
-      '<circle class="t" cx="' + c + '" cy="' + c + '" r="' + r + '"/>' +
-      '<circle class="p" data-c="' + C.toFixed(2) + '" cx="' + c + '" cy="' + c + '" r="' + r + '" stroke-dasharray="' + (p * C).toFixed(2) + ' ' + C.toFixed(2) + '"' + (p === 0 ? ' style="opacity:0"' : '') + '/>' +
+      '<circle class="t" cx="' + c + '" cy="' + c + '" r="' + r + '"/>' + arc("s", g.s) + arc("p", g.p) +
       '</svg><span class="n">' + dateOf(n).getDate() + '</span></span>';
   }
   const marker = (n) => '<span class="mk">' + (n === NIGHT_N ? svg("moon") : n === SURG_N ? svg("tooth") : "") + '</span>';
   function dayLabel(n) {
     const tag = n === NIGHT_N ? ", night before surgery" : n === SURG_N ? ", surgery day" : "";
-    return fLong(dateOf(n)) + tag + ", " + doneCount(n) + " of " + dueCount(n) + " done";
+    const sk = skipCount(n);
+    return fLong(dateOf(n)) + tag + ", " + doneCount(n) + " of " + itemsFor(n).length + " taken" + (sk ? ", " + sk + " skipped" : "");
   }
   function dayClass(n) { return "d" + (n === todayN ? " today" : "") + (special(n) ? " sp" : ""); }
   function updateRings(n) {
     document.querySelectorAll('.d[data-n="' + n + '"]').forEach((b) => {
-      const c = b.querySelector(".p"), C = +c.dataset.c, p = dueCount(n) ? doneCount(n) / dueCount(n) : 0;
-      c.setAttribute("stroke-dasharray", (p * C).toFixed(2) + " " + C.toFixed(2));
-      c.style.opacity = p === 0 ? "0" : "";
+      const c = b.querySelector(".p"), C = +c.dataset.c, g = ringArcs(n, C);
+      [["p", g.p], ["s", g.s]].forEach(([cls, x]) => {
+        const el = b.querySelector("." + cls); if (!el) return;
+        el.setAttribute("stroke-dasharray", x.dash); el.setAttribute("stroke-dashoffset", x.off);
+        el.style.opacity = x.show ? "" : "0";
+      });
       b.setAttribute("aria-label", dayLabel(n));
     });
   }
@@ -932,10 +945,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function renderProgress() {
     const last = Math.min(todayN, DAYS - 1);
     let due = 0, taken = 0;
-    for (let n = 0; n <= last; n++) { due += dueCount(n); taken += doneCount(n); }
+    let skippedAll = 0;
+    for (let n = 0; n <= last; n++) { due += itemsFor(n).length; taken += doneCount(n); skippedAll += skipCount(n); }
     const stat = todayN < 0
       ? '<div class="dateline">' + (todayN === -1 ? "Starts tomorrow" : "Starts " + fLong(DAY1)) + '</div>'
-      : '<div class="counter" style="margin-top:8px"><span class="big">' + taken + '</span><span class="of"><b>/ ' + due + '</b></span><span class="lbl">doses so far</span></div>';
+      : '<div class="counter" style="margin-top:8px"><span class="big">' + taken + '</span><span class="of"><b>/ ' + due + '</b></span><span class="lbl">doses taken so far' + (skippedAll ? ' · ' + skippedAll + ' skipped' : '') + '</span></div>';
     let rows = "";
     for (let w = 0; w < DAYS / 7; w++) {
       if (w === 0) rows += '<div class="cal-c">Before surgery</div>';
