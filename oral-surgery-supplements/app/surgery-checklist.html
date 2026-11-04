@@ -219,6 +219,9 @@ html.push-open .push-dim{opacity:.1}
 .taken-at input{font:inherit;font-size:16px;color:var(--ink);background:var(--tile);border:0;border-radius:10px;padding:8px 10px;min-height:40px;font-variant-numeric:tabular-nums}
 .clear-time{font-size:15px;font-weight:600;color:var(--accent-ink);padding:8px 10px;min-height:40px;border-radius:10px}
 .clear-time[hidden]{display:none}
+.at.due{color:var(--muted)}
+.item.rep.done .tile,.item.rep.done .body{opacity:1}
+.next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
@@ -370,24 +373,24 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // day the antibiotic and the first ibuprofen 2 hours before. Silver gel, jaw exercises and pellets start that day.
   const ABX_FIRST_N = SURG_N - 3;   // Fri Oct 30
   const ABX = [
-    { id: "abx1", slot: "Breakfast", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
-    { id: "abx2", slot: "Lunch", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
-    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "As prescribed", icon: "tablet" }
+    { id: "abx1", slot: "Breakfast", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 },
+    { id: "abx2", slot: "Lunch", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 },
+    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 }
   ];
   const SURGERY = [
-    { id: "s-abx1",    slot: "2 hours before", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
+    { id: "s-abx1",    slot: "2 hours before", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 },
     { id: "s-ibu",     slot: "2 hours before", name: "Ibuprofen", sub: "800 mg, after a little food", icon: "tablet" },
     { id: "s-gaba",    slot: "1 hour before", name: "GABA", sub: "1 pump", icon: "pump" },
     { id: "s-cbd",     slot: "1 hour before", name: "CBD", sub: "1 pump", icon: "pump" },
     { id: "s-relax",   slot: "1 hour before", name: "Relax Milieu", sub: "1 pump", icon: "pump" },
     { id: "s-halcion", slot: "Also today", name: "Halcion", sub: "As directed by the office", icon: "tablet" },
     { id: "s-intz",    slot: "Also today", name: "Intenzyme Forte", sub: "10 tablets", icon: "tablet", img: "intz", pill: "Empty stomach", nth: [1, 5] },
-    { id: "s-abx2",    slot: "After surgery", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
-    { id: "s-abx3",    slot: "After surgery", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
+    { id: "s-abx2",    slot: "After surgery", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 },
+    { id: "s-abx3",    slot: "After surgery", name: "Antibiotic", sub: "As prescribed", icon: "tablet", every: 8 },
     { id: "s-drain",   slot: "After surgery", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "s-lymph",   slot: "After surgery", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "s-silver",  slot: "After surgery", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
-    { id: "s-pellets", slot: "After surgery", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" },
+    { id: "s-pellets", slot: "After surgery", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets", every: 3, repeat: true },
     { id: "s-jaw1",    slot: "After surgery", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" },
     { id: "s-jaw2",    slot: "After surgery", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" },
     { id: "s-jaw3",    slot: "After surgery", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" }
@@ -402,7 +405,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
-    { id: "pellets", slot: "Anytime", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
+    { id: "pellets", slot: "Anytime", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets", every: 3, repeat: true }
   ];
   // From the office's post-op sheet: jaw exercises 3 times a day for the first week (surgery day is past, so
   // from the day after through Nov 8), then warm salt water rinses 2–3 times a day for 5 days after the first 3.
@@ -519,11 +522,39 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // A taken dose is stored as the time it was logged ("14:05"), or true when its time was cleared
   // (and for checkmarks saved before times existed).
   const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
-  const valid = (v) => v === true || (typeof v === "string" && HM.test(v));
+  // A dose taken over and over (pellets every 3 hours) keeps a list of its times instead.
+  const valid = (v) => v === true || (typeof v === "string" && HM.test(v)) ||
+    (Array.isArray(v) && v.length > 0 && v.every((t) => typeof t === "string" && HM.test(t)));
   const on = (k) => valid(state[k]);
-  const timeOf = (k) => typeof state[k] === "string" && HM.test(state[k]) ? state[k] : "";
+  const timesOf = (k) => !on(k) ? [] : Array.isArray(state[k]) ? state[k].slice().sort() : typeof state[k] === "string" ? [state[k]] : [];
+  const timeOf = (k) => { const t = timesOf(k); return t.length ? t[t.length - 1] : ""; };
+  const toMin = (hm) => { const [h, m] = hm.split(":").map(Number); return h * 60 + m; };
+  const fromMin = (x) => { x = ((x % 1440) + 1440) % 1440; return String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); };
   const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
   const fmtHM = (hm) => { const [h, m] = hm.split(":").map(Number); return ((h + 11) % 12 + 1) + ":" + String(m).padStart(2, "0") + (h < 12 ? " AM" : " PM"); };
+  // When the next dose of a timed supplement is due: the latest time it was logged that day plus its
+  // interval. With nothing logged yet today, the previous day's last dose counts if it runs past midnight.
+  function lastLog(n, pk) {
+    let best = -1;
+    if (n >= 0 && n < DAYS) itemsFor(n).forEach((it) => { if (it.p === pk) timesOf(key(n, it)).forEach((t) => { best = Math.max(best, toMin(t)); }); });
+    return best;
+  }
+  function nextDue(n, it) {
+    if (!it.every) return null;
+    let last = lastLog(n, it.p), shift = 0;
+    if (last < 0) { last = lastLog(n - 1, it.p) - 1440; if (last < -1440) return null; }
+    const due = last + it.every * 60;
+    if (due < 0) return null;
+    if (due >= 1440) shift = 1;
+    return { hm: fromMin(due), tomorrow: shift === 1 };
+  }
+  // "next 4:10 PM", or "due now" once that time has passed today.
+  const dueText = (n, d) => {
+    const nowMin = toMin(nowHM());
+    if (n < todayN || (n === todayN && !d.tomorrow && toMin(d.hm) <= nowMin)) return "due now";
+    return "next " + fmtHM(d.hm) + (d.tomorrow ? " tomorrow" : "");
+  };
+  const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
   const doneCount = (n) => itemsFor(n).filter((it) => on(key(n, it))).length;
 
   /* ---------- Countdown ---------- */
@@ -593,14 +624,32 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function markDots(w) { Array.prototype.forEach.call(dots.children, (d, i) => d.classList.toggle("on", i === w)); }
   strip.addEventListener("scroll", () => { if (strip.clientWidth) markDots(Math.round(strip.scrollLeft / strip.clientWidth)); }, { passive: true });
 
+  // What a row says about times: when it was taken, and for timed doses when the next one is due.
+  function timeLine(n, it, k) {
+    const times = timesOf(k), due = nextDue(n, it);
+    if (it.repeat) {
+      if (!times.length) return due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
+      return '<span class="at">' + (times.length > 1 ? times.length + " doses · last " : "Taken ") + fmtHM(times[times.length - 1]) +
+        (due ? ' · ' + dueText(n, due) : "") + '</span>';
+    }
+    if (!on(k)) {
+      // Only the first not-yet-taken dose of the day shows when it's due.
+      const first = it.every && itemsFor(n).filter((x) => x.p === it.p && !on(key(n, x)))
+        .sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))[0];
+      return first && first.id === it.id && due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
+    }
+    if (!times.length) return "";
+    const latest = it.every && toMin(times[0]) === lastLog(n, it.p);
+    return '<span class="at">Taken ' + fmtHM(times[0]) + (latest && due ? ' · ' + dueText(n, due) : "") + '</span>';
+  }
   function itemHTML(n, it) {
     const k = key(n, it), done = on(k);
     const at = ' data-k="' + k + '" data-n="' + n + '"';
-    return '<div class="item' + (done ? ' done' : '') + (k === popKey ? ' pop' : '') + '">' +
+    return '<div class="item' + (done ? ' done' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
-      (done && timeOf(k) ? '<span class="at">Taken ' + fmtHM(timeOf(k)) + '</span>' : '') + '</span></button>' +
+      timeLine(n, it, k) + '</span></button>' +
       '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
@@ -621,7 +670,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     SLOTS.forEach((s) => {
       const group = items.filter((it) => it.slot === s);
       if (!group.length) return;
-      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length;
+      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length && !group.some((it) => it.repeat);
       if (!all) sectionsOpened.delete(id);
       const fold = all && !sectionsOpened.has(id);
       const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
@@ -825,10 +874,27 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   let detailFor = null, detailRoute = "", opener = null;   // detailFor: { k, n } when opened from a day
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
+  const itemAt = (n, k) => itemsFor(n).find((x) => key(n, x) === k);
   function toggle(k, n) {
+    const it = itemAt(n, k);
+    if (it && it.repeat) { logDose(k, n); return; }
     if (on(k)) delete state[k]; else { state[k] = nowHM(); popKey = k; }
     stateChanged(k);
     renderDay(); updateRings(n);
+  }
+  // A repeating dose: each tap logs another time; times come off on its details page.
+  function logDose(k, n) {
+    state[k] = timesOf(k).concat([nowHM()]).sort(); popKey = k;
+    stateChanged(k);
+    renderDay(); updateRings(n);
+  }
+  function setRepeatTime(k, i, hm) {
+    const t = timesOf(k);
+    if (i < 0 || i >= t.length) return;
+    if (HM.test(hm)) t[i] = hm; else t.splice(i, 1);
+    if (t.length) state[k] = t.sort(); else delete state[k];
+    stateChanged(k);
+    renderDay(); if (detailFor) updateRings(detailFor.n);
   }
   function stateChanged(k) {
     if (!synced) early[k] = on(k) ? state[k] : false;
@@ -851,6 +917,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
+    if (dayCtx && row.repeat) return detailRepeatHTML(row, dayCtx, rows, img, d);
     const at = t === null ? "" : '<div class="taken-at"><label for="taken-time">Taken at</label>' +
       '<input type="time" id="taken-time" data-time value="' + t + '">' +
       '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
@@ -862,6 +929,31 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + esc(row.name) + '</h2>' +
       (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
       '<div class="list" style="margin-top:12px">' + rows + '</div></div>' + foot + '</div>';
+  }
+
+  // A repeating dose's page lists each logged time (change one, or × to remove it) and logs another.
+  function repeatListHTML(row, dayCtx) {
+    const times = timesOf(dayCtx.k), due = nextDue(dayCtx.n, row);
+    return (due ? '<p class="next-due">' + cap(dueText(dayCtx.n, due).replace("next ", "next dose ")) + '</p>' : '') +
+      times.map((tm, i) => '<div class="taken-at"><label for="rt-' + i + '">Dose ' + (i + 1) + '</label>' +
+        '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
+        '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("");
+  }
+  function detailRepeatHTML(row, dayCtx, rows, img, d) {
+    return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
+      '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
+      '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
+      '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + esc(row.name) + '</h2>' +
+      (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
+      '<div class="list" style="margin-top:12px">' + rows + '</div></div>' +
+      '<div class="push-foot"><div data-rlist>' + repeatListHTML(row, dayCtx) + '</div>' +
+      '<button type="button" class="sh-btn" data-mark>Log a dose now</button></div></div>';
+  }
+  function refreshRepeatList() {
+    const box = push.querySelector("[data-rlist]");
+    if (!box || !detailFor) return;
+    const it = itemAt(detailFor.n, detailFor.k);
+    if (it) box.innerHTML = repeatListHTML(it, detailFor);
   }
 
   // iOS Safari ignores overflow:hidden on the page, so pin the body in place while the details page is open.
@@ -1177,7 +1269,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     location.hash = "#changes";
   }
   // Typing or picking a new time on the details page saves it right away.
-  const onTime = (e) => { if (e.target.matches("[data-time]") && detailFor) setTime(detailFor.k, e.target.value); };
+  const onTime = (e) => {
+    if (!detailFor) return;
+    if (e.target.matches("[data-time]")) setTime(detailFor.k, e.target.value);
+    // A repeating dose's times re-sort when one changes, so redraw its list once the picker is done.
+    if (e.target.matches("[data-rtime]") && e.type === "change" && e.target.value) { setRepeatTime(detailFor.k, +e.target.dataset.rtime, e.target.value); refreshRepeatList(); }
+  };
   push.addEventListener("change", onTime);
   push.addEventListener("input", onTime);
   esheet.addEventListener("input", markDirty);
@@ -1242,6 +1339,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
     if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
     if (e.target.closest("[data-back]")) { closeDetail(); return; }
+    const rdel = e.target.closest("[data-rdel]");
+    if (rdel) { if (detailFor) { setRepeatTime(detailFor.k, +rdel.dataset.rdel, ""); refreshRepeatList(); } return; }
     if (e.target.closest("[data-clear-time]")) {
       if (detailFor) { const inp = push.querySelector("[data-time]"); if (inp) inp.value = ""; setTime(detailFor.k, ""); }
       return;
