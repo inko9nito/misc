@@ -369,7 +369,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // held in the mouth, with vitamin C split before each meal; PhytoMulti (iron) and Bone Builder (calcium)
   // with food and at different meals, since calcium blocks iron; magnesium glycinate 3 times a day, away from the iron at breakfast;
   // Intenzyme between meals so it isn't spent digesting food.
-  const SLOTS = ["2 hours before", "1 hour before", "Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Anytime", "After surgery", "Also today"];
+  const SLOTS = ["2 hours before", "1 hour before", "Through the day", "Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Anytime", "After surgery", "Also today"];
   const BEFORE = [
     { id: "d3k2",  slot: "Before breakfast", name: "D3K2", sub: "8 pumps · hold 30 sec", icon: "capsule", img: "d3k2" },
     { id: "b12",   slot: "Before breakfast", name: "Methyl-B12", sub: "2 pumps · hold 30 sec", icon: "pump", img: "b12" },
@@ -423,8 +423,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const RECOVERY = [
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
-    { id: "silver", slot: "Anytime", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
-    { id: "pellets", slot: "Anytime", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
+    { id: "silver", slot: "Through the day", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
+    { id: "pellets", slot: "Through the day", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
   ];
   // From the office's post-op sheet: jaw exercises 3 times a day for the first week (surgery day is past, so
   // from the day after through Nov 8), then warm salt water rinses 2–3 times a day for 5 days after the first 3.
@@ -460,7 +460,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Intenzyme Forte": { brand: "Biotics Research · 50 tablets", how: "Empty stomach, between meals. With food it only helps digestion.", label: "10 tablets a dose, 5 doses: Nov 2, 3, 5, 7 and 9." },
     "Drainage Milieu": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Lymph 3 Chronic": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
-    "Renew silver gel": { brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
+    "Renew silver gel": { every: "4", brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
     "Homeopathic pellets": { every: "3", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
@@ -660,7 +660,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
       if (!times.length) return due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
-      return '<span class="at">' + (times.length > 1 ? times.length + " doses · last " : "Taken ") + fmtHM(times[times.length - 1]) +
+      return '<span class="at">' + (times.length > 1 ? times.length + " times today · last " : "Taken ") + fmtHM(times[times.length - 1]) +
         (due ? ' · ' + dueText(n, due) : "") + '</span>';
     }
     if (!on(k)) {
