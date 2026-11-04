@@ -160,3 +160,8 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - **Daily target.** A repeating dose can have `perDay` (editable as "Times a day"): silver gel 4, pellets 6 (estimates from 3–5 a day and every 3 hours while awake). Its row shows a segmented bar, one segment per time, filled as they're logged, with "2 of 4 · last 8:00 AM · next 12:00 PM". Its circle shows a plus until the target is reached, then the check; its card counts it as finished only then. The details page shows a larger bar with "2 of 4 today".
 - **Doses tab.** A repeating dose's details page has Doses | Details tabs under its title. Doses starts with the day it was opened from ("Tuesday, Nov 3 · Yesterday") and counts that day only; past days show no next time (Doses first; the choice is remembered while the app is open). Doses holds the bar, the next time and the logged times in one card; the sticky footer keeps only "Log a dose now" (and Skip), so it stays short however many doses there are.
 
+## Added supplements
+- The Supplements tab has an **Add** button (top right). It opens the bottom sheet with Supplement (name, brand, how, label, why, note, icon) then Schedule (dose, times of day as chips with one dose each, start and end date, repeat every, times a day, reminder).
+- They're stored in the edits doc as `EDITS.c["u_<id>"]` (so they sync like other edits) and appear in an "Added by you" group on the Supplements tab and as rows on each day in their date range (`customItemsFor`; item ids `u_<id>_<slot index>`). Edit on one of them reopens the same form, with Delete supplement.
+- Each one counts as a local change ("New supplement" with everything about it on one line), so Copy for Claude can build it into the defaults.
+
