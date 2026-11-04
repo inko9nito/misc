@@ -269,6 +269,17 @@ html.push-open .push-dim{opacity:.1}
 .clear-time{font-size:15px;font-weight:600;color:var(--accent-ink);padding:8px 10px;min-height:40px;border-radius:10px}
 .clear-time[hidden]{display:none}
 .at.due{color:var(--muted)}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;max-width:420px;z-index:30;display:flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;
+  border-radius:16px;background:var(--ink);color:var(--bg);box-shadow:0 6px 24px rgba(0,0,0,.18);
+  transform:translateY(12px);opacity:0;transition:transform .25s cubic-bezier(.32,.72,0,1),opacity .2s;pointer-events:none}
+.toast.on{transform:none;opacity:1;pointer-events:auto}
+.toast[hidden]{display:none}
+.toast-t{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;font-weight:600}
+.toast-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast-t svg{flex:none;width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.toast-time{position:relative;flex:none;display:flex;align-items:center;min-height:36px;padding:0 12px;border-radius:11px;
+  background:color-mix(in srgb,var(--bg) 18%,transparent);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.toast-time input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0;font-size:16px;-webkit-appearance:none;appearance:none}
 .item.rep.done .tile,.item.rep.done .body{opacity:1}
 .next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
@@ -931,16 +942,55 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function toggle(k, n) {
     const it = itemAt(n, k);
     if (it && it.repeat) { logDose(k, n); return; }
-    if (on(k)) delete state[k]; else { state[k] = nowHM(); popKey = k; }
+    if (on(k)) { delete state[k]; hideToast(); } else { state[k] = nowHM(); popKey = k; }
     stateChanged(k);
     renderDay(); updateRings(n);
+    if (on(k) && it) showToast(k, n, it, state[k]);
   }
   // A repeating dose: each tap logs another time; times come off on its details page.
   function logDose(k, n) {
-    state[k] = timesOf(k).concat([nowHM()]).sort(); popKey = k;
+    const t = nowHM(), it = itemAt(n, k);
+    state[k] = timesOf(k).concat([t]).sort(); popKey = k;
     stateChanged(k);
     renderDay(); updateRings(n);
+    if (it) showToast(k, n, it, t);
   }
+
+  /* ---------- Logged toast ---------- */
+  // After a dose is logged, a toast shows its time for a few seconds. The time is a native time
+  // picker under a label, so tapping it changes the time without opening the details page.
+  const toast = document.createElement("div");
+  toast.className = "toast"; toast.setAttribute("role", "status"); toast.hidden = true;
+  document.body.appendChild(toast);
+  let toastCtx = null, toastTimer = null;
+  function hideToast() {
+    clearTimeout(toastTimer); toastCtx = null;
+    toast.classList.remove("on");
+    toastTimer = setTimeout(() => { if (!toastCtx) toast.hidden = true; }, 250);
+  }
+  const toastLater = (ms) => { clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, ms); };
+  function showToast(k, n, it, hm) {
+    toastCtx = { k: k, n: n, repeat: !!it.repeat, hm: hm };
+    toast.innerHTML = '<span class="toast-t">' + CHECK + '<span>' + esc(it.name) + ' logged</span></span>' +
+      '<label class="toast-time"><span data-toast-hm>' + fmtHM(hm) + '</span>' +
+      '<input type="time" value="' + hm + '" aria-label="Change the time ' + esc(it.name) + ' was taken"></label>';
+    const bar = document.querySelector(".bar");
+    toast.style.bottom = ((bar && bar.offsetHeight) || 0) + 12 + "px";
+    toast.hidden = false; void toast.offsetWidth;
+    toast.classList.add("on");
+    toastLater(4500);
+  }
+  toast.addEventListener("focusin", () => clearTimeout(toastTimer));
+  toast.addEventListener("focusout", () => { if (toastCtx) toastLater(2500); });
+  toast.addEventListener("change", (e) => {
+    const c = toastCtx, v = e.target.value;
+    if (!c || !HM.test(v)) return;
+    if (c.repeat) { const i = timesOf(c.k).indexOf(c.hm); if (i >= 0) setRepeatTime(c.k, i, v); }
+    else setTime(c.k, v);
+    c.hm = v;
+    const lbl = toast.querySelector("[data-toast-hm]"); if (lbl) lbl.textContent = fmtHM(v);
+    toastLater(2500);
+  });
   function setRepeatTime(k, i, hm) {
     const t = timesOf(k);
     if (i < 0 || i >= t.length) return;
