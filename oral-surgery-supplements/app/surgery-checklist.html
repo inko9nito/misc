@@ -219,6 +219,20 @@ html.push-open .push-dim{opacity:.1}
 .taken-at input{font:inherit;font-size:16px;color:var(--ink);background:var(--tile);border:0;border-radius:10px;padding:8px 10px;min-height:40px;font-variant-numeric:tabular-nums}
 .clear-time{font-size:15px;font-weight:600;color:var(--accent-ink);padding:8px 10px;min-height:40px;border-radius:10px}
 .clear-time[hidden]{display:none}
+.at.due{color:var(--muted)}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:fit-content;max-width:420px;z-index:30;display:flex;align-items:center;gap:12px;padding:6px 6px 6px 14px;
+  border-radius:16px;background:var(--ink);color:var(--bg);box-shadow:0 6px 24px rgba(0,0,0,.18);
+  transform:translateY(12px);opacity:0;transition:transform .25s cubic-bezier(.32,.72,0,1),opacity .2s;pointer-events:none}
+.toast.on{transform:none;opacity:1;pointer-events:auto}
+.toast[hidden]{display:none}
+.toast-t{display:flex;align-items:center;gap:8px;min-width:0;font-size:15px;font-weight:600}
+.toast-t span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toast-t svg{flex:none;width:18px;height:18px;fill:none;stroke:var(--accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.toast-time{position:relative;flex:none;display:flex;align-items:center;min-height:36px;padding:0 12px;border-radius:11px;
+  background:color-mix(in srgb,var(--bg) 18%,transparent);font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
+.toast-time input{position:absolute;inset:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0;font-size:16px;-webkit-appearance:none;appearance:none}
+.item.rep.done .tile,.item.rep.done .body{opacity:1}
+.next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
@@ -431,7 +445,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "CBD": { brand: "Pump bottle", how: PUMP3 },
     "Relax Milieu": { brand: "Blue pump bottle", how: PUMP3 },
     "Halcion": { brand: "Prescription · the office calls it in", how: "As directed by the office.", note: "The office’s checklist email says Valium; the office called in Halcion. Take only what was prescribed." },
-    "Antibiotic": { brand: "Prescription · usually amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
+    "Antibiotic": { every: "8", brand: "Prescription · usually amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
       note: "Keep taking it until the prescription is finished, as the label says." },
     "Ibuprofen": { brand: "800 mg", how: "The first pain medicine dose, 2 hours before surgery, from the office’s checklist email. Eat something first.",
       note: "The post-op sheet says the office prefers to avoid ibuprofen afterwards, since it can slow healing, unless you need it for pain." },
@@ -439,7 +453,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Drainage Milieu": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Lymph 3 Chronic": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Renew silver gel": { brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
-    "Homeopathic pellets": { brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
+    "Homeopathic pellets": { every: "3", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
     "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
@@ -485,7 +499,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note"];
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every"];
   function prodInfo(pk) {
     const out = Object.assign({ name: PNAME[pk] || pk }, PDETAILS[pk] || {}, EDITS.p[pk] || {});
     if (!out.name) out.name = PNAME[pk] || pk;   // a name can't be blank
@@ -493,7 +507,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   function eff(it) {
     const pk = prodOf(it.id);
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: prodInfo(pk).name, base: it });
+    const info = prodInfo(pk);
+    // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
+    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
   // supplement taken more than once a day, in time order; Intenzyme's counts its 5-dose course instead.
@@ -502,6 +518,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     items.forEach((it) => { (by[it.p] = by[it.p] || []).push(it); });
     Object.keys(by).forEach((pk) => {
       const g = by[pk];
+      // A timed supplement with one row that day is logged again each time it's taken (pellets every 3 hours).
+      g.forEach((it) => { it.repeat = !!it.every && g.length === 1; });
       if (g.length < 2) return;
       g.slice().sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot)).forEach((it, i) => { it.nth = [i + 1, g.length]; });
     });
@@ -519,11 +537,39 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // A taken dose is stored as the time it was logged ("14:05"), or true when its time was cleared
   // (and for checkmarks saved before times existed).
   const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
-  const valid = (v) => v === true || (typeof v === "string" && HM.test(v));
+  // A dose taken over and over (pellets every 3 hours) keeps a list of its times instead.
+  const valid = (v) => v === true || (typeof v === "string" && HM.test(v)) ||
+    (Array.isArray(v) && v.length > 0 && v.every((t) => typeof t === "string" && HM.test(t)));
   const on = (k) => valid(state[k]);
-  const timeOf = (k) => typeof state[k] === "string" && HM.test(state[k]) ? state[k] : "";
+  const timesOf = (k) => !on(k) ? [] : Array.isArray(state[k]) ? state[k].slice().sort() : typeof state[k] === "string" ? [state[k]] : [];
+  const timeOf = (k) => { const t = timesOf(k); return t.length ? t[t.length - 1] : ""; };
+  const toMin = (hm) => { const [h, m] = hm.split(":").map(Number); return h * 60 + m; };
+  const fromMin = (x) => { x = ((x % 1440) + 1440) % 1440; return String(Math.floor(x / 60)).padStart(2, "0") + ":" + String(x % 60).padStart(2, "0"); };
   const nowHM = () => { const d = new Date(); return String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); };
   const fmtHM = (hm) => { const [h, m] = hm.split(":").map(Number); return ((h + 11) % 12 + 1) + ":" + String(m).padStart(2, "0") + (h < 12 ? " AM" : " PM"); };
+  // When the next dose of a timed supplement is due: the latest time it was logged that day plus its
+  // interval. With nothing logged yet today, the previous day's last dose counts if it runs past midnight.
+  function lastLog(n, pk) {
+    let best = -1;
+    if (n >= 0 && n < DAYS) itemsFor(n).forEach((it) => { if (it.p === pk) timesOf(key(n, it)).forEach((t) => { best = Math.max(best, toMin(t)); }); });
+    return best;
+  }
+  function nextDue(n, it) {
+    if (!it.every) return null;
+    let last = lastLog(n, it.p), shift = 0;
+    if (last < 0) { last = lastLog(n - 1, it.p) - 1440; if (last < -1440) return null; }
+    const due = last + it.every * 60;
+    if (due < 0) return null;
+    if (due >= 1440) shift = 1;
+    return { hm: fromMin(due), tomorrow: shift === 1 };
+  }
+  // "next 4:10 PM", or "due now" once that time has passed today.
+  const dueText = (n, d) => {
+    const nowMin = toMin(nowHM());
+    if (n < todayN || (n === todayN && !d.tomorrow && toMin(d.hm) <= nowMin)) return "due now";
+    return "next " + fmtHM(d.hm) + (d.tomorrow ? " tomorrow" : "");
+  };
+  const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
   const doneCount = (n) => itemsFor(n).filter((it) => on(key(n, it))).length;
 
   /* ---------- Countdown ---------- */
@@ -593,14 +639,32 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function markDots(w) { Array.prototype.forEach.call(dots.children, (d, i) => d.classList.toggle("on", i === w)); }
   strip.addEventListener("scroll", () => { if (strip.clientWidth) markDots(Math.round(strip.scrollLeft / strip.clientWidth)); }, { passive: true });
 
+  // What a row says about times: when it was taken, and for timed doses when the next one is due.
+  function timeLine(n, it, k) {
+    const times = timesOf(k), due = nextDue(n, it);
+    if (it.repeat) {
+      if (!times.length) return due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
+      return '<span class="at">' + (times.length > 1 ? times.length + " doses · last " : "Taken ") + fmtHM(times[times.length - 1]) +
+        (due ? ' · ' + dueText(n, due) : "") + '</span>';
+    }
+    if (!on(k)) {
+      // Only the first not-yet-taken dose of the day shows when it's due.
+      const first = it.every && itemsFor(n).filter((x) => x.p === it.p && !on(key(n, x)))
+        .sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))[0];
+      return first && first.id === it.id && due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
+    }
+    if (!times.length) return "";
+    const latest = it.every && toMin(times[0]) === lastLog(n, it.p);
+    return '<span class="at">Taken ' + fmtHM(times[0]) + (latest && due ? ' · ' + dueText(n, due) : "") + '</span>';
+  }
   function itemHTML(n, it) {
     const k = key(n, it), done = on(k);
     const at = ' data-k="' + k + '" data-n="' + n + '"';
-    return '<div class="item' + (done ? ' done' : '') + (k === popKey ? ' pop' : '') + '">' +
+    return '<div class="item' + (done ? ' done' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
-      (done && timeOf(k) ? '<span class="at">Taken ' + fmtHM(timeOf(k)) + '</span>' : '') + '</span></button>' +
+      timeLine(n, it, k) + '</span></button>' +
       '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
@@ -621,7 +685,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     SLOTS.forEach((s) => {
       const group = items.filter((it) => it.slot === s);
       if (!group.length) return;
-      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length;
+      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length && !group.some((it) => it.repeat);
       if (!all) sectionsOpened.delete(id);
       const fold = all && !sectionsOpened.has(id);
       const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
@@ -825,10 +889,66 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   let detailFor = null, detailRoute = "", opener = null;   // detailFor: { k, n } when opened from a day
   const inFrame = (() => { try { return window.self !== window.top; } catch (e) { return true; } })();
 
+  const itemAt = (n, k) => itemsFor(n).find((x) => key(n, x) === k);
   function toggle(k, n) {
-    if (on(k)) delete state[k]; else { state[k] = nowHM(); popKey = k; }
+    const it = itemAt(n, k);
+    if (it && it.repeat) { logDose(k, n); return; }
+    if (on(k)) { delete state[k]; hideToast(); } else { state[k] = nowHM(); popKey = k; }
     stateChanged(k);
     renderDay(); updateRings(n);
+    if (on(k) && it) showToast(k, n, it, state[k]);
+  }
+  // A repeating dose: each tap logs another time; times come off on its details page.
+  function logDose(k, n) {
+    const t = nowHM(), it = itemAt(n, k);
+    state[k] = timesOf(k).concat([t]).sort(); popKey = k;
+    stateChanged(k);
+    renderDay(); updateRings(n);
+    if (it) showToast(k, n, it, t);
+  }
+
+  /* ---------- Logged toast ---------- */
+  // After a dose is logged, a toast shows its time for a few seconds. The time is a native time
+  // picker under a label, so tapping it changes the time without opening the details page.
+  const toast = document.createElement("div");
+  toast.className = "toast"; toast.setAttribute("role", "status"); toast.hidden = true;
+  document.body.appendChild(toast);
+  let toastCtx = null, toastTimer = null;
+  function hideToast() {
+    clearTimeout(toastTimer); toastCtx = null;
+    toast.classList.remove("on");
+    toastTimer = setTimeout(() => { if (!toastCtx) toast.hidden = true; }, 250);
+  }
+  const toastLater = (ms) => { clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, ms); };
+  function showToast(k, n, it, hm) {
+    toastCtx = { k: k, n: n, repeat: !!it.repeat, hm: hm };
+    toast.innerHTML = '<span class="toast-t">' + CHECK + '<span>' + esc(it.name) + ' logged</span></span>' +
+      '<label class="toast-time"><span data-toast-hm>' + fmtHM(hm) + '</span>' +
+      '<input type="time" value="' + hm + '" aria-label="Change the time ' + esc(it.name) + ' was taken"></label>';
+    const bar = document.querySelector(".bar");
+    toast.style.bottom = ((bar && bar.offsetHeight) || 0) + 12 + "px";
+    toast.hidden = false; void toast.offsetWidth;
+    toast.classList.add("on");
+    toastLater(4500);
+  }
+  toast.addEventListener("focusin", () => clearTimeout(toastTimer));
+  toast.addEventListener("focusout", () => { if (toastCtx) toastLater(2500); });
+  toast.addEventListener("change", (e) => {
+    const c = toastCtx, v = e.target.value;
+    if (!c || !HM.test(v)) return;
+    if (c.repeat) { const i = timesOf(c.k).indexOf(c.hm); if (i >= 0) setRepeatTime(c.k, i, v); }
+    else setTime(c.k, v);
+    c.hm = v;
+    const lbl = toast.querySelector("[data-toast-hm]"); if (lbl) lbl.textContent = fmtHM(v);
+    toastLater(2500);
+  });
+  function setRepeatTime(k, i, hm) {
+    const t = timesOf(k);
+    if (i < 0 || i >= t.length) return;
+    if (HM.test(hm)) t[i] = hm; else t.splice(i, 1);
+    if (t.length) state[k] = t.sort(); else delete state[k];
+    stateChanged(k);
+    renderDay(); if (detailFor) updateRings(detailFor.n);
   }
   function stateChanged(k) {
     if (!synced) early[k] = on(k) ? state[k] : false;
@@ -848,9 +968,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
     // Supplement details first, then this dose (or row), as in the Edit sheet.
-    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) +
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
+    if (dayCtx && row.repeat) return detailRepeatHTML(row, dayCtx, rows, img, d);
     const at = t === null ? "" : '<div class="taken-at"><label for="taken-time">Taken at</label>' +
       '<input type="time" id="taken-time" data-time value="' + t + '">' +
       '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
@@ -862,6 +983,31 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + esc(row.name) + '</h2>' +
       (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
       '<div class="list" style="margin-top:12px">' + rows + '</div></div>' + foot + '</div>';
+  }
+
+  // A repeating dose's page lists each logged time (change one, or × to remove it) and logs another.
+  function repeatListHTML(row, dayCtx) {
+    const times = timesOf(dayCtx.k), due = nextDue(dayCtx.n, row);
+    return (due ? '<p class="next-due">' + cap(dueText(dayCtx.n, due).replace("next ", "next dose ")) + '</p>' : '') +
+      times.map((tm, i) => '<div class="taken-at"><label for="rt-' + i + '">Dose ' + (i + 1) + '</label>' +
+        '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
+        '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("");
+  }
+  function detailRepeatHTML(row, dayCtx, rows, img, d) {
+    return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
+      '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
+      '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
+      '<div class="push-b"><div class="sh-img">' + img + '</div><h2 class="sh-t" id="sh-t">' + esc(row.name) + '</h2>' +
+      (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
+      '<div class="list" style="margin-top:12px">' + rows + '</div></div>' +
+      '<div class="push-foot"><div data-rlist>' + repeatListHTML(row, dayCtx) + '</div>' +
+      '<button type="button" class="sh-btn" data-mark>Log a dose now</button></div></div>';
+  }
+  function refreshRepeatList() {
+    const box = push.querySelector("[data-rlist]");
+    if (!box || !detailFor) return;
+    const it = itemAt(detailFor.n, detailFor.k);
+    if (it) box.innerHTML = repeatListHTML(it, detailFor);
   }
 
   // iOS Safari ignores overflow:hidden on the page, so pin the body in place while the details page is open.
@@ -984,7 +1130,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const id = "ef-" + name;
     let control;
     if (opts.options) {
-      control = '<select id="' + id + '" name="' + name + '">' + opts.options.map((o) => '<option' + (o === value ? ' selected' : '') + '>' + esc(o) + '</option>').join("") + '</select>';
+      control = '<select id="' + id + '" name="' + name + '">' + opts.options.map((o) => {
+        const [val, text] = Array.isArray(o) ? o : [o, o];
+        return '<option value="' + esc(val) + '"' + (val === value ? ' selected' : '') + '>' + esc(text) + '</option>';
+      }).join("") + '</select>';
     } else if (opts.long) {
       control = '<textarea id="' + id + '" name="' + name + '" rows="3">' + esc(value) + '</textarea>';
     } else {
@@ -992,13 +1141,16 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     }
     return '<div class="ef"><label for="' + id + '">' + label + (opts.hint ? ' <span>' + opts.hint + '</span>' : '') + '</label>' + control + '</div>';
   }
+  const EVERY_OPTS = [["", "No set times"]].concat([1, 2, 3, 4, 6, 8, 12, 24].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
+  const everyText = (v) => { const h = Number(v); return h ? "Every " + (h === 1 ? "hour" : h + " hours") : ""; };
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
     // Each section says what its changes affect, under its own card.
     const prod = '<div class="es-sec">Supplement</div><div class="es-card">' + field("name", "Name", d.name, { required: true }) +
       field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
-      field("note", "Note", d.note || "", { long: true }) + '</div>' +
+      field("note", "Note", d.note || "", { long: true }) +
+      field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
       ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
@@ -1074,7 +1226,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!f || !editCtx) return;
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
-    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note"].forEach((n) => set(n, d[n]));
+    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every"].forEach((n) => set(n, d[n]));
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
   }
@@ -1093,7 +1245,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
-    sub: "Dose", slot: "When", pill: "Reminder" };
+    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
@@ -1177,7 +1329,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     location.hash = "#changes";
   }
   // Typing or picking a new time on the details page saves it right away.
-  const onTime = (e) => { if (e.target.matches("[data-time]") && detailFor) setTime(detailFor.k, e.target.value); };
+  const onTime = (e) => {
+    if (!detailFor) return;
+    if (e.target.matches("[data-time]")) setTime(detailFor.k, e.target.value);
+    // A repeating dose's times re-sort when one changes, so redraw its list once the picker is done.
+    if (e.target.matches("[data-rtime]") && e.type === "change" && e.target.value) { setRepeatTime(detailFor.k, +e.target.dataset.rtime, e.target.value); refreshRepeatList(); }
+  };
   push.addEventListener("change", onTime);
   push.addEventListener("input", onTime);
   esheet.addEventListener("input", markDirty);
@@ -1242,6 +1399,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (e.target.closest("[data-cancel]")) { closeEdit(); return; }
     if (e.target.closest("[data-reset]")) { restoreOriginal(); return; }
     if (e.target.closest("[data-back]")) { closeDetail(); return; }
+    const rdel = e.target.closest("[data-rdel]");
+    if (rdel) { if (detailFor) { setRepeatTime(detailFor.k, +rdel.dataset.rdel, ""); refreshRepeatList(); } return; }
     if (e.target.closest("[data-clear-time]")) {
       if (detailFor) { const inp = push.querySelector("[data-time]"); if (inp) inp.value = ""; setTime(detailFor.k, ""); }
       return;
