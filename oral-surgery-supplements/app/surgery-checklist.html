@@ -133,7 +133,11 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .list{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
 .list > * + *{border-top:1px solid var(--line)}
 /* A row is two targets: .open (tile and text) shows details; .tick (the circle) marks it taken. */
-.item{display:flex;align-items:stretch;width:100%;min-height:64px}
+.item{position:relative;display:flex;align-items:stretch;width:100%;min-height:64px;overflow:hidden;touch-action:pan-y}
+.item > .open,.item > .tick{position:relative;z-index:1;background:var(--card);transform:translateX(var(--sx,0px));transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.item.swiping > .open,.item.swiping > .tick{transition:none}
+.swipe-act{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;background:var(--ink2);color:var(--bg);font-size:15px;font-weight:600}
+.swipe-act span{width:96px;text-align:center}
 .open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 0 10px 14px}
 .open:last-child{padding-right:14px}
 .open:active,.tick:active{background:var(--band)}
@@ -151,6 +155,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .chk svg{width:13px;height:13px;fill:none;stroke:var(--on-accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
 .item.done .chk{background:var(--accent);border-color:var(--accent)}
 .item.done .chk svg{opacity:1}
+.item.skip .tile,.item.skip .body{opacity:.5}
+.item.skip .chk{border-style:dashed;position:relative}
+.item.skip .chk::after{content:"";position:absolute;width:10px;height:2px;border-radius:1px;background:var(--chk)}
 .item.done .tile,.item.done .body{opacity:.5}
 .open:focus-visible,.tick:focus-visible{outline:2px solid var(--accent);outline-offset:-3px;border-radius:12px}
 
@@ -234,6 +241,7 @@ html.push-open .push-dim{opacity:.1}
 .item.rep.done .tile,.item.rep.done .body{opacity:1}
 .next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
+.skip-btn{display:block;width:100%;min-height:44px;margin-top:6px;border-radius:12px;font-size:16px;font-weight:600;text-align:center;color:var(--accent-ink)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
 /* Edit sheet: slides up and stops below the status bar, as HPDE's page sheets do. The details page under it
@@ -538,9 +546,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // (and for checkmarks saved before times existed).
   const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
   // A dose taken over and over (pellets every 3 hours) keeps a list of its times instead.
-  const valid = (v) => v === true || (typeof v === "string" && HM.test(v)) ||
+  // A skipped dose is stored as "skip": not taken, but dealt with, so it doesn't hold a day or card open.
+  const SKIP = "skip";
+  const taken = (v) => v === true || (typeof v === "string" && HM.test(v)) ||
     (Array.isArray(v) && v.length > 0 && v.every((t) => typeof t === "string" && HM.test(t)));
-  const on = (k) => valid(state[k]);
+  const valid = (v) => taken(v) || v === SKIP;
+  const on = (k) => taken(state[k]);
+  const skipped = (k) => state[k] === SKIP;
+  const resolved = (k) => on(k) || skipped(k);
   const timesOf = (k) => !on(k) ? [] : Array.isArray(state[k]) ? state[k].slice().sort() : typeof state[k] === "string" ? [state[k]] : [];
   const timeOf = (k) => { const t = timesOf(k); return t.length ? t[t.length - 1] : ""; };
   const toMin = (hm) => { const [h, m] = hm.split(":").map(Number); return h * 60 + m; };
@@ -571,6 +584,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   };
   const cap = (t) => t.charAt(0).toUpperCase() + t.slice(1);
   const doneCount = (n) => itemsFor(n).filter((it) => on(key(n, it))).length;
+  // Doses still expected that day: skipped ones drop out, so a day can still fill its ring.
+  const dueCount = (n) => itemsFor(n).filter((it) => !skipped(key(n, it))).length;
 
   /* ---------- Countdown ---------- */
   function renderCountdown() {
@@ -591,7 +606,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 
   /* ---------- Rings ---------- */
   function ring(n, r) {
-    const C = 2 * Math.PI * r, tot = itemsFor(n).length, dn = doneCount(n), p = tot ? dn / tot : 0;
+    const C = 2 * Math.PI * r, tot = dueCount(n), dn = doneCount(n), p = tot ? dn / tot : 0;
     const box = 2 * r + 4, c = box / 2;
     return '<span class="ring"><svg viewBox="0 0 ' + box + ' ' + box + '" aria-hidden="true">' +
       '<circle class="t" cx="' + c + '" cy="' + c + '" r="' + r + '"/>' +
@@ -601,12 +616,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const marker = (n) => '<span class="mk">' + (n === NIGHT_N ? svg("moon") : n === SURG_N ? svg("tooth") : "") + '</span>';
   function dayLabel(n) {
     const tag = n === NIGHT_N ? ", night before surgery" : n === SURG_N ? ", surgery day" : "";
-    return fLong(dateOf(n)) + tag + ", " + doneCount(n) + " of " + itemsFor(n).length + " done";
+    return fLong(dateOf(n)) + tag + ", " + doneCount(n) + " of " + dueCount(n) + " done";
   }
   function dayClass(n) { return "d" + (n === todayN ? " today" : "") + (special(n) ? " sp" : ""); }
   function updateRings(n) {
     document.querySelectorAll('.d[data-n="' + n + '"]').forEach((b) => {
-      const c = b.querySelector(".p"), C = +c.dataset.c, p = doneCount(n) / itemsFor(n).length;
+      const c = b.querySelector(".p"), C = +c.dataset.c, p = dueCount(n) ? doneCount(n) / dueCount(n) : 0;
       c.setAttribute("stroke-dasharray", (p * C).toFixed(2) + " " + C.toFixed(2));
       c.style.opacity = p === 0 ? "0" : "";
       b.setAttribute("aria-label", dayLabel(n));
@@ -641,6 +656,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 
   // What a row says about times: when it was taken, and for timed doses when the next one is due.
   function timeLine(n, it, k) {
+    if (skipped(k)) return '<span class="at due">Skipped</span>';
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
       if (!times.length) return due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
@@ -649,7 +665,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     }
     if (!on(k)) {
       // Only the first not-yet-taken dose of the day shows when it's due.
-      const first = it.every && itemsFor(n).filter((x) => x.p === it.p && !on(key(n, x)))
+      const first = it.every && itemsFor(n).filter((x) => x.p === it.p && !resolved(key(n, x)))
         .sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))[0];
       return first && first.id === it.id && due ? '<span class="at due">' + cap(dueText(n, due)) + '</span>' : "";
     }
@@ -660,12 +676,15 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function itemHTML(n, it) {
     const k = key(n, it), done = on(k);
     const at = ' data-k="' + k + '" data-n="' + n + '"';
-    return '<div class="item' + (done ? ' done' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' +
+    // Behind the row: the action a left swipe reveals (Skip, or Undo skip on a skipped dose).
+    const act = done ? "" : '<button type="button" class="swipe-act" data-swipe' + at + ' tabindex="-1" aria-hidden="true"><span>' +
+      (skipped(k) ? "Undo skip" : "Skip") + '</span></button>';
+    return '<div class="item' + (done ? ' done' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' + act +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
       (it.pill && !done ? '<span class="pill">' + esc(it.pill) + '</span>' : '') +
       timeLine(n, it, k) + '</span></button>' +
-      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub) + '"' + at + '>' +
+      '<button type="button" class="tick" role="checkbox" aria-checked="' + done + '" aria-label="' + esc(it.name + (it.nth ? ', dose ' + nthText(it) : '') + ', ' + it.sub + (skipped(k) ? ', skipped' : '')) + '"' + at + '>' +
       '<span class="chk">' + CHECK + '</span></button></div>';
   }
   // Each time of day is its own card. Once everything in it is taken it folds down to its header
@@ -685,7 +704,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     SLOTS.forEach((s) => {
       const group = items.filter((it) => it.slot === s);
       if (!group.length) return;
-      const id = n + ":" + s, taken = group.filter((it) => on(key(n, it))).length, all = taken === group.length && !group.some((it) => it.repeat);
+      const id = n + ":" + s, taken = group.filter((it) => resolved(key(n, it))).length, all = taken === group.length && !group.some((it) => it.repeat && !skipped(key(n, it)));
       if (!all) sectionsOpened.delete(id);
       const fold = all && !sectionsOpened.has(id);
       const drawn = sectionsShown.has(id) ? sectionsShown.get(id) : fold;
@@ -847,7 +866,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function renderProgress() {
     const last = Math.min(todayN, DAYS - 1);
     let due = 0, taken = 0;
-    for (let n = 0; n <= last; n++) { due += itemsFor(n).length; taken += doneCount(n); }
+    for (let n = 0; n <= last; n++) { due += dueCount(n); taken += doneCount(n); }
     const stat = todayN < 0
       ? '<div class="dateline">' + (todayN === -1 ? "Starts tomorrow" : "Starts " + fLong(DAY1)) + '</div>'
       : '<div class="counter" style="margin-top:8px"><span class="big">' + taken + '</span><span class="of"><b>/ ' + due + '</b></span><span class="lbl">doses so far</span></div>';
@@ -892,6 +911,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const itemAt = (n, k) => itemsFor(n).find((x) => key(n, x) === k);
   function toggle(k, n) {
     const it = itemAt(n, k);
+    if (skipped(k)) { delete state[k]; stateChanged(k); renderDay(); updateRings(n); return; }
     if (it && it.repeat) { logDose(k, n); return; }
     if (on(k)) { delete state[k]; hideToast(); } else { state[k] = nowHM(); popKey = k; }
     stateChanged(k);
@@ -906,6 +926,69 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     renderDay(); updateRings(n);
     if (it) showToast(k, n, it, t);
   }
+
+  /* ---------- Swipe a row left to skip it ---------- */
+  // Drag a not-yet-taken row left: past halfway it skips (or un-skips) straight away; a shorter drag
+  // leaves the button showing, to tap. Only horizontal drags are taken; vertical ones still scroll.
+  const SW_OPEN = 96;
+  let sw = null, swOpen = null, swEatClick = false;
+  const dayEl = document.getElementById("day");
+  const setSx = (item, x, animate) => { item.classList.toggle("swiping", !animate); item.style.setProperty("--sx", x + "px"); };
+  function closeSwipe(animate) {
+    if (!swOpen) return;
+    setSx(swOpen, 0, animate !== false); swOpen.classList.remove("swiped"); swOpen = null;
+  }
+  dayEl.addEventListener("touchstart", (e) => {
+    const item = e.target.closest(".item");
+    if (swOpen && swOpen !== item) closeSwipe();
+    if (!item || e.touches.length !== 1 || !item.querySelector(".swipe-act") || e.target.closest(".swipe-act")) { sw = null; return; }
+    const t = e.touches[0];
+    sw = { item: item, x: t.clientX, y: t.clientY, dir: null, base: item === swOpen ? -SW_OPEN : 0, off: 0, w: item.offsetWidth };
+  }, { passive: true });
+  dayEl.addEventListener("touchmove", (e) => {
+    if (!sw || e.touches.length !== 1) return;
+    const t = e.touches[0], dx = t.clientX - sw.x, dy = t.clientY - sw.y;
+    if (!sw.dir) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      sw.dir = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+    }
+    if (sw.dir !== "h") return;
+    e.preventDefault();
+    let off = sw.base + dx;
+    if (off > 0) off = off / 4;            // a little give to the right, like iOS
+    sw.off = off;
+    setSx(sw.item, off, false);
+  }, { passive: false });
+  function endSwipe() {
+    const g = sw; sw = null;
+    if (!g || g.dir !== "h") return;
+    swEatClick = true; setTimeout(() => { swEatClick = false; }, 350);
+    const btn = g.item.querySelector(".swipe-act");
+    if (g.off < -g.w * 0.5 && btn) {
+      setSx(g.item, -g.w, true);
+      setTimeout(() => runSwipe(btn), 180);
+      swOpen = null;
+    } else if (g.off < -SW_OPEN / 2) {
+      setSx(g.item, -SW_OPEN, true); g.item.classList.add("swiped"); swOpen = g.item;
+    } else {
+      setSx(g.item, 0, true); g.item.classList.remove("swiped"); if (swOpen === g.item) swOpen = null;
+    }
+  }
+  dayEl.addEventListener("touchend", endSwipe);
+  dayEl.addEventListener("touchcancel", endSwipe);
+  function runSwipe(btn) {
+    const k = btn.dataset.k, n = +btn.dataset.n;
+    swOpen = null;
+    setSkip(k, n, !skipped(k));
+  }
+  // A drag isn't a tap: swallow the click that follows it, and close an open row on the next tap.
+  document.addEventListener("click", (e) => {
+    if (swEatClick) { e.stopPropagation(); e.preventDefault(); return; }
+    const act = e.target.closest("[data-swipe]");
+    if (act) { e.stopPropagation(); runSwipe(act); return; }
+    if (swOpen) { e.stopPropagation(); e.preventDefault(); closeSwipe(); }
+  }, true);
+  window.addEventListener("scroll", () => closeSwipe(), { passive: true });
 
   /* ---------- Logged toast ---------- */
   // After a dose is logged, a toast shows its time for a few seconds. The time is a native time
@@ -950,6 +1033,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     stateChanged(k);
     renderDay(); if (detailFor) updateRings(detailFor.n);
   }
+  function setSkip(k, n, skip) {
+    if (skip) { state[k] = SKIP; hideToast(); } else if (skipped(k)) delete state[k];
+    stateChanged(k);
+    renderDay(); updateRings(n);
+  }
   function stateChanged(k) {
     if (!synced) early[k] = on(k) ? state[k] : false;
     saveLocal(); queueSync();
@@ -976,7 +1064,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       '<input type="time" id="taken-time" data-time value="' + t + '">' +
       '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
     const foot = dayCtx ? '<div class="push-foot">' + at + '<button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
-      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button></div>' : "";
+      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button>' + skipBtn(dayCtx) + '</div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
       '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
       '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
@@ -993,6 +1081,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
         '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("");
   }
+  // Skip sits under the main button while nothing is logged; a skipped dose offers Undo skip.
+  function skipBtn(dayCtx) {
+    if (skipped(dayCtx.k)) return '<button type="button" class="skip-btn" data-skip="0">Undo skip</button>';
+    return on(dayCtx.k) ? "" : '<button type="button" class="skip-btn" data-skip="1">Skip this dose</button>';
+  }
   function detailRepeatHTML(row, dayCtx, rows, img, d) {
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
       '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
@@ -1001,7 +1094,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       (d.brand ? '<p class="sh-b">' + esc(d.brand) + '</p>' : '') +
       '<div class="list" style="margin-top:12px">' + rows + '</div></div>' +
       '<div class="push-foot"><div data-rlist>' + repeatListHTML(row, dayCtx) + '</div>' +
-      '<button type="button" class="sh-btn" data-mark>Log a dose now</button></div></div>';
+      '<button type="button" class="sh-btn" data-mark>Log a dose now</button>' + skipBtn(dayCtx) + '</div></div>';
   }
   function refreshRepeatList() {
     const box = push.querySelector("[data-rlist]");
@@ -1405,7 +1498,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (detailFor) { const inp = push.querySelector("[data-time]"); if (inp) inp.value = ""; setTime(detailFor.k, ""); }
       return;
     }
-    if (e.target.closest("[data-mark]")) { if (detailFor) toggle(detailFor.k, detailFor.n); closeDetail(); return; }
+    const sk = e.target.closest("[data-skip]");
+    if (sk) { if (detailFor) setSkip(detailFor.k, detailFor.n, sk.dataset.skip === "1"); closeDetail(); return; }
+    if (e.target.closest("[data-mark]")) {
+      if (detailFor) { if (skipped(detailFor.k)) delete state[detailFor.k]; toggle(detailFor.k, detailFor.n); }
+      closeDetail(); return;
+    }
     const t = e.target.closest(".tab, .tick, .open, .d");
     if (!t) return;
     if (t.classList.contains("tab")) { showView(t.dataset.view); return; }
