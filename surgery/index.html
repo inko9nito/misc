@@ -348,6 +348,20 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
 .ef input:focus,.ef textarea:focus,.ef select:focus{outline:none;border-color:var(--accent)}
 .es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
+.ef-l{display:block;font-size:13px;font-weight:600;color:var(--ink2)}
+.ef-l span{font-weight:400;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;width:1px;height:1px}
+.chip span{display:block;padding:8px 12px;border:1px solid var(--track);border-radius:999px;font-size:14px;font-weight:500}
+.chip input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.ef .chip span{font-weight:500;color:var(--ink)}
+.ef .chip input:checked + span{color:var(--on-accent)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.es-del{color:#C0453A}
+.vt-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.add-btn{display:flex;align-items:center;gap:4px;margin-top:12px;min-height:40px;padding:0 12px 0 8px;border-radius:12px;font-size:16px;font-weight:600;color:var(--accent-ink)}
+.add-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round}
 .es-reset{display:block;margin:14px auto 0;padding:10px 14px;border-radius:12px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 
 @media (prefers-reduced-motion: reduce){ .item.pop .chk,.sec-card.just-done .sec-done,.sec-card.just-done .chev{animation:none} .sec-body,.chev,.ring .p,.chk,.wrap,.bar,.push,.push-dim,.esheet,.sheet-dim,html{transition:none} }
@@ -538,7 +552,18 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       why: "Flushes out food caught around the surgery site and helps it heal." }
   };
 
-  function baseItemsFor(n) {
+  // Added supplements: one row per chosen time of day, on each day from its start to its end date.
+  function customItemsFor(n) {
+    const day = iso(dateOf(n)), out = [];
+    Object.keys(EDITS.c).forEach((pk) => {
+      const c = EDITS.c[pk];
+      if ((c.from && day < c.from) || (c.to && day > c.to)) return;
+      (c.slots && c.slots.length ? c.slots : ["Anytime"]).forEach((sl, i) => out.push({ id: pk + "_" + i, slot: sl, name: c.name, sub: c.sub || "", icon: c.icon || "capsule", pill: c.pill || undefined }));
+    });
+    return out;
+  }
+  function baseItemsFor(n) { return coreItemsFor(n).concat(customItemsFor(n)); }
+  function coreItemsFor(n) {
     if (n < ABX_FIRST_N) return BEFORE;
     if (n < NIGHT_N) return BEFORE.concat(ABX);
     if (n === NIGHT_N) return BEFORE.concat(ABX, NIGHT);
@@ -564,11 +589,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   Object.keys(NAME2P).forEach((nm) => { PNAME[NAME2P[nm]] = nm; PDETAILS[NAME2P[nm]] = DETAILS[nm] || {}; });
   const PROD = { vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgdn: "mag", mgpm: "mag", jaw1: "jaw", jaw2: "jaw", jaw3: "jaw",
     salt1: "salt", salt2: "salt", abx1: "abx", abx2: "abx", abx3: "abx" };
-  const prodOf = (id) => { const b = id.replace(/^[ns]-/, ""); return PROD[b] || b; };
+  const prodOf = (id) => { if (/^u_/.test(id)) return id.split("_").slice(0, 2).join("_"); const b = id.replace(/^[ns]-/, ""); return PROD[b] || b; };
   // What's been changed, over the defaults above: p = a supplement's fields, i = one dose's (by item id, on
   // every day it appears), s = one Supplements row's. A field that's present overrides, even when empty.
   const LSE = "surgery-tracker-edits-v1";
-  const normEdits = (v) => ({ p: (v && v.p) || {}, i: (v && v.i) || {}, s: (v && v.s) || {} });
+  // c = supplements added in the app (by id "u_..."), each with its own schedule.
+  const normEdits = (v) => ({ p: (v && v.p) || {}, i: (v && v.i) || {}, s: (v && v.s) || {}, c: (v && v.c) || {} });
   let EDITS = (function () { try { return normEdits(JSON.parse(localStorage.getItem(LSE) || "{}")); } catch (e) { return normEdits(null); } })();
   let eref = null;
   function saveEdits() {
@@ -576,7 +602,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
   const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay"];
+  const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
+    if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
     const out = Object.assign({ name: PNAME[pk] || pk }, PDETAILS[pk] || {}, EDITS.p[pk] || {});
     if (!out.name) out.name = PNAME[pk] || pk;   // a name can't be blank
     return out;
@@ -895,7 +923,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function renderSupps() {
     suppRows.length = 0;
     document.getElementById("v-supps").innerHTML =
-      '<h1 class="vt">Supplements</h1>' +
+      '<div class="vt-row"><h1 class="vt">Supplements</h1><button type="button" class="add-btn" data-add>' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add</button></div>' +
+      (Object.keys(EDITS.c).length ? grp("Added by you", "", customRows()) : '') +
       grp("2 weeks before", fShort(DAY1) + " – " + fShort(dateOf(NIGHT_N)), [
         infoRow("before", "capsule", "D3K2", "8 pumps (20,000 IU) before breakfast", "Hold in mouth 30 sec"),
         infoRow("before", "pump", "Methyl-B12", "2 pumps before breakfast", "Hold in mouth 30 sec"),
@@ -1367,8 +1397,20 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function showEdit(instant) {
     const row = currentRow();
     if (!row) return;
-    editCtx = { row: row, dayCtx: detailFor };
-    esheet.innerHTML = editHTML(row, detailFor);
+    editCtx = { row: row, dayCtx: detailFor, custom: isCustom(row.p) ? row.p : undefined };
+    esheet.innerHTML = editCtx.custom ? customHTML(row.p) : editHTML(row, detailFor);
+    openSheet(instant);
+  }
+  // Add supplement (from the Supplements tab): the same sheet, empty, with no details page under it.
+  function openAdd() {
+    editCtx = { custom: null };
+    esheet.innerHTML = customHTML(null);
+    openSheet(false);
+    const nm = esheet.querySelector("#ef-name"); if (nm && !usingTouch) nm.focus();
+  }
+  let usingTouch = false;
+  window.addEventListener("touchstart", () => { usingTouch = true; }, { once: true, passive: true });
+  function openSheet(instant) {
     editStart = formValues();
     esheet.hidden = false; esheet.style.transform = esheet.style.transition = "";
     document.documentElement.classList.add("sheet-open");
@@ -1409,6 +1451,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function saveEdit() {
     const f = document.getElementById("es-form");
     if (!f || !editCtx) return;
+    if (editCtx.custom !== undefined) { saveCustom(f); return; }
     const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
     const row = editCtx.row, pk = row.p, base = row.base || {};
     PFIELDS.forEach((n) => setOverride(EDITS.p, pk, n, n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n), n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]));
@@ -1417,6 +1460,66 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     saveEdits();
     refreshEdited();
     closeEdit();
+  }
+  /* ---------- Added supplements ---------- */
+  const SLOT_CHOICES = ["Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Through the day", "Anytime"];
+  const ICON_OPTS = [["capsule", "Capsule"], ["tablet", "Tablet"], ["drops", "Dropper bottle"], ["pump", "Pump bottle"], ["spoon", "Spoon"], ["pellets", "Pellets"], ["swab", "Swab"], ["cup", "Cup"]];
+  const lastDay = () => iso(dateOf(DAYS - 1));
+  function customHTML(pk) {
+    const c = pk ? EDITS.c[pk] : { from: iso(dateOf(Math.min(Math.max(todayN, 0), DAYS - 1))), slots: [] };
+    const date = (name, label, value, hint) => '<div class="ef"><label for="ef-' + name + '">' + label + (hint ? ' <span>' + hint + '</span>' : '') + '</label>' +
+      '<input type="date" id="ef-' + name + '" name="' + name + '" value="' + esc(value || "") + '" min="' + iso(DAY1) + '" max="' + lastDay() + '"></div>';
+    const slots = '<div class="ef"><span class="ef-l">Times of day <span>One dose for each</span></span><div class="chips">' +
+      SLOT_CHOICES.map((sl) => '<label class="chip"><input type="checkbox" name="slots" value="' + esc(sl) + '"' + ((c.slots || []).indexOf(sl) >= 0 ? ' checked' : '') + '><span>' + esc(sl) + '</span></label>').join("") + '</div></div>';
+    const info = '<div class="es-sec">Supplement</div><div class="es-card">' + field("name", "Name", c.name || "", { required: true }) +
+      field("brand", "Brand", c.brand || "") + field("how", "How to take it", c.how || "", { long: true }) +
+      field("label", "Label", c.label || "", { long: true }) + field("why", "Why", c.why || "", { long: true }) +
+      field("note", "Note", c.note || "", { long: true }) + field("icon", "Icon", c.icon || "capsule", { options: ICON_OPTS }) + '</div>';
+    const sched = '<div class="es-sec">Schedule</div><div class="es-card">' + field("sub", "Dose", c.sub || "", { hint: "e.g. 1 capsule" }) + slots +
+      date("from", "Start", c.from) + date("to", "End", c.to, "Leave empty to keep going") +
+      field("every", "Repeat every", c.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
+      field("perDay", "Times a day", c.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) +
+      field("pill", "Reminder", c.pill || "", { hint: "Shown in the list" }) + '</div>' +
+      '<p class="es-note">Added supplements are saved on this phone; Copy for Claude (under local changes) builds them into the app.</p>';
+    return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
+      '<div class="es-tt"><div id="es-t">' + (pk ? "Edit" : "Add supplement") + '</div>' + (pk ? '<div class="es-st">' + esc(c.name) + '</div>' : '') + '</div>' +
+      '<button type="submit" form="es-form" class="es-btn es-save" data-save disabled>' + (pk ? "Save" : "Add") + '</button></div>' +
+      '<div class="es-b"><form id="es-form" novalidate>' + info + sched +
+      (pk ? '<button type="button" class="es-reset es-del" data-del-custom>Delete supplement</button>' : '') + '</form></div>';
+  }
+  function saveCustom(f) {
+    const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
+    if (!v("name")) { const nm = f.elements.name; if (nm) nm.focus(); return; }
+    const pk = editCtx.custom || ("u_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5));
+    const c = { slots: Array.from(f.querySelectorAll('input[name="slots"]:checked')).map((x) => x.value) };
+    ["name", "brand", "how", "label", "why", "note", "icon", "sub", "from", "to", "every", "perDay", "pill"].forEach((n) => { if (v(n)) c[n] = v(n); });
+    if (!c.slots.length) c.slots = ["Anytime"];
+    if (c.from && c.to && c.to < c.from) c.to = c.from;
+    EDITS.c[pk] = c;
+    saveEdits();
+    closeEdit();
+    refreshEdited(); refreshAll();
+  }
+  function deleteCustom() {
+    const pk = editCtx && editCtx.custom;
+    if (!pk || !window.confirm("Delete " + EDITS.c[pk].name + "? Its checkmarks go too.")) return;
+    delete EDITS.c[pk];
+    Object.keys(state).forEach((k) => { if (k.indexOf(":" + pk + "_") > 0) delete state[k]; });
+    saveLocal(); queueSync(); saveEdits();
+    hideEdit(false);
+    if (!push.hidden) closeDetail();
+    refreshEdited(); refreshAll();
+  }
+  const customSchedule = (c) => [c.sub, (c.slots || ["Anytime"]).join(", ")].filter(Boolean).join(" · ") +
+    (c.to ? ", " + fShort(new Date(c.from + "T12:00")) + " – " + fShort(new Date(c.to + "T12:00")) : c.from ? ", from " + fShort(new Date(c.from + "T12:00")) : "");
+  function customRows() {
+    return Object.keys(EDITS.c).map((pk) => {
+      const c = EDITS.c[pk], row = { p: pk, rk: "custom:" + pk, icon: c.icon || "capsule", sub: customSchedule(c), pill: c.pill, name: c.name, base: {} };
+      const i = suppRows.push(row) - 1;
+      return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(null, row.icon) +
+        '<span class="body"><span class="nm">' + esc(row.name) + '</span><span class="sb">' + esc(row.sub) + '</span>' +
+        (row.pill ? '<span class="pill">' + esc(row.pill) + '</span>' : '') + '</span></button></div>';
+    });
   }
   function restoreOriginal() {
     const f = document.getElementById("es-form");
@@ -1442,7 +1545,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
-    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day" };
+    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
@@ -1469,6 +1572,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!Object.keys(SUPP_BASE).length) renderSupps();
     const out = [];
     const add = (pk, where, field, from, to, keyText) => out.push({ pk: pk, name: prodInfo(pk).name, where: where, field: field, from: from == null ? "" : from, to: to, key: keyText });
+    // An added supplement is one change: everything about it, in one line.
+    Object.keys(EDITS.c).forEach((pk) => {
+      const c = EDITS.c[pk];
+      const parts = ["Dose: " + (c.sub || "(none)"), "When: " + (c.slots || ["Anytime"]).join(", "), "From " + (c.from || "start") + (c.to ? " to " + c.to : ", ongoing")];
+      [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Icon"]]
+        .forEach(([f, l]) => { if (c[f]) parts.push(l + ": " + c[f]); });
+      add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
+    });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
       add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], EDITS.p[pk][f], "supplement " + pk)));
     Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
@@ -1589,6 +1700,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const sec = e.target.closest("[data-sec-toggle]");
     if (sec) { if (!sec.disabled) toggleSection(sec.dataset.secToggle); return; }
     if (e.target.closest("[data-edit]")) { openEdit(); return; }
+    if (e.target.closest("[data-add]")) { openAdd(); return; }
+    if (e.target.closest("[data-del-custom]")) { deleteCustom(); return; }
     const chip = e.target.closest("[data-changes]");
     if (chip) { openChanges(chip); return; }
     const cp = e.target.closest("[data-copy-changes]");
