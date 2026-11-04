@@ -236,6 +236,7 @@ html.push-open .push-dim{opacity:.1}
 .dpanel[hidden]{display:none}
 .dlist .taken-at{margin:0;border:0;border-radius:0;background:none}
 .dlist .taken-at + .taken-at{border-top:1px solid var(--line)}
+.ddate{margin:0 2px 8px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.03em}
 .dempty{margin:4px 2px 0;font-size:15px;color:var(--muted)}
 .seg-big{display:flex;align-items:center;gap:12px;margin:0 2px 10px}
 .seg-big .segs{flex:1;max-width:none;margin:0}
@@ -586,7 +587,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return best;
   }
   function nextDue(n, it) {
-    if (!it.every) return null;
+    if (!it.every || n < todayN) return null;   // a past day has nothing left to be due
     let last = lastLog(n, it.p), shift = 0;
     if (last < 0) { last = lastLog(n - 1, it.p) - 1440; if (last < -1440) return null; }
     const due = last + it.every * 60;
@@ -692,7 +693,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (it.repeat) {
       const goal = it.perDay, bits = [];
       if (goal) bits.push(times.length + " of " + goal);
-      if (times.length) bits.push((goal ? "last " : times.length > 1 ? times.length + " times today · last " : "Taken ") + fmtHM(times[times.length - 1]));
+      if (times.length) bits.push((goal ? "last " : times.length > 1 ? times.length + " times · last " : "Taken ") + fmtHM(times[times.length - 1]));
       if (due) bits.push(dueText(n, due));
       return (goal ? segsHTML(times.length, goal) : "") + (bits.length ? '<span class="at' + (times.length ? '' : ' due') + '">' + cap(bits.join(" · ")) + '</span>' : "");
     }
@@ -1112,9 +1113,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function repeatListHTML(row, dayCtx) {
     const times = timesOf(dayCtx.k), due = nextDue(dayCtx.n, row);
     const goal = row.perDay;
-    return (goal ? '<div class="seg-big">' + segsHTML(times.length, goal) + '<span>' + times.length + ' of ' + goal + ' today</span></div>' : '') +
+    // Say which day these doses are for: the day the page was opened from.
+    const dn = dayCtx.n, when = fmt(dateOf(dn), { weekday: "long", month: "short", day: "numeric" }) +
+      (dn === todayN ? " · Today" : dn === todayN - 1 ? " · Yesterday" : dn === todayN + 1 ? " · Tomorrow" : "");
+    return '<p class="ddate">' + esc(when) + '</p>' +
+      (goal ? '<div class="seg-big">' + segsHTML(times.length, goal) + '<span>' + times.length + ' of ' + goal + '</span></div>' : '') +
       (due ? '<p class="next-due">' + cap(dueText(dayCtx.n, due).replace("next ", "next dose ")) + '</p>' : '') +
-      (times.length ? "" : '<p class="dempty">No doses logged yet today.</p>') +
+      (times.length ? "" : '<p class="dempty">No doses logged ' + (dn === todayN ? "yet today" : "this day") + '.</p>') +
       (times.length ? '<div class="list dlist">' : '') + times.map((tm, i) => '<div class="taken-at"><label for="rt-' + i + '">Dose ' + (i + 1) + '</label>' +
         '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
         '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("") + (times.length ? '</div>' : '');
