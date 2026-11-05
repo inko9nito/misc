@@ -165,3 +165,7 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 - They're stored in the edits doc as `EDITS.c["u_<id>"]` (so they sync like other edits) and appear in an "Added by you" group on the Supplements tab and as rows on each day in their date range (`customItemsFor`; item ids `u_<id>_<slot index>`). Edit on one of them reopens the same form, with Delete supplement.
 - Each one counts as a local change ("New supplement" with everything about it on one line), so Copy for Claude can build it into the defaults.
 
+
+## Activity
+
+The Today view has a Schedule | Activity switch under the day strip. Activity lists every logged time for the selected day, earliest first, one row per time (so a dose taken 4 times shows 4 rows, numbered "2 of 4"). Doses ticked with no time and skipped doses are listed after it under their own headings. Tapping a row opens its details, where the time can be changed. The switch stays put when you change days.

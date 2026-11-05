@@ -234,6 +234,12 @@ html.push-open .push-dim{opacity:.1}
 .dtabs{display:flex;gap:2px;margin:14px 0 12px;padding:2px;border-radius:10px;background:var(--track)}
 .dtabs button{flex:1;text-align:center;min-height:34px;border-radius:8px;font-size:14px;font-weight:600;color:var(--ink2)}
 .dtabs button[aria-selected="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+/* Today's Schedule | Activity switch, and the activity list: one row per logged time. */
+.dtabs.dmode{margin:4px 0 14px}
+.act .open{gap:14px}
+.act-t{flex:none;width:68px;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
+.act-gh{margin:18px 4px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.act-empty{margin:24px 4px;text-align:center;font-size:15px;color:var(--muted)}
 .dpanel[hidden]{display:none}
 .dlist .taken-at{margin:0;border:0;border-radius:0;background:none}
 .dlist .taken-at + .taken-at{border-top:1px solid var(--line)}
@@ -833,11 +839,42 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     sectionsShown.set(id, fold);
   }
 
+  // The day shows either its schedule or its activity: every logged time, in the order it happened.
+  let dayMode = "plan";
+  function modeHTML() {
+    const b = (m, t) => '<button type="button" role="tab" data-dmode="' + m + '" aria-selected="' + (dayMode === m) + '">' + t + '</button>';
+    return '<div class="dtabs dmode" role="tablist" aria-label="Show">' + b("plan", "Schedule") + b("log", "Activity") + '</div>';
+  }
+  function actRow(n, it, label, extra) {
+    return '<div class="item"><button type="button" class="open" data-k="' + key(n, it) + '" data-n="' + n + '" aria-haspopup="dialog">' +
+      '<span class="act-t">' + label + '</span><span class="body"><span class="nm">' + esc(it.name) +
+      (extra ? ' <span class="nth">' + extra + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span></span></button></div>';
+  }
+  function activityHTML(n, items) {
+    const timed = [], untimed = [], skips = [];
+    items.forEach((it) => {
+      const k = key(n, it);
+      if (skipped(k)) { skips.push(it); return; }
+      const times = timesOf(k);
+      if (on(k) && !times.length) { untimed.push(it); return; }
+      times.forEach((hm, i) => timed.push({ hm: hm, it: it,
+        extra: it.repeat ? (it.perDay ? (i + 1) + " of " + it.perDay : times.length > 1 ? (i + 1) + " of " + times.length : "") : nthText(it) }));
+    });
+    timed.sort((a, b) => toMin(a.hm) - toMin(b.hm) || SLOTS.indexOf(a.it.slot) - SLOTS.indexOf(b.it.slot));
+    if (!timed.length && !untimed.length && !skips.length)
+      return '<p class="act-empty">Nothing logged ' + (n === todayN ? "yet today" : "on this day") + '.</p>';
+    let h = "";
+    if (timed.length) h += '<div class="list act">' + timed.map((e) => actRow(n, e.it, fmtHM(e.hm), e.extra)).join("") + '</div>';
+    if (untimed.length) h += '<div class="act-gh">Taken, no time</div><div class="list act">' + untimed.map((it) => actRow(n, it, "—", nthText(it))).join("") + '</div>';
+    if (skips.length) h += '<div class="act-gh">Skipped</div><div class="list act">' + skips.map((it) => actRow(n, it, "—", nthText(it))).join("") + '</div>';
+    return h;
+  }
   function renderDay() {
     const n = sel, items = itemsFor(n);
     const banded = new Set(items.map((it) => it.slot)).size > 1;
     // Taken doses stay where they are, faded with their check, so the list doesn't reshuffle under a tap.
-    document.getElementById("day").innerHTML = listHTML(n, items, banded);
+    if (dayMode === "log") { document.getElementById("day").innerHTML = modeHTML() + activityHTML(n, items); popKey = null; return; }
+    document.getElementById("day").innerHTML = modeHTML() + listHTML(n, items, banded);
     popKey = null;
     settleSections();
   }
@@ -1688,6 +1725,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (detailFor) { if (skipped(detailFor.k)) delete state[detailFor.k]; toggle(detailFor.k, detailFor.n); }
       closeDetail(); return;
     }
+    const dm = e.target.closest("[data-dmode]");
+    if (dm) { dayMode = dm.dataset.dmode; renderDay(); return; }
     const t = e.target.closest(".tab, .tick, .open, .d");
     if (!t) return;
     if (t.classList.contains("tab")) { showView(t.dataset.view); return; }
