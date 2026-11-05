@@ -260,6 +260,7 @@ html.push-open .push-dim{opacity:.1}
 .act .open{gap:14px}
 .act-t{flex:none;width:68px;font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink)}
 .act-gh{margin:18px 4px 8px;font-size:13px;font-weight:600;color:var(--muted)}
+.act-gh.first{margin-top:4px}
 .act-empty{margin:24px 4px;text-align:center;font-size:15px;color:var(--muted)}
 .dpanel[hidden]{display:none}
 .dlist .taken-at{margin:0;border:0;border-radius:0;background:none}
@@ -911,7 +912,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!timed.length && !untimed.length && !skips.length)
       return '<p class="act-empty">Nothing logged ' + (n === todayN ? "yet today" : "on this day") + '.</p>';
     let h = "";
-    if (timed.length) h += '<div class="list act">' + timed.map((e) => actRow(n, e.it, fmtHM(e.hm), e.extra)).join("") + '</div>';
+    // One card per hour, under a heading like "8 AM", so the day reads at a glance.
+    const hours = [];
+    timed.forEach((e) => { const hr = +e.hm.slice(0, 2), last = hours[hours.length - 1]; if (last && last.hr === hr) last.rows.push(e); else hours.push({ hr: hr, rows: [e] }); });
+    h += hours.map((g, i) => '<div class="act-gh' + (i ? '' : ' first') + '">' + ((g.hr + 11) % 12 + 1) + (g.hr < 12 ? ' AM' : ' PM') + '</div>' +
+      '<div class="list act">' + g.rows.map((e) => actRow(n, e.it, fmtHM(e.hm), e.extra)).join("") + '</div>').join("");
     if (untimed.length) h += '<div class="act-gh">Taken, no time</div><div class="list act">' + untimed.map((it) => actRow(n, it, "—", nthText(it))).join("") + '</div>';
     if (skips.length) h += '<div class="act-gh">Skipped</div><div class="list act">' + skips.map((it) => actRow(n, it, "—", nthText(it))).join("") + '</div>';
     return h;

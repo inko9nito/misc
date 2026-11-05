@@ -168,7 +168,7 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 
 ## Activity
 
-The Today view has a Schedule | Activity switch under the day strip. Activity lists every logged time for the selected day, earliest first, one row per time (so a dose taken 4 times shows 4 rows, numbered "2 of 4"). Doses ticked with no time and skipped doses are listed after it under their own headings. Tapping a row opens its details, where the time can be changed. The switch stays put when you change days.
+The Today view has a Schedule | Activity switch under the day strip. Activity lists every logged time for the selected day, earliest first, grouped into one card per hour under a heading like "8 AM", one row per time (so a dose taken 4 times shows 4 rows, numbered "2 of 4"). Doses ticked with no time and skipped doses are listed after it under their own headings. Tapping a row opens its details, where the time can be changed. The switch stays put when you change days.
 
 ## Reschedule
 
