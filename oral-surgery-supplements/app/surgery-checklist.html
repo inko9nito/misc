@@ -137,8 +137,29 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .item{position:relative;display:flex;align-items:stretch;width:100%;min-height:64px;overflow:hidden;touch-action:pan-y}
 .item > .open,.item > .tick{position:relative;z-index:1;background:var(--card);transform:translateX(var(--sx,0px));transition:transform .3s cubic-bezier(.32,.72,0,1)}
 .item.swiping > .open,.item.swiping > .tick{transition:none}
-.swipe-act{position:absolute;inset:0;display:flex;align-items:center;justify-content:flex-end;background:var(--ink2);color:var(--bg);font-size:15px;font-weight:600}
-.swipe-act span{width:96px;text-align:center}
+.swipe-act{position:absolute;inset:0;display:flex;align-items:stretch;justify-content:flex-end;background:var(--ink2)}
+.swipe-act button{flex:none;width:96px;display:grid;place-items:center;color:var(--bg);font-size:15px;font-weight:600}
+.swipe-act .sw-mv{background:var(--accent);color:var(--on-accent)}
+/* Swiped far enough to skip outright: Skip fills the row, as in iOS. */
+.item.sw-full .sw-mv{display:none}
+.item.sw-full .sw-sk{flex:1;justify-items:end}
+.item.sw-full .sw-sk span{width:96px;text-align:center}
+/* Reschedule: a small sheet with a date and an optional time. */
+.mv-dim{position:fixed;inset:0;z-index:47;background:#000;opacity:0;transition:opacity .25s}
+.mv-dim.on{opacity:.3}
+.mv{position:fixed;left:16px;right:16px;top:50%;z-index:48;max-width:400px;margin:0 auto;padding:18px 16px 16px;border-radius:20px;background:var(--bg);
+  box-shadow:0 10px 40px rgba(0,0,0,.2);transform:translateY(-50%) scale(.96);opacity:0;transition:opacity .2s,transform .2s}
+.mv.on{opacity:1;transform:translateY(-50%) scale(1)}
+.mv h2{margin:0 2px;font-size:20px;font-weight:800}
+.mv-s{margin:2px 2px 14px;font-size:14px;color:var(--muted)}
+.mv .taken-at label span{font-weight:400;color:var(--muted)}
+.mv-btns{display:flex;gap:8px;margin-top:6px}
+.mv-btns button{flex:1;min-height:46px;border-radius:12px;font-size:16px;font-weight:600}
+.mv-btns .mv-go{background:var(--accent);color:var(--on-accent)}
+.mv-btns .mv-no{color:var(--accent-ink)}
+.moved .open{cursor:default}
+.moved .tile,.moved .body{opacity:.55}
+.unmove{flex:none;align-self:center;margin-right:8px;padding:8px 12px;min-height:40px;border-radius:10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .open{flex:1;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 0 10px 14px}
 .open:last-child{padding-right:14px}
 .open:active,.tick:active{background:var(--band)}
@@ -585,7 +606,26 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (g.length < 2) return;
       g.slice().sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot)).forEach((it, i) => { it.nth = [i + 1, g.length]; });
     });
-    return items;
+    // Doses moved away leave the day (the rest keep their numbers); doses moved here join it.
+    return items.filter((it) => !moveOf(key(n, it))).concat(movedIn(n));
+  }
+  // The doses moved to day n from their own day: same supplement and dose, without a dose number.
+  function movedIn(n) {
+    const day = iso(dateOf(n)), out = [];
+    Object.keys(state).forEach((k) => {
+      const mv = moveOf(k);
+      if (!mv || mv.to !== day) return;
+      const from = k.slice(0, 10), id = k.slice(11), n0 = nOfIso(from);
+      if (id.indexOf("@") >= 0 || n0 < 0 || n0 >= DAYS) return;
+      const it = baseItemsFor(n0).map(eff).find((x) => x.id === id);
+      if (it) out.push(Object.assign(it, { mvFrom: from, mvAt: mv.at, repeat: false, nth: null, pill: "Moved from " + fLong(dateOf(n0)) }));
+    });
+    return out;
+  }
+  // The doses moved off day n to another day, shown at the end of the day so the move can be undone.
+  function movedOut(n) {
+    const day = iso(dateOf(n));
+    return baseItemsFor(n).map(eff).filter((it) => { const mv = moveOf(key(n, it)); return mv && mv.to !== day; });
   }
   const nthText = (it) => it.nth ? it.nth[0] + " of " + it.nth[1] : "";
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -595,7 +635,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const LS = "surgery-tracker-v2";
   let state = (function () { try { const v = JSON.parse(localStorage.getItem(LS) || "{}"); return v && typeof v === "object" ? v : {}; } catch (e) { return {}; } })();
   const saveLocal = () => { try { localStorage.setItem(LS, JSON.stringify(state)); } catch (e) {} };
-  const key = (n, it) => iso(dateOf(n)) + ":" + it.id;
+  const key = (n, it) => iso(dateOf(n)) + ":" + it.id + (it.mvFrom ? "@" + it.mvFrom : "");
   // A taken dose is stored as the time it was logged ("14:05"), or true when its time was cleared
   // (and for checkmarks saved before times existed).
   const HM = /^([01]\d|2[0-3]):[0-5]\d$/;
@@ -604,10 +644,15 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const SKIP = "skip";
   const taken = (v) => v === true || (typeof v === "string" && HM.test(v)) ||
     (Array.isArray(v) && v.length > 0 && v.every((t) => typeof t === "string" && HM.test(t)));
-  const valid = (v) => taken(v) || v === SKIP;
+  // A dose moved to another day, or to a set time, is stored on its original key as "mv>2026-11-06"
+  // or "mv>2026-11-06T14:00". On the new day it's its own row, keyed "2026-11-06:id@2026-11-04".
+  const MV = /^mv>(\d{4}-\d{2}-\d{2})(?:T(([01]\d|2[0-3]):[0-5]\d))?$/;
+  const valid = (v) => taken(v) || v === SKIP || (typeof v === "string" && MV.test(v));
   const on = (k) => taken(state[k]);
   const skipped = (k) => state[k] === SKIP;
   const resolved = (k) => on(k) || skipped(k);
+  const moveOf = (k) => { const m = typeof state[k] === "string" && MV.exec(state[k]); return m ? { to: m[1], at: m[2] || "" } : null; };
+  const nOfIso = (t) => { const [y, m, d] = t.split("-").map(Number); return diff(new Date(y, m - 1, d), DAY1); };
   const timesOf = (k) => !on(k) ? [] : Array.isArray(state[k]) ? state[k].slice().sort() : typeof state[k] === "string" ? [state[k]] : [];
   const timeOf = (k) => { const t = timesOf(k); return t.length ? t[t.length - 1] : ""; };
   const toMin = (hm) => { const [h, m] = hm.split(":").map(Number); return h * 60 + m; };
@@ -736,6 +781,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // What a row says about times: when it was taken, and for timed doses when the next one is due.
   function timeLine(n, it, k) {
     if (skipped(k)) return '<span class="at due">Skipped</span>';
+    if (it.mvAt && !on(k)) return '<span class="at due">At ' + fmtHM(it.mvAt) + '</span>';
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
       const goal = it.perDay, bits = [];
@@ -760,8 +806,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const done = goal ? count >= goal : on(k), part = goal && count > 0 && !done;
     const at = ' data-k="' + k + '" data-n="' + n + '"';
     // Behind the row: the action a left swipe reveals (Skip, or Undo skip on a skipped dose).
-    const act = on(k) ? "" : '<button type="button" class="swipe-act" data-swipe' + at + ' tabindex="-1" aria-hidden="true"><span>' +
-      (skipped(k) ? "Undo skip" : "Skip") + '</span></button>';
+    const act = on(k) ? "" : '<div class="swipe-act" aria-hidden="true">' +
+      (canMove(it, k) ? '<button type="button" class="sw-mv" data-swipe="move"' + at + ' tabindex="-1"><span>Move</span></button>' : '') +
+      '<button type="button" class="sw-sk" data-swipe="skip"' + at + ' tabindex="-1"><span>' + (skipped(k) ? "Undo skip" : "Skip") + '</span></button></div>';
     return '<div class="item' + (done ? ' done' : '') + (part ? ' part' : '') + (skipped(k) ? ' skip' : '') + (it.repeat ? ' rep' : '') + (k === popKey ? ' pop' : '') + '">' + act +
       '<button type="button" class="open"' + at + ' aria-haspopup="dialog">' + tile(it.img, it.icon) +
       '<span class="body"><span class="nm">' + esc(it.name) + (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(it.sub) + '</span>' +
@@ -869,12 +916,25 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (skips.length) h += '<div class="act-gh">Skipped</div><div class="list act">' + skips.map((it) => actRow(n, it, "—", nthText(it))).join("") + '</div>';
     return h;
   }
+  // Rescheduling: any dose not yet taken or skipped, except one logged over and over through the day.
+  const canMove = (it, k) => !on(k) && !skipped(k) && !it.repeat;
+  function movedHTML(n) {
+    const out = movedOut(n);
+    if (!out.length) return "";
+    return '<div class="act-gh">Moved</div><div class="list">' + out.map((it) => {
+      const k = key(n, it), mv = moveOf(k), tk = mv.to + ":" + it.id + "@" + k.slice(0, 10), n1 = nOfIso(mv.to);
+      const where = "Moved to " + fLong(dateOf(n1)) + (mv.at ? " · " + fmtHM(mv.at) : "") + (on(tk) ? " · taken" : skipped(tk) ? " · skipped" : "");
+      return '<div class="item moved"><div class="open">' + tile(it.img, it.icon) + '<span class="body"><span class="nm">' + esc(it.name) +
+        (it.nth ? ' <span class="nth">' + nthText(it) + '</span>' : '') + '</span><span class="sb">' + esc(where) + '</span></span></div>' +
+        (resolved(tk) ? '' : '<button type="button" class="unmove" data-unmove="' + k + '" aria-label="Undo move, ' + esc(it.name) + '">Undo</button>') + '</div>';
+    }).join("") + '</div>';
+  }
   function renderDay() {
     const n = sel, items = itemsFor(n);
     const banded = new Set(items.map((it) => it.slot)).size > 1;
     // Taken doses stay where they are, faded with their check, so the list doesn't reshuffle under a tap.
-    if (dayMode === "log") { document.getElementById("day").innerHTML = modeHTML() + activityHTML(n, items); popKey = null; return; }
-    document.getElementById("day").innerHTML = modeHTML() + listHTML(n, items, banded);
+    if (dayMode === "log") { document.getElementById("day").innerHTML = modeHTML() + activityHTML(n, items) + movedHTML(n); popKey = null; return; }
+    document.getElementById("day").innerHTML = modeHTML() + listHTML(n, items, banded) + movedHTML(n);
     popKey = null;
     settleSections();
   }
@@ -1047,7 +1107,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   /* ---------- Swipe a row left to skip it ---------- */
   // Drag a not-yet-taken row left: past halfway it skips (or un-skips) straight away; a shorter drag
   // leaves the button showing, to tap. Only horizontal drags are taken; vertical ones still scroll.
-  const SW_OPEN = 96;
+  const SW_BTN = 96, swW = (item) => item.querySelectorAll("[data-swipe]").length * SW_BTN;
   let sw = null, swOpen = null, swEatClick = false;
   const dayEl = document.getElementById("day");
   const setSx = (item, x, animate) => { item.classList.toggle("swiping", !animate); item.style.setProperty("--sx", x + "px"); };
@@ -1060,7 +1120,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (swOpen && swOpen !== item) closeSwipe();
     if (!item || e.touches.length !== 1 || !item.querySelector(".swipe-act") || e.target.closest(".swipe-act")) { sw = null; return; }
     const t = e.touches[0];
-    sw = { item: item, x: t.clientX, y: t.clientY, dir: null, base: item === swOpen ? -SW_OPEN : 0, off: 0, w: item.offsetWidth };
+    sw = { item: item, x: t.clientX, y: t.clientY, dir: null, base: item === swOpen ? -swW(item) : 0, off: 0, w: item.offsetWidth };
   }, { passive: true });
   dayEl.addEventListener("touchmove", (e) => {
     if (!sw || e.touches.length !== 1) return;
@@ -1074,20 +1134,23 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     let off = sw.base + dx;
     if (off > 0) off = off / 4;            // a little give to the right, like iOS
     sw.off = off;
+    sw.item.classList.toggle("sw-full", off < -sw.w * 0.5);
     setSx(sw.item, off, false);
   }, { passive: false });
   function endSwipe() {
     const g = sw; sw = null;
     if (!g || g.dir !== "h") return;
     swEatClick = true; setTimeout(() => { swEatClick = false; }, 350);
-    const btn = g.item.querySelector(".swipe-act");
+    const btn = g.item.querySelector('[data-swipe="skip"]'), open = swW(g.item);
     if (g.off < -g.w * 0.5 && btn) {
       setSx(g.item, -g.w, true);
       setTimeout(() => runSwipe(btn), 180);
       swOpen = null;
-    } else if (g.off < -SW_OPEN / 2) {
-      setSx(g.item, -SW_OPEN, true); g.item.classList.add("swiped"); swOpen = g.item;
+    } else if (g.off < -open / 2) {
+      g.item.classList.remove("sw-full");
+      setSx(g.item, -open, true); g.item.classList.add("swiped"); swOpen = g.item;
     } else {
+      g.item.classList.remove("sw-full");
       setSx(g.item, 0, true); g.item.classList.remove("swiped"); if (swOpen === g.item) swOpen = null;
     }
   }
@@ -1095,6 +1158,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   dayEl.addEventListener("touchcancel", endSwipe);
   function runSwipe(btn) {
     const k = btn.dataset.k, n = +btn.dataset.n;
+    if (btn.dataset.swipe === "move") { closeSwipe(); openMove(k, n); return; }
     swOpen = null;
     setSkip(k, n, !skipped(k));
   }
@@ -1106,6 +1170,72 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (swOpen) { e.stopPropagation(); e.preventDefault(); closeSwipe(); }
   }, true);
   window.addEventListener("scroll", () => closeSwipe(), { passive: true });
+
+  /* ---------- Reschedule a dose ---------- */
+  // Pick a new day, and a time if you like. The move is saved on the dose's original key, so moving a
+  // dose that was already moved just changes where it goes.
+  const mvDim = document.createElement("div"), mvBox = document.createElement("div");
+  mvDim.className = "mv-dim"; mvDim.hidden = true;
+  mvBox.className = "mv"; mvBox.hidden = true;
+  mvBox.setAttribute("role", "dialog"); mvBox.setAttribute("aria-modal", "true"); mvBox.setAttribute("aria-labelledby", "mv-t");
+  document.body.append(mvDim, mvBox);
+  let mvCtx = null;
+  const origKey = (n, it) => it.mvFrom ? it.mvFrom + ":" + it.id : key(n, it);
+  function openMove(k, n) {
+    const it = itemAt(n, k);
+    if (!it) return;
+    hideToast();
+    const ok = origKey(n, it), from = ok.slice(0, 10), mv = moveOf(ok);
+    // Start from where it's going now, or the next day.
+    const d = mv ? mv.to : iso(dateOf(Math.min(n + 1, DAYS - 1))), t = mv ? mv.at : "";
+    mvCtx = { ok: ok, id: it.id, from: from };
+    mvBox.innerHTML = '<h2 id="mv-t">Reschedule</h2><p class="mv-s">' + esc(it.name) + (it.nth ? ' ' + nthText(it) : '') + ' · from ' + fLong(dateOf(nOfIso(from))) + '</p>' +
+      '<div class="taken-at"><label for="mv-d">Date</label><input type="date" id="mv-d" value="' + d + '" min="' + iso(DAY1) + '" max="' + iso(dateOf(DAYS - 1)) + '"></div>' +
+      '<div class="taken-at"><label for="mv-h">Time <span>optional</span></label><input type="time" id="mv-h" value="' + t + '">' +
+      '<button type="button" class="clear-time" data-mv-clear' + (t ? '' : ' hidden') + '>Clear</button></div>' +
+      '<div class="mv-btns"><button type="button" class="mv-no" data-mv-cancel>Cancel</button><button type="button" class="mv-go" data-mv-save>Move</button></div>';
+    mvDim.hidden = mvBox.hidden = false; void mvBox.offsetWidth;
+    mvDim.classList.add("on"); mvBox.classList.add("on");
+    const f = mvBox.querySelector("#mv-d"); if (f && !usingTouch) f.focus();
+  }
+  function closeMove() {
+    mvCtx = null;
+    mvDim.classList.remove("on"); mvBox.classList.remove("on");
+    setTimeout(() => { if (!mvCtx) mvDim.hidden = mvBox.hidden = true; }, 220);
+  }
+  // Clear whatever was logged on the moved copy, so it doesn't linger on a day the dose has left.
+  function dropTarget(ok) {
+    const mv = moveOf(ok);
+    if (!mv) return;
+    const tk = mv.to + ":" + ok.slice(11) + "@" + ok.slice(0, 10);
+    if (tk in state) { delete state[tk]; stateChanged(tk); }
+  }
+  function saveMove() {
+    const c = mvCtx; if (!c) return;
+    const d = mvBox.querySelector("#mv-d").value, t = mvBox.querySelector("#mv-h").value;
+    const dn = /^\d{4}-\d{2}-\d{2}$/.test(d) ? nOfIso(d) : -1;
+    if (dn < 0 || dn >= DAYS) { mvBox.querySelector("#mv-d").focus(); return; }
+    const before = moveOf(c.ok), next = d === c.from && !HM.test(t) ? null : { to: d, at: HM.test(t) ? t : "" };
+    if (before && (!next || before.to !== next.to)) dropTarget(c.ok);
+    if (next) state[c.ok] = "mv>" + next.to + (next.at ? "T" + next.at : ""); else delete state[c.ok];
+    stateChanged(c.ok);
+    closeMove();
+    refreshAll();
+  }
+  function unmove(ok) {
+    if (!moveOf(ok)) return;
+    dropTarget(ok);
+    delete state[ok]; stateChanged(ok);
+    refreshAll();
+  }
+  mvDim.addEventListener("click", closeMove);
+  mvBox.addEventListener("click", (e) => {
+    if (e.target.closest("[data-mv-cancel]")) closeMove();
+    else if (e.target.closest("[data-mv-save]")) saveMove();
+    else if (e.target.closest("[data-mv-clear]")) { mvBox.querySelector("#mv-h").value = ""; e.target.closest("[data-mv-clear]").hidden = true; }
+  });
+  mvBox.addEventListener("input", (e) => { if (e.target.id === "mv-h") mvBox.querySelector("[data-mv-clear]").hidden = !e.target.value; });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && mvCtx) { e.stopImmediatePropagation(); closeMove(); } }, true);
 
   /* ---------- Logged toast ---------- */
   // After a dose is logged, a toast shows its time for a few seconds. The time is a native time
@@ -1156,7 +1286,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     renderDay(); updateRings(n);
   }
   function stateChanged(k) {
-    if (!synced) early[k] = on(k) ? state[k] : false;
+    if (!synced) early[k] = valid(state[k]) ? state[k] : false;
     saveLocal(); queueSync();
   }
   // The time on the details page: change it, or clear it (the dose stays taken, just without a time).
@@ -1208,7 +1338,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Skip sits under the main button while nothing is logged; a skipped dose offers Undo skip.
   function skipBtn(dayCtx) {
     if (skipped(dayCtx.k)) return '<button type="button" class="skip-btn" data-skip="0">Undo skip</button>';
-    return on(dayCtx.k) ? "" : '<button type="button" class="skip-btn" data-skip="1">Skip this dose</button>';
+    if (on(dayCtx.k)) return "";
+    const it = itemAt(dayCtx.n, dayCtx.k);
+    return '<button type="button" class="skip-btn" data-skip="1">Skip this dose</button>' +
+      (it && canMove(it, dayCtx.k) ? '<button type="button" class="skip-btn" data-move>Reschedule</button>' : '');
   }
   function detailRepeatHTML(row, dayCtx, rows, img, d) {
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
@@ -1254,15 +1387,15 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Inside claude.ai's frame there's no history to use, so it just opens and closes.
   const useHistory = !inFrame;
   function routeOf(row, dayCtx) {
-    if (dayCtx) return "#d/" + dayCtx.n + "/" + dayCtx.k.split(":")[1];
+    if (dayCtx) return "#d/" + dayCtx.n + "/" + dayCtx.k.slice(11);
     const i = suppRows.indexOf(row);
     return i >= 0 ? "#s/" + i : "";
   }
   // A details page's route, with /edit while its Edit sheet is up (a history entry of its own, as in HPDE).
   function fromRoute(hash) {
-    let m = /^#d\/(\d+)\/([\w-]+)(\/edit)?$/.exec(hash);
+    let m = /^#d\/(\d+)\/([\w@-]+)(\/edit)?$/.exec(hash);
     if (m) {
-      const n = +m[1], it = itemsFor(n).find((x) => x.id === m[2]);
+      const n = +m[1], it = n >= 0 && n < DAYS ? itemsFor(n).find((x) => key(n, x).slice(11) === m[2]) : null;
       return it ? { row: it, dayCtx: { k: key(n, it), n: n }, base: "#d/" + n + "/" + m[2], edit: !!m[3] } : null;
     }
     if (hash === "#changes") return { changes: true, base: "#changes", edit: false, dayCtx: null };
@@ -1724,6 +1857,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (e.target.closest("[data-mark]")) {
       if (detailFor) { if (skipped(detailFor.k)) delete state[detailFor.k]; toggle(detailFor.k, detailFor.n); }
       closeDetail(); return;
+    }
+    const um = e.target.closest("[data-unmove]");
+    if (um) { unmove(um.dataset.unmove); return; }
+    if (e.target.closest("[data-move]")) {
+      const c = detailFor; closeDetail();
+      if (c) setTimeout(() => openMove(c.k, c.n), 350);
+      return;
     }
     const dm = e.target.closest("[data-dmode]");
     if (dm) { dayMode = dm.dataset.dmode; renderDay(); return; }

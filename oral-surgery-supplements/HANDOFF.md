@@ -169,3 +169,11 @@ Keys: `mag`, `bone`, `d3k2`, `lymph`, `drain`, `silver`, `intz`, `biod`, `multi`
 ## Activity
 
 The Today view has a Schedule | Activity switch under the day strip. Activity lists every logged time for the selected day, earliest first, one row per time (so a dose taken 4 times shows 4 rows, numbered "2 of 4"). Doses ticked with no time and skipped doses are listed after it under their own headings. Tapping a row opens its details, where the time can be changed. The switch stays put when you change days.
+
+## Reschedule
+
+Swipe a dose left to show Move and Skip (a full swipe still skips). Move, or Reschedule on the details page, opens a small sheet with a date and an optional time. Doses that are taken, skipped or logged over and over through the day (silver gel, pellets) can't be moved.
+
+- Stored on the dose's original key as `"mv>2026-11-06"` or `"mv>2026-11-06T14:30"`, so it syncs with the checkmarks. Moving it again changes the same record.
+- On the new day it's its own row keyed `2026-11-06:d3k2@2026-11-05`, with a "Moved from" note, "At 2:30 PM" when a time was set, and no dose number. It counts toward the new day's ring, not the old one.
+- The old day lists it under "Moved" at the end, with Undo while the moved copy isn't taken or skipped. Choosing the original date with no time also undoes the move.
