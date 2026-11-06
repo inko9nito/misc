@@ -106,11 +106,13 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .strip::-webkit-scrollbar{display:none}
 .week{flex:0 0 100%;scroll-snap-align:start;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
 .d{display:flex;flex-direction:column;align-items:center;gap:5px;padding:9px 0 6px;border-radius:16px;text-align:center}
-.d .wd{font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
-.d.today .wd{color:var(--accent-ink)}
+.d .wd{font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+/* Today is bold black, whichever day is selected; the selected day is just the white card. */
+.d .n{color:var(--muted);font-weight:500}
 .d[aria-pressed="true"]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.d[aria-pressed="true"] .wd{color:var(--ink);font-weight:800}
-.d[aria-pressed="true"] .n{font-weight:800}
+.d[aria-pressed="true"] .wd,.d[aria-pressed="true"] .n{color:var(--ink)}
+.d.today .wd{color:var(--ink);font-weight:800}
+.d.today .n{color:var(--ink);font-weight:800}
 .ring{position:relative;width:34px;height:34px}
 .ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
 .ring .t{fill:none;stroke:var(--track);stroke-width:3}
