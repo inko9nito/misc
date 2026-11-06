@@ -177,3 +177,11 @@ Swipe a dose left to show Move and Skip (a full swipe still skips). Move, or Res
 - Stored on the dose's original key as `"mv>2026-11-06"` or `"mv>2026-11-06T14:30"`, so it syncs with the checkmarks. Moving it again changes the same record.
 - On the new day it's its own row keyed `2026-11-06:d3k2@2026-11-05`, with a "Moved from" note, "At 2:30 PM" when a time was set, and no dose number. It counts toward the new day's ring, not the old one.
 - The old day lists it under "Moved" at the end, with Undo while the moved copy isn't taken or skipped. Choosing the original date with no time also undoes the move.
+
+## Care tab
+
+A fourth tab in the bottom nav, from the office's implant post-op sheet (2 pages) and the checklist email. It replaced the "Recovery care" card on the Supplements tab.
+
+- **Timeline** with dates worked out from surgery day. Rows that apply today get a "Now" chip, and finished ones fade: first 24 hours, jaw exercises, silver gel, very soft foods, salt water rinse, tougher foods, retainer.
+- The rest of the tab: first 24 hours, pain, homeopathic pellets (kinds, and both doses with "ask the office"), mouth care, foods to eat and foods to avoid.
+- Office name, address and phone numbers, including the after-hours emergency number, are left out on purpose. The footer points to the office's sheet instead.
