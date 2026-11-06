@@ -183,5 +183,5 @@ Swipe a dose left to show Move and Skip (a full swipe still skips). Move, or Res
 A fourth tab in the bottom nav, from the office's implant post-op sheet (2 pages) and the checklist email. It replaced the "Recovery care" card on the Supplements tab.
 
 - **Timeline** with dates worked out from surgery day. Rows that apply today get a "Now" chip, and finished ones fade: first 24 hours, jaw exercises, silver gel, very soft foods, salt water rinse, tougher foods, retainer.
-- The rest of the tab: first 24 hours, pain, homeopathic pellets (kinds, and both doses with "ask the office"), mouth care, foods to eat and foods to avoid.
+- The rest of the tab: first 24 hours, pain, mouth care (pellets are left out, since they're already on the Today and Supplements tabs), foods to eat and foods to avoid.
 - Office name, address and phone numbers, including the after-hours emergency number, are left out on purpose. The footer points to the office's sheet instead.
