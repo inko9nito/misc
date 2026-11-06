@@ -301,7 +301,12 @@ html.push-open .push-dim{opacity:.1}
 .item.part .chk::after{width:2px;height:10px}
 .next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
-.skip-btn{display:block;width:100%;min-height:44px;margin-top:6px;border-radius:12px;font-size:16px;font-weight:600;text-align:center;color:var(--accent-ink)}
+.foot-row{display:flex;gap:8px}
+.foot-row .sh-btn{flex:1;min-width:0}
+.sq-btn{flex:none;width:50px;height:50px;display:grid;place-items:center;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--accent-ink)}
+.sq-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sq-btn.on{background:var(--accent-tint);border-color:transparent}
+.sq-btn:active{background:var(--band)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
 /* Edit sheet: slides up and stops below the status bar, as HPDE's page sheets do. The details page under it
@@ -339,6 +344,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 .ef select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
 .ef input:focus,.ef textarea:focus,.ef select:focus{outline:none;border-color:var(--accent)}
+.ef-gap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ef-gap select[name="gapOf"]{grid-column:1 / -1;margin-top:0}
+.ef-gap select{margin-top:6px}
 .es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .ef-l{display:block;font-size:13px;font-weight:600;color:var(--ink2)}
 .ef-l span{font-weight:400;color:var(--muted)}
@@ -472,7 +480,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const ABX = [
     { id: "abx1", slot: "Breakfast", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
     { id: "abx2", slot: "Lunch", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
-    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "As prescribed", icon: "tablet" }
+    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "1 tablet", icon: "tablet" }
   ];
   const SURGERY = [
     { id: "s-abx1",    slot: "2 hours before", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
@@ -502,7 +510,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "silver", slot: "Through the day", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
-    { id: "pellets", slot: "Through the day", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
+    { id: "pellets", slot: "Through the day", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" },
+    // Added by the user (a probiotic), timed 4 hours after the antibiotic.
+    { id: "flora", slot: "Anytime", name: "Ultra Flora", sub: "1 tablet", icon: "capsule" }
   ];
   // From the office's post-op sheet: jaw exercises 3 times a day for the first week (surgery day is past, so
   // from the day after through Nov 8), then warm salt water rinses 2–3 times a day for 5 days after the first 3.
@@ -531,7 +541,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "CBD": { brand: "Pump bottle", how: PUMP3 },
     "Relax Milieu": { brand: "Blue pump bottle", how: PUMP3 },
     "Halcion": { brand: "Prescription · the office calls it in", how: "As directed by the office.", note: "The office’s checklist email says Valium; the office called in Halcion. Take only what was prescribed." },
-    "Antibiotic": { every: "8", brand: "Prescription · usually amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
+    "Antibiotic": { every: "8", brand: "Amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
       note: "Keep taking it until the prescription is finished, as the label says." },
     "Ibuprofen": { brand: "800 mg", how: "The first pain medicine dose, 2 hours before surgery, from the office’s checklist email. Eat something first.",
       note: "The post-op sheet says the office prefers to avoid ibuprofen afterwards, since it can slow healing, unless you need it for pain." },
@@ -542,6 +552,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Homeopathic pellets": { every: "3", perDay: "6", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
+    "Ultra Flora": { brand: "Metagenics · probiotic", how: "4 hours after the antibiotic.", gap: "4", gapOf: "abx",
+      note: "Added by you. Spacing it from the antibiotic keeps the antibiotic from killing the probiotic." },
     "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
       why: "Keeping the jaw closed after surgery can shorten and tighten the muscles." },
     "Salt water rinse": { brand: "From the office’s post-op sheet", how: "1 teaspoon of salt in 8 oz of warm water, 2–3 times a day for 5 days, starting 3 days after surgery. Rinse gently.",
@@ -578,7 +590,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Each supplement has a product key; its doses (items) and Supplements rows point at it.
   const NAME2P = { "D3K2": "d3k2", "Methyl-B12": "b12", "PhytoMulti": "multi", "Bio-D-Mulsion Forte": "biod", "Vitamin C": "vitc",
     "Magnesium glycinate": "mag", "Bone Builder Plus": "bone", "GABA": "gaba", "CBD": "cbd", "Relax Milieu": "relax", "Halcion": "halcion",
-    "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
+    "Intenzyme Forte": "intz", "Ultra Flora": "flora", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
     "Homeopathic pellets": "pellets", "Jaw exercises": "jaw", "Salt water rinse": "salt",
     "Antibiotic": "abx", "Ibuprofen": "ibu" };
   const PNAME = {}, PDETAILS = {};
@@ -593,11 +605,31 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const normEdits = (v) => ({ p: (v && v.p) || {}, i: (v && v.i) || {}, s: (v && v.s) || {}, c: (v && v.c) || {} });
   let EDITS = (function () { try { return normEdits(JSON.parse(localStorage.getItem(LSE) || "{}")); } catch (e) { return normEdits(null); } })();
   let eref = null;
+  // Added supplements that have since been built into the app: the added copy goes, and its checkmarks
+  // move to the built-in dose (u_mw3ca7gx8x7_0 -> flora). Runs at start and on each synced update.
+  const BUILT_IN = { u_mw3ca7gx8x7: "flora" };
+  function migrateEdits() {
+    let ch = false;
+    Object.keys(BUILT_IN).forEach((pk) => { if (EDITS.c[pk]) { delete EDITS.c[pk]; ch = true; } });
+    Object.keys(EDITS.p).forEach((pk) => { const o = EDITS.p[pk]; if (o.gapOf && BUILT_IN[o.gapOf]) { o.gapOf = BUILT_IN[o.gapOf]; ch = true; } });
+    if (ch) saveEdits();
+  }
+  function migrateState() {
+    Object.keys(state).forEach((k) => {
+      const m = /^(u_[a-z0-9]+)_\d+(.*)$/.exec(k.slice(11));
+      if (!m || !BUILT_IN[m[1]]) return;
+      const nk = k.slice(0, 11) + BUILT_IN[m[1]] + m[2];
+      if (!(nk in state)) state[nk] = state[k];
+      delete state[k];
+      stateChanged(nk); stateChanged(k);
+    });
+  }
   function saveEdits() {
     try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay"];
+  // gap, gapDir, gapOf: take this gap hours after (or before) another supplement, e.g. a probiotic 4 hours after the antibiotic.
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf"];
   const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
     if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
@@ -609,7 +641,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     const info = prodInfo(pk);
     // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0, base: it });
+    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
+      gap: info.gapOf && info.gapOf !== pk ? Number(info.gap) || 0 : 0, gapDir: info.gapDir === "before" ? "before" : "after", gapOf: info.gapOf || "", base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
   // supplement taken more than once a day, in time order; Intenzyme's counts its 5-dose course instead.
@@ -795,10 +828,33 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     for (let i = 0; i < n; i++) h += '<i' + (i < count ? ' class="on"' : '') + '></i>';
     return h + '</span>';
   }
+  // A dose tied to another supplement (4 hours after the antibiotic): when it can be taken, worked out
+  // from the other one's latest logged time ("after") or its next due time ("before").
+  const gapText = (it) => (it.gap === 1 ? "1 h" : it.gap + " h") + " " + it.gapDir + " " + prodInfo(it.gapOf).name;
+  function gapLine(n, it) {
+    const other = itemsFor(n).filter((x) => x.p === it.gapOf);
+    let at = null;
+    if (it.gapDir === "after") {
+      const last = lastLog(n, it.gapOf);
+      if (last >= 0) at = last + it.gap * 60;
+    } else {
+      const due = other.map((x) => nextDue(n, x)).find(Boolean);
+      if (due && !due.tomorrow) at = toMin(due.hm) - it.gap * 60;
+    }
+    if (at === null || at < 0 || at >= 1440) return '<span class="at due">' + cap(gapText(it)) + '</span>';
+    const passed = n < todayN || (n === todayN && at <= toMin(nowHM()));
+    if (it.gapDir === "after") return '<span class="at' + (passed ? '' : ' due') + '">' + (passed ? "Ready now" : "Take after " + fmtHM(fromMin(at))) + ' · ' + gapText(it) + '</span>';
+    return passed ? '<span class="at due">' + cap(gapText(it)) + '</span>' : '<span class="at">Take before ' + fmtHM(fromMin(at)) + ' · ' + gapText(it) + '</span>';
+  }
   // What a row says about times: when it was taken, and for timed doses when the next one is due.
   function timeLine(n, it, k) {
     if (skipped(k)) return '<span class="at due">Skipped</span>';
     if (it.mvAt && !on(k)) return '<span class="at due">At ' + fmtHM(it.mvAt) + '</span>';
+    // Only the first dose of the day still to take shows its timing.
+    if (it.gap && !it.repeat && !on(k)) {
+      const first = itemsFor(n).filter((x) => x.p === it.p && !resolved(key(n, x))).sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))[0];
+      return first && first.id === it.id && first.mvFrom === it.mvFrom ? gapLine(n, it) : "";
+    }
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
       const goal = it.perDay, bits = [];
@@ -1033,6 +1089,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("recovery", "tooth", "Jaw exercises", "3 times a day, through " + fShort(dateOf(JAW_LAST_N))),
         infoRow("recovery", "cup", "Salt water rinse", "2–3 times a day, " + fShort(dateOf(SALT_FIRST_N)) + " – " + fShort(dateOf(SALT_LAST_N))),
         infoRow("recovery", "tablet", "Antibiotic", "3 times a day until finished", "As prescribed"),
+        infoRow("recovery", "capsule", "Ultra Flora", "1 tablet a day, 4 hours after the antibiotic"),
         infoRow("recovery", "capsule", "D3K2", "8 pumps before breakfast, until gone"),
         infoRow("recovery", "pump", "Methyl-B12", "2 pumps before breakfast, until gone"),
         infoRow("recovery", "capsule", "PhytoMulti", "2 tablets with breakfast, until gone"),
@@ -1376,15 +1433,15 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
     // Supplement details first, then this dose (or row), as in the Edit sheet.
-    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) +
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) + kv("Timing", timingText(d, row.p)) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
     if (dayCtx && row.repeat) return detailRepeatHTML(row, dayCtx, rows, img, d);
     const at = t === null ? "" : '<div class="taken-at"><label for="taken-time">Taken at</label>' +
       '<input type="time" id="taken-time" data-time value="' + t + '">' +
       '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
-    const foot = dayCtx ? '<div class="push-foot">' + at + '<button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
-      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button>' + skipBtn(dayCtx) + '</div>' : "";
+    const foot = dayCtx ? '<div class="push-foot">' + at + '<div class="foot-row"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
+      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button>' + skipBtn(dayCtx) + '</div></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
       '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
       '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
@@ -1408,13 +1465,17 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
         '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("") + (times.length ? '</div>' : '');
   }
-  // Skip sits under the main button while nothing is logged; a skipped dose offers Undo skip.
+  // Skip and Reschedule are square icon buttons beside the main one, so the sticky footer stays one row.
+  const ICON_SKIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5l9 6.5-9 6.5z"/><path d="M18.5 5.5v13"/></svg>';
+  const ICON_UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
+  const ICON_MOVE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="M9.5 15h5.5M13 13l2 2-2 2"/></svg>';
+  const iconBtn = (attr, label, icon, on) => '<button type="button" class="sq-btn' + (on ? ' on' : '') + '" ' + attr + ' aria-label="' + label + '" title="' + label + '">' + icon + '</button>';
   function skipBtn(dayCtx) {
-    if (skipped(dayCtx.k)) return '<button type="button" class="skip-btn" data-skip="0">Undo skip</button>';
+    if (skipped(dayCtx.k)) return iconBtn('data-skip="0"', "Undo skip", ICON_UNDO, true);
     if (on(dayCtx.k)) return "";
     const it = itemAt(dayCtx.n, dayCtx.k);
-    return '<button type="button" class="skip-btn" data-skip="1">Skip this dose</button>' +
-      (it && canMove(it, dayCtx.k) ? '<button type="button" class="skip-btn" data-move>Reschedule</button>' : '');
+    return iconBtn('data-skip="1"', "Skip this dose", ICON_SKIP) +
+      (it && canMove(it, dayCtx.k) ? iconBtn("data-move", "Reschedule", ICON_MOVE) : '');
   }
   function detailRepeatHTML(row, dayCtx, rows, img, d) {
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
@@ -1428,7 +1489,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         (t === 'doses' ? 'Doses' : 'Details') + '</button>').join("") + '</div>' +
       '<div class="dpanel" id="dpanel-doses" role="tabpanel" aria-labelledby="dtab-doses" data-rlist' + (detailTab === 'doses' ? '' : ' hidden') + '>' + repeatListHTML(row, dayCtx) + '</div>' +
       '<div class="dpanel" id="dpanel-info" role="tabpanel" aria-labelledby="dtab-info"' + (detailTab === 'info' ? '' : ' hidden') + '><div class="list">' + rows + '</div></div></div>' +
-      '<div class="push-foot"><button type="button" class="sh-btn" data-mark>Log a dose now</button>' + skipBtn(dayCtx) + '</div></div>';
+      '<div class="push-foot"><div class="foot-row"><button type="button" class="sh-btn" data-mark>Log a dose now</button>' + skipBtn(dayCtx) + '</div></div></div>';
   }
   let detailTab = "doses";
   function showDetailTab(t) {
@@ -1576,6 +1637,18 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   const EVERY_OPTS = [["", "No set times"]].concat([1, 2, 3, 4, 6, 8, 12, 24].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
   const PERDAY_OPTS = [["", "Not set"]].concat([1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((x) => [String(x), String(x)]));
+  const GAP_OPTS = [["", "Not set"]].concat([1, 2, 3, 4, 6, 8, 12].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
+  const timingText = (d, pk) => d.gapOf && d.gapOf !== pk && Number(d.gap) ? d.gap + (d.gap === "1" ? " hour " : " hours ") + (d.gapDir === "before" ? "before " : "after ") + prodInfo(d.gapOf).name : "";
+  // Timing: "Take [4 hours] [after] [Antibiotic]", three selects in one field.
+  function timingField(d, self) {
+    const opt = (list, val) => list.map(([v, t]) => '<option value="' + esc(v) + '"' + (v === (val || "") ? ' selected' : '') + '>' + esc(t) + '</option>').join("");
+    const others = Object.keys(PNAME).concat(Object.keys(EDITS.c)).filter((pk) => pk !== self)
+      .map((pk) => [pk, prodInfo(pk).name]).sort((a, b) => a[1].localeCompare(b[1]));
+    return '<div class="ef"><span class="ef-l">Timing <span>Take it a set time after or before another</span></span><div class="ef-gap">' +
+      '<select name="gap" aria-label="Hours">' + opt(GAP_OPTS, d.gap) + '</select>' +
+      '<select name="gapDir" aria-label="After or before">' + opt([["after", "after"], ["before", "before"]], d.gapDir || "after") + '</select>' +
+      '<select name="gapOf" aria-label="Which supplement">' + opt([["", "Choose…"]].concat(others), d.gapOf) + '</select></div></div>';
+  }
   const everyText = (v) => { const h = Number(v); return h ? "Every " + (h === 1 ? "hour" : h + " hours") : ""; };
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
@@ -1585,7 +1658,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
       field("note", "Note", d.note || "", { long: true }) +
       field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
-      field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + '</div>' +
+      field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + timingField(d, row.p) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
       ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
@@ -1662,7 +1735,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (editCtx.custom !== undefined) { saveCustom(f); return; }
     const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
     const row = editCtx.row, pk = row.p, base = row.base || {};
-    PFIELDS.forEach((n) => setOverride(EDITS.p, pk, n, n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n), n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]));
+    const noGap = !v("gap") || !v("gapOf");   // a half-set timing isn't kept
+    PFIELDS.forEach((n) => {
+      let val = n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n);
+      if (n === "gap" || n === "gapOf") val = noGap ? "" : val;
+      if (n === "gapDir") val = noGap || val === "after" ? "" : val;
+      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]);
+    });
     if (editCtx.dayCtx) ["sub", "slot", "pill"].forEach((n) => setOverride(EDITS.i, row.id, n, v(n), base[n]));
     else ["sub", "pill"].forEach((n) => setOverride(EDITS.s, row.rk, n, v(n), base[n]));
     saveEdits();
@@ -1687,6 +1766,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       date("from", "Start", c.from) + date("to", "End", c.to, "Leave empty to keep going") +
       field("every", "Repeat every", c.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
       field("perDay", "Times a day", c.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) +
+      timingField(c, pk) +
       field("pill", "Reminder", c.pill || "", { hint: "Shown in the list" }) + '</div>' +
       '<p class="es-note">Added supplements are saved on this phone; Copy for Claude (under local changes) builds them into the app.</p>';
     return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
@@ -1701,6 +1781,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = editCtx.custom || ("u_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5));
     const c = { slots: Array.from(f.querySelectorAll('input[name="slots"]:checked')).map((x) => x.value) };
     ["name", "brand", "how", "label", "why", "note", "icon", "sub", "from", "to", "every", "perDay", "pill"].forEach((n) => { if (v(n)) c[n] = v(n); });
+    if (v("gap") && v("gapOf")) { c.gap = v("gap"); c.gapOf = v("gapOf"); if (v("gapDir") === "before") c.gapDir = "before"; }
     if (!c.slots.length) c.slots = ["Anytime"];
     if (c.from && c.to && c.to < c.from) c.to = c.from;
     EDITS.c[pk] = c;
@@ -1734,7 +1815,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!f || !editCtx) return;
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
-    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay"].forEach((n) => set(n, d[n]));
+    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapOf"].forEach((n) => set(n, d[n]));
+    set("gapDir", d.gapDir || "after");
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
   }
@@ -1753,7 +1835,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
-    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added" };
+    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added",
+    gap: "Timing (hours apart)", gapDir: "Timing (before or after)", gapOf: "Timing (apart from)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
@@ -1786,10 +1869,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       const parts = ["Dose: " + (c.sub || "(none)"), "When: " + (c.slots || ["Anytime"]).join(", "), "From " + (c.from || "start") + (c.to ? " to " + c.to : ", ongoing")];
       [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Icon"]]
         .forEach(([f, l]) => { if (c[f]) parts.push(l + ": " + c[f]); });
+      if (timingText(c, pk)) parts.push("Timing: " + timingText(c, pk));
       add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
     });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
-      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], EDITS.p[pk][f], "supplement " + pk)));
+      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
     Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
       add(prodOf(id), "This dose (" + itemWhere(id) + ")", f, (BASE_ITEMS[id] || {})[f], EDITS.i[id][f], "dose " + id)));
     Object.keys(EDITS.s).forEach((rk) => Object.keys(EDITS.s[rk]).forEach((f) => {
@@ -1994,6 +2078,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         synced = true;
         state = remote || clean(state);
         Object.keys(early).forEach((k) => { if (early[k]) state[k] = early[k]; else delete state[k]; });
+        migrateState();
         saveLocal(); refreshAll();
         setSync("Checkmarks sync across your devices.");
         if (!remote || Object.keys(early).length) queueSync();
@@ -2001,6 +2086,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       }
       if (pending) return;
       state = remote || {};
+      migrateState();
       saveLocal(); refreshAll();
     }, () => { ref = null; setSync("Checkmarks are saved on this device."); });
     // Edits sync in their own document; the first time, this device's edits seed it.
@@ -2013,11 +2099,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         if (!remote && (Object.keys(EDITS.p).length || Object.keys(EDITS.i).length || Object.keys(EDITS.s).length)) { saveEdits(); return; }
       }
       EDITS = normEdits(remote);
+      migrateEdits();
       try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
       if (!editOpen()) refreshEdited();
     }, () => { eref = null; });
   }
 
+  migrateEdits(); migrateState();
   pruneEdits();
   renderCountdown();
   renderStrip();
