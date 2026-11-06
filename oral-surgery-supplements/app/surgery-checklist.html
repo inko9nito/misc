@@ -204,7 +204,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 /* Bottom bar */
 .bar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--card);border-top:1px solid var(--line);padding:6px max(10px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px))}
-.bar-in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.bar-in{max-width:520px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
 .tab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:48px;border-radius:14px;color:var(--muted);font-size:12px;font-weight:600;text-align:center}
 .tab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .tab[aria-current="page"]{background:var(--accent-tint);color:var(--accent-ink)}
@@ -242,6 +242,16 @@ html.push-open .push-dim{opacity:.1}
 .kv .k{flex:none;width:64px;font-size:13px;font-weight:600;color:var(--muted);padding-top:1px}
 .kv .v{flex:1;min-width:0}
 .care .kv .k{width:78px}
+/* Care tab: a timeline of what applies when, then the office's instructions. */
+.tl .kv{align-items:flex-start}
+.tl .kv .k{width:88px;font-variant-numeric:tabular-nums}
+.tl .kv .v b{display:block;font-weight:600}
+.tl .kv .v small{display:block;font-size:13px;color:var(--muted);margin-top:1px}
+.tl .kv.past .v,.tl .kv.past .k{opacity:.5}
+.now-chip{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;background:var(--accent-tint);color:var(--accent-ink);font-size:12px;font-weight:700;vertical-align:1px}
+.bul{margin:0;padding:10px 14px 10px 30px;font-size:15px;line-height:1.45}
+.bul li + li{margin-top:6px}
+.bul li span{color:var(--muted)}
 .at{font-size:13px;color:var(--accent-ink);font-variant-numeric:tabular-nums;margin-top:1px}
 .taken-at{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:6px 6px 6px 14px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
 .taken-at label{flex:1;font-size:15px;font-weight:600}
@@ -355,6 +365,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     <div id="day"></div>
   </section>
   <section id="v-supps" aria-label="Supplements" hidden></section>
+  <section id="v-care" aria-label="Care" hidden></section>
   <section id="v-progress" aria-label="Progress" hidden></section>
   <!-- A Home Screen app can't pull to refresh, so this reloads it. -->
   <footer class="app-foot"><span id="changes-chip"></span><button type="button" class="refresh" data-refresh>
@@ -368,6 +379,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     </button>
     <button type="button" class="tab" data-view="supps">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r=".6"/><circle cx="4.5" cy="12" r=".6"/><circle cx="4.5" cy="18" r=".6"/></svg>Supplements
+    </button>
+    <button type="button" class="tab" data-view="care">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7.5-4.6-7.5-10.2A4.2 4.2 0 0 1 12 7.3a4.2 4.2 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></svg>Care
     </button>
     <button type="button" class="tab" data-view="progress">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>Progress
@@ -973,19 +987,6 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function grp(title, when, rows, sp) {
     return '<div class="grp"><div class="gh' + (sp ? " sp" : "") + '"><b>' + title + '</b><span>' + when + '</span></div><div class="list">' + rows.join("") + '</div></div>';
   }
-  // Care after surgery, from the office's post-op sheet and checklist email.
-  const CARE = [
-    ["First 24 hours", "No straws, smoking, alcohol, fizzy drinks or vigorous rinsing: they can dislodge or dissolve the clot. A little oozing is normal."],
-    ["Eating", "Very soft foods for about a week: soups and broth, eggs, yogurt, oatmeal, mashed potatoes, soft fruit and smoothies. Chew on the other side."],
-    ["Avoid", "Hard, crunchy, chewy, sticky, spicy and acidic foods (nuts, chips, jerky, caramel, tomato, citrus) until it heals. Don’t bite hard things on the implant side."],
-    ["Pain", "Eat something before any pain medicine. The office prefers to avoid ice and ibuprofen, which slow healing. For mild pain: 2 Tylenol, then 2 ibuprofen 4–6 hours later."],
-    ["Retainer", "After an implant, wear the retainer 24/7 for 6 months, until the crown goes on. Take it out to eat."],
-    ["Rest", "Rest as much as you can so your body puts its energy into healing."]
-  ];
-  function careHTML() {
-    return '<div class="grp"><div class="gh"><b>Recovery care</b><span>From the office</span></div><div class="list care">' +
-      CARE.map((c) => '<div class="kv"><span class="k">' + esc(c[0]) + '</span><span class="v">' + esc(c[1]) + '</span></div>').join("") + '</div></div>';
-  }
   function renderSupps() {
     suppRows.length = 0;
     document.getElementById("v-supps").innerHTML =
@@ -1038,8 +1039,71 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("recovery", "capsule", "Magnesium glycinate", "100 mg at lunch, dinner and bedtime, until gone"),
         infoRow("recovery", "capsule", "Bone Builder Plus", "2 capsules with dinner, until gone")
       ]) +
-      careHTML() +
       '<p class="foot">Times follow the bottle labels. Calcium in Bone Builder blocks iron in PhytoMulti, so they go at different meals. The post-op sheet says to keep taking all your supplements, every day including surgery day, until they’re gone.</p>';
+  }
+
+  /* ---------- Care view ---------- */
+  // From the office's implant post-op sheet and checklist email. Office details stay out of the repo.
+  function renderCare() {
+    const S = SURG_N, since = todayN - S;
+    const rng = (a, b) => b == null ? "From " + fShort(dateOf(a)) : a === b ? fShort(dateOf(a)) : fShort(dateOf(a)) + " – " + (dateOf(a).getMonth() === dateOf(b).getMonth() ? dateOf(b).getDate() : fShort(dateOf(b)));
+    // [first day, last day (null: no end), what, detail]
+    const TL = [
+      [S, S + 1, "First 24 hours", "No straws, smoking, suction, alcohol, fizzy drinks or vigorous rinsing"],
+      [S, JAW_LAST_N, "Jaw exercises", "3 times a day for the first week"],
+      [S, null, "Silver gel", "On the site with a Q-tip, 3–5 times a day"],
+      [S, S + 6, "Very soft foods", "Thin soups and broth, eggs, yogurt, oatmeal"],
+      [SALT_FIRST_N, SALT_LAST_N, "Salt water rinse", "Warm, 2–3 times a day for 5 days"],
+      [S + 7, null, "Tougher foods", "Thicker soups like stew and chili after a week; chewier foods after 1–2 weeks"],
+      [S, null, "Retainer 24/7", "For 6 months, until the crown goes on. Take it out to eat"]
+    ];
+    const tl = TL.map((r) => {
+      const past = r[1] != null && todayN > r[1], now = todayN >= r[0] && (r[1] == null || todayN <= r[1]);
+      return '<div class="kv' + (past ? ' past' : '') + '"><span class="k">' + rng(r[0], r[1]) + '</span><span class="v"><b>' + esc(r[2]) +
+        (now ? '<span class="now-chip">Now</span>' : '') + '</b><small>' + esc(r[3]) + '</small></span></div>';
+    }).join("");
+    const kv = (rows) => '<div class="list care">' + rows.map((c) => '<div class="kv"><span class="k">' + esc(c[0]) + '</span><span class="v">' + esc(c[1]) + '</span></div>').join("") + '</div>';
+    const bul = (rows) => '<div class="list"><ul class="bul">' + rows.map((r) => '<li>' + esc(r[0]) + (r[1] ? ' <span>' + esc(r[1]) + '</span>' : '') + '</li>').join("") + '</ul></div>';
+    const g = (t, sub, body) => '<div class="grp"><div class="gh"><b>' + t + '</b><span>' + (sub || "") + '</span></div>' + body + '</div>';
+    document.getElementById("v-care").innerHTML =
+      '<h1 class="vt">Care</h1>' +
+      '<div class="dateline">' + (since > 0 ? "Day " + since + " after surgery" : since === 0 ? "Surgery day" : "Surgery " + fLong(dateOf(S))) + ' · rest as much as you can</div>' +
+      g("Timeline", "", '<div class="list tl">' + tl + '</div>') +
+      g("First 24 hours", rng(S, S + 1), kv([
+        ["The clot", "The site heals from the bottom up around a clot that must stay in place. Straws, smoking and any suction can pull it out; alcohol and fizzy drinks can dissolve it."],
+        ["Rinsing", "No vigorous rinsing."],
+        ["Bleeding", "A little oozing is normal. It’s mostly saliva and will gradually stop."]
+      ])) +
+      g("Pain", "", kv([
+        ["Eat first", "Never take pain medicine on an empty stomach. Keep soups and protein drinks on hand."],
+        ["Prescription", "Fill it even if you think you won’t need it."],
+        ["Ice, ibuprofen", "The office prefers to avoid both: they restrict blood flow and slow healing. Some people still need them."],
+        ["Mild pain", "2 regular strength Tylenol, then 2 ibuprofen 4–6 hours later. Use the least that works, spaced as far apart as you can."]
+      ])) +
+      g("Mouth", "", kv([
+        ["Silver gel", "Apply on the site 3–5 times a day, starting surgery day."],
+        ["Jaw", "Exercises 3 times a day for the first week, from surgery day, so the muscles don’t tighten."],
+        ["Salt water", "From day 3: 1 tsp salt in 8 oz warm water, 2–3 times a day for 5 days. It flushes out food around the site."],
+        ["Chewing", "Chew on the other side. Don’t bite hard things on the implant side until it’s fully healed."],
+        ["Retainer", "Wear it 24/7 for 6 months, until the implant gets its crown. Take it out to eat."]
+      ])) +
+      g("Good to eat", "Soft, mild, not chewy", bul([
+        ["Soft fruit", "peaches, berries, bananas, or in smoothies"],
+        ["Quinoa or oatmeal"],
+        ["Yogurt, cottage cheese, cheese", "keep it off the implant site"],
+        ["Mashed potatoes"],
+        ["Eggs", "any way"],
+        ["Soups and broth", "thin the first week, then stew and chili"]
+      ])) +
+      g("Avoid", "Until it heals", bul([
+        ["Hard", "nuts, ice, hard candy"],
+        ["Crunchy", "chips, taco shells, popcorn"],
+        ["Tough and chewy", "jerky, steak, raw vegetables"],
+        ["Spicy"],
+        ["Acidic", "tomatoes, citrus, vinegar"],
+        ["Sticky", "caramel, taffy"]
+      ])) +
+      '<p class="foot">After 3–4 days you can mostly go back to a normal diet, but keep hard foods away from the implant. Keep taking all your supplements as per the protocol until they’re gone. For an emergency after hours, use the number on the office’s post-op sheet.</p>';
   }
 
   /* ---------- Progress view ---------- */
@@ -1078,6 +1142,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     document.getElementById("v-today").hidden = v !== "today";
     document.getElementById("v-supps").hidden = v !== "supps";
     document.getElementById("v-progress").hidden = v !== "progress";
+    document.getElementById("v-care").hidden = v !== "care";
+    if (v === "care") renderCare();
     if (v === "supps") renderSupps();
     if (v === "progress") renderProgress();
     if (v === "today") showWeek();
