@@ -198,3 +198,5 @@ Edit → Timing ties one supplement to another: "Take [4 hours] [after] [Antibio
 - The details page shows the rule as "Timing".
 
 Built-in from local changes (Nov 6): Ultra Flora was an added supplement (`u_mw3ca7gx8x7`). On load the app drops that copy and moves its checkmarks to `flora` (`BUILT_IN` in the app).
+
+Details page footer (sticky): one row with the main button, then square icon buttons for Skip (or Undo skip, tinted) and Reschedule. Labels are in aria-label and title.

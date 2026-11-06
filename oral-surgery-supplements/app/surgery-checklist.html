@@ -301,7 +301,12 @@ html.push-open .push-dim{opacity:.1}
 .item.part .chk::after{width:2px;height:10px}
 .next-due{margin:0 2px 10px;font-size:15px;font-weight:600;color:var(--accent-ink)}
 .sh-btn{display:block;width:100%;min-height:50px;border-radius:14px;font-size:16px;font-weight:600;text-align:center;background:var(--accent);color:var(--on-accent)}
-.skip-btn{display:block;width:100%;min-height:44px;margin-top:6px;border-radius:12px;font-size:16px;font-weight:600;text-align:center;color:var(--accent-ink)}
+.foot-row{display:flex;gap:8px}
+.foot-row .sh-btn{flex:1;min-width:0}
+.sq-btn{flex:none;width:50px;height:50px;display:grid;place-items:center;border-radius:14px;background:var(--card);border:1px solid var(--line);color:var(--accent-ink)}
+.sq-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.sq-btn.on{background:var(--accent-tint);border-color:transparent}
+.sq-btn:active{background:var(--band)}
 .sh-btn.undo{background:var(--card);color:var(--ink);border:1px solid var(--line)}
 
 /* Edit sheet: slides up and stops below the status bar, as HPDE's page sheets do. The details page under it
@@ -1435,8 +1440,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const at = t === null ? "" : '<div class="taken-at"><label for="taken-time">Taken at</label>' +
       '<input type="time" id="taken-time" data-time value="' + t + '">' +
       '<button type="button" class="clear-time" data-clear-time' + (t ? '' : ' hidden') + '>Clear</button></div>';
-    const foot = dayCtx ? '<div class="push-foot">' + at + '<button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
-      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button>' + skipBtn(dayCtx) + '</div>' : "";
+    const foot = dayCtx ? '<div class="push-foot">' + at + '<div class="foot-row"><button type="button" class="sh-btn' + (on(dayCtx.k) ? ' undo' : '') + '" data-mark>' +
+      (on(dayCtx.k) ? "Mark as not taken" : "Mark as taken") + '</button>' + skipBtn(dayCtx) + '</div></div>' : "";
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
       '<div class="push-ht" aria-hidden="true">' + esc(row.name) + '</div>' +
       '<button type="button" class="edit-btn" data-edit aria-haspopup="dialog">Edit</button></div>' +
@@ -1460,13 +1465,17 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         '<input type="time" id="rt-' + i + '" data-rtime="' + i + '" value="' + tm + '">' +
         '<button type="button" class="clear-time" data-rdel="' + i + '" aria-label="Remove dose ' + (i + 1) + '">Remove</button></div>').join("") + (times.length ? '</div>' : '');
   }
-  // Skip sits under the main button while nothing is logged; a skipped dose offers Undo skip.
+  // Skip and Reschedule are square icon buttons beside the main one, so the sticky footer stays one row.
+  const ICON_SKIP = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5.5l9 6.5-9 6.5z"/><path d="M18.5 5.5v13"/></svg>';
+  const ICON_UNDO = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>';
+  const ICON_MOVE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M8 3v4M16 3v4M3.5 10h17"/><path d="M9.5 15h5.5M13 13l2 2-2 2"/></svg>';
+  const iconBtn = (attr, label, icon, on) => '<button type="button" class="sq-btn' + (on ? ' on' : '') + '" ' + attr + ' aria-label="' + label + '" title="' + label + '">' + icon + '</button>';
   function skipBtn(dayCtx) {
-    if (skipped(dayCtx.k)) return '<button type="button" class="skip-btn" data-skip="0">Undo skip</button>';
+    if (skipped(dayCtx.k)) return iconBtn('data-skip="0"', "Undo skip", ICON_UNDO, true);
     if (on(dayCtx.k)) return "";
     const it = itemAt(dayCtx.n, dayCtx.k);
-    return '<button type="button" class="skip-btn" data-skip="1">Skip this dose</button>' +
-      (it && canMove(it, dayCtx.k) ? '<button type="button" class="skip-btn" data-move>Reschedule</button>' : '');
+    return iconBtn('data-skip="1"', "Skip this dose", ICON_SKIP) +
+      (it && canMove(it, dayCtx.k) ? iconBtn("data-move", "Reschedule", ICON_MOVE) : '');
   }
   function detailRepeatHTML(row, dayCtx, rows, img, d) {
     return '<div class="push-in"><div class="push-h"><button type="button" class="back" aria-label="Back" data-back>' + BACK + '</button>' +
@@ -1480,7 +1489,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         (t === 'doses' ? 'Doses' : 'Details') + '</button>').join("") + '</div>' +
       '<div class="dpanel" id="dpanel-doses" role="tabpanel" aria-labelledby="dtab-doses" data-rlist' + (detailTab === 'doses' ? '' : ' hidden') + '>' + repeatListHTML(row, dayCtx) + '</div>' +
       '<div class="dpanel" id="dpanel-info" role="tabpanel" aria-labelledby="dtab-info"' + (detailTab === 'info' ? '' : ' hidden') + '><div class="list">' + rows + '</div></div></div>' +
-      '<div class="push-foot"><button type="button" class="sh-btn" data-mark>Log a dose now</button>' + skipBtn(dayCtx) + '</div></div>';
+      '<div class="push-foot"><div class="foot-row"><button type="button" class="sh-btn" data-mark>Log a dose now</button>' + skipBtn(dayCtx) + '</div></div></div>';
   }
   let detailTab = "doses";
   function showDetailTab(t) {
