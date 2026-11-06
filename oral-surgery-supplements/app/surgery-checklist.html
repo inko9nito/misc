@@ -339,6 +339,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
 .ef select{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);
   background-position:calc(100% - 18px) 55%,calc(100% - 13px) 55%;background-size:5px 5px;background-repeat:no-repeat;padding-right:34px}
 .ef input:focus,.ef textarea:focus,.ef select:focus{outline:none;border-color:var(--accent)}
+.ef-gap{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ef-gap select[name="gapOf"]{grid-column:1 / -1;margin-top:0}
+.ef-gap select{margin-top:6px}
 .es-note{margin:8px 4px 0;font-size:13px;line-height:1.45;color:var(--muted)}
 .ef-l{display:block;font-size:13px;font-weight:600;color:var(--ink2)}
 .ef-l span{font-weight:400;color:var(--muted)}
@@ -597,7 +600,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay"];
+  // gap, gapDir, gapOf: take this gap hours after (or before) another supplement, e.g. a probiotic 4 hours after the antibiotic.
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf"];
   const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
     if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
@@ -609,7 +613,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     const info = prodInfo(pk);
     // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0, base: it });
+    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
+      gap: info.gapOf && info.gapOf !== pk ? Number(info.gap) || 0 : 0, gapDir: info.gapDir === "before" ? "before" : "after", gapOf: info.gapOf || "", base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
   // supplement taken more than once a day, in time order; Intenzyme's counts its 5-dose course instead.
@@ -795,10 +800,33 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     for (let i = 0; i < n; i++) h += '<i' + (i < count ? ' class="on"' : '') + '></i>';
     return h + '</span>';
   }
+  // A dose tied to another supplement (4 hours after the antibiotic): when it can be taken, worked out
+  // from the other one's latest logged time ("after") or its next due time ("before").
+  const gapText = (it) => (it.gap === 1 ? "1 h" : it.gap + " h") + " " + it.gapDir + " " + prodInfo(it.gapOf).name;
+  function gapLine(n, it) {
+    const other = itemsFor(n).filter((x) => x.p === it.gapOf);
+    let at = null;
+    if (it.gapDir === "after") {
+      const last = lastLog(n, it.gapOf);
+      if (last >= 0) at = last + it.gap * 60;
+    } else {
+      const due = other.map((x) => nextDue(n, x)).find(Boolean);
+      if (due && !due.tomorrow) at = toMin(due.hm) - it.gap * 60;
+    }
+    if (at === null || at < 0 || at >= 1440) return '<span class="at due">' + cap(gapText(it)) + '</span>';
+    const passed = n < todayN || (n === todayN && at <= toMin(nowHM()));
+    if (it.gapDir === "after") return '<span class="at' + (passed ? '' : ' due') + '">' + (passed ? "Ready now" : "Take after " + fmtHM(fromMin(at))) + ' · ' + gapText(it) + '</span>';
+    return passed ? '<span class="at due">' + cap(gapText(it)) + '</span>' : '<span class="at">Take before ' + fmtHM(fromMin(at)) + ' · ' + gapText(it) + '</span>';
+  }
   // What a row says about times: when it was taken, and for timed doses when the next one is due.
   function timeLine(n, it, k) {
     if (skipped(k)) return '<span class="at due">Skipped</span>';
     if (it.mvAt && !on(k)) return '<span class="at due">At ' + fmtHM(it.mvAt) + '</span>';
+    // Only the first dose of the day still to take shows its timing.
+    if (it.gap && !it.repeat && !on(k)) {
+      const first = itemsFor(n).filter((x) => x.p === it.p && !resolved(key(n, x))).sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot))[0];
+      return first && first.id === it.id && first.mvFrom === it.mvFrom ? gapLine(n, it) : "";
+    }
     const times = timesOf(k), due = nextDue(n, it);
     if (it.repeat) {
       const goal = it.perDay, bits = [];
@@ -1376,7 +1404,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
     // Supplement details first, then this dose (or row), as in the Edit sheet.
-    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) +
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) + kv("Timing", timingText(d, row.p)) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
     if (dayCtx && row.repeat) return detailRepeatHTML(row, dayCtx, rows, img, d);
@@ -1576,6 +1604,18 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   const EVERY_OPTS = [["", "No set times"]].concat([1, 2, 3, 4, 6, 8, 12, 24].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
   const PERDAY_OPTS = [["", "Not set"]].concat([1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map((x) => [String(x), String(x)]));
+  const GAP_OPTS = [["", "Not set"]].concat([1, 2, 3, 4, 6, 8, 12].map((h) => [String(h), h === 1 ? "1 hour" : h + " hours"]));
+  const timingText = (d, pk) => d.gapOf && d.gapOf !== pk && Number(d.gap) ? d.gap + (d.gap === "1" ? " hour " : " hours ") + (d.gapDir === "before" ? "before " : "after ") + prodInfo(d.gapOf).name : "";
+  // Timing: "Take [4 hours] [after] [Antibiotic]", three selects in one field.
+  function timingField(d, self) {
+    const opt = (list, val) => list.map(([v, t]) => '<option value="' + esc(v) + '"' + (v === (val || "") ? ' selected' : '') + '>' + esc(t) + '</option>').join("");
+    const others = Object.keys(PNAME).concat(Object.keys(EDITS.c)).filter((pk) => pk !== self)
+      .map((pk) => [pk, prodInfo(pk).name]).sort((a, b) => a[1].localeCompare(b[1]));
+    return '<div class="ef"><span class="ef-l">Timing <span>Take it a set time after or before another</span></span><div class="ef-gap">' +
+      '<select name="gap" aria-label="Hours">' + opt(GAP_OPTS, d.gap) + '</select>' +
+      '<select name="gapDir" aria-label="After or before">' + opt([["after", "after"], ["before", "before"]], d.gapDir || "after") + '</select>' +
+      '<select name="gapOf" aria-label="Which supplement">' + opt([["", "Choose…"]].concat(others), d.gapOf) + '</select></div></div>';
+  }
   const everyText = (v) => { const h = Number(v); return h ? "Every " + (h === 1 ? "hour" : h + " hours") : ""; };
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
@@ -1585,7 +1625,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
       field("note", "Note", d.note || "", { long: true }) +
       field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
-      field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + '</div>' +
+      field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + timingField(d, row.p) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
       ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
@@ -1662,7 +1702,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (editCtx.custom !== undefined) { saveCustom(f); return; }
     const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
     const row = editCtx.row, pk = row.p, base = row.base || {};
-    PFIELDS.forEach((n) => setOverride(EDITS.p, pk, n, n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n), n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]));
+    const noGap = !v("gap") || !v("gapOf");   // a half-set timing isn't kept
+    PFIELDS.forEach((n) => {
+      let val = n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n);
+      if (n === "gap" || n === "gapOf") val = noGap ? "" : val;
+      if (n === "gapDir") val = noGap || val === "after" ? "" : val;
+      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]);
+    });
     if (editCtx.dayCtx) ["sub", "slot", "pill"].forEach((n) => setOverride(EDITS.i, row.id, n, v(n), base[n]));
     else ["sub", "pill"].forEach((n) => setOverride(EDITS.s, row.rk, n, v(n), base[n]));
     saveEdits();
@@ -1687,6 +1733,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       date("from", "Start", c.from) + date("to", "End", c.to, "Leave empty to keep going") +
       field("every", "Repeat every", c.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
       field("perDay", "Times a day", c.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) +
+      timingField(c, pk) +
       field("pill", "Reminder", c.pill || "", { hint: "Shown in the list" }) + '</div>' +
       '<p class="es-note">Added supplements are saved on this phone; Copy for Claude (under local changes) builds them into the app.</p>';
     return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
@@ -1701,6 +1748,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = editCtx.custom || ("u_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5));
     const c = { slots: Array.from(f.querySelectorAll('input[name="slots"]:checked')).map((x) => x.value) };
     ["name", "brand", "how", "label", "why", "note", "icon", "sub", "from", "to", "every", "perDay", "pill"].forEach((n) => { if (v(n)) c[n] = v(n); });
+    if (v("gap") && v("gapOf")) { c.gap = v("gap"); c.gapOf = v("gapOf"); if (v("gapDir") === "before") c.gapDir = "before"; }
     if (!c.slots.length) c.slots = ["Anytime"];
     if (c.from && c.to && c.to < c.from) c.to = c.from;
     EDITS.c[pk] = c;
@@ -1734,7 +1782,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!f || !editCtx) return;
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
-    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay"].forEach((n) => set(n, d[n]));
+    set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapOf"].forEach((n) => set(n, d[n]));
+    set("gapDir", d.gapDir || "after");
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
   }
@@ -1753,7 +1802,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Edits live only in this app's storage (deleting the Home Screen app deletes them), so the chip
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
-    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added" };
+    sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added",
+    gap: "Timing (hours apart)", gapDir: "Timing (before or after)", gapOf: "Timing (apart from)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
   BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT).forEach((it) => { BASE_ITEMS[it.id] = it; });
@@ -1786,10 +1836,11 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       const parts = ["Dose: " + (c.sub || "(none)"), "When: " + (c.slots || ["Anytime"]).join(", "), "From " + (c.from || "start") + (c.to ? " to " + c.to : ", ongoing")];
       [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Icon"]]
         .forEach(([f, l]) => { if (c[f]) parts.push(l + ": " + c[f]); });
+      if (timingText(c, pk)) parts.push("Timing: " + timingText(c, pk));
       add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
     });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
-      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], EDITS.p[pk][f], "supplement " + pk)));
+      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
     Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
       add(prodOf(id), "This dose (" + itemWhere(id) + ")", f, (BASE_ITEMS[id] || {})[f], EDITS.i[id][f], "dose " + id)));
     Object.keys(EDITS.s).forEach((rk) => Object.keys(EDITS.s[rk]).forEach((f) => {

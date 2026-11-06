@@ -185,3 +185,12 @@ A fourth tab in the bottom nav, from the office's implant post-op sheet (2 pages
 - **Timeline** with dates worked out from surgery day. Rows that apply today get a "Now" chip, and finished ones fade: first 24 hours, jaw exercises, silver gel, very soft foods, salt water rinse, tougher foods, retainer.
 - The rest of the tab: first 24 hours, pain, mouth care (pellets are left out, since they're already on the Today and Supplements tabs), foods to eat and foods to avoid.
 - Office name, address and phone numbers, including the after-hours emergency number, are left out on purpose. The footer points to the office's sheet instead.
+
+## Timing between supplements
+
+Edit → Timing ties one supplement to another: "Take [4 hours] [after] [Antibiotic]". It's saved as the product fields `gap` (hours), `gapDir` ("after" by default, or "before") and `gapOf` (the other product's key), and works on added supplements too.
+
+- **After:** the row shows "Take after 12:15 PM · 4 h after Antibiotic", using the other supplement's latest logged time that day. Once that time has passed it says "Ready now".
+- **Before:** the row shows "Take before 2:15 PM · 2 h before Antibiotic", using the other supplement's next due time, which needs its "Repeat every" set.
+- With nothing to work from, the row shows just "4 h after Antibiotic". Only the first dose of the day still to take shows timing.
+- The details page shows the rule as "Timing".
