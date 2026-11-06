@@ -524,7 +524,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const ABX = [
     { id: "abx1", slot: "Breakfast", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
     { id: "abx2", slot: "Lunch", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
-    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "As prescribed", icon: "tablet" }
+    { id: "abx3", slot: "Dinner", name: "Antibiotic", sub: "1 tablet", icon: "tablet" }
   ];
   const SURGERY = [
     { id: "s-abx1",    slot: "2 hours before", name: "Antibiotic", sub: "As prescribed", icon: "tablet" },
@@ -554,7 +554,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "drain",  slot: "Anytime", name: "Drainage Milieu", sub: "Per bottle until empty", icon: "drops", img: "drain" },
     { id: "lymph",  slot: "Anytime", name: "Lymph 3 Chronic", sub: "Per bottle until empty", icon: "drops", img: "lymph" },
     { id: "silver", slot: "Through the day", name: "Renew silver gel", sub: "Q-tip on the site, 3–5 times a day", icon: "swab", img: "silver", pill: "Gently, don’t dislodge the clot" },
-    { id: "pellets", slot: "Through the day", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" }
+    { id: "pellets", slot: "Through the day", name: "Homeopathic pellets", sub: "4 of each under the tongue, every 3 hours", icon: "pellets" },
+    // Added by the user (a probiotic), timed 4 hours after the antibiotic.
+    { id: "flora", slot: "Anytime", name: "Ultra Flora", sub: "1 tablet", icon: "capsule" }
   ];
   // From the office's post-op sheet: jaw exercises 3 times a day for the first week (surgery day is past, so
   // from the day after through Nov 8), then warm salt water rinses 2–3 times a day for 5 days after the first 3.
@@ -583,7 +585,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "CBD": { brand: "Pump bottle", how: PUMP3 },
     "Relax Milieu": { brand: "Blue pump bottle", how: PUMP3 },
     "Halcion": { brand: "Prescription · the office calls it in", how: "As directed by the office.", note: "The office’s checklist email says Valium; the office called in Halcion. Take only what was prescribed." },
-    "Antibiotic": { every: "8", brand: "Prescription · usually amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
+    "Antibiotic": { every: "8", brand: "Amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
       note: "Keep taking it until the prescription is finished, as the label says." },
     "Ibuprofen": { brand: "800 mg", how: "The first pain medicine dose, 2 hours before surgery, from the office’s checklist email. Eat something first.",
       note: "The post-op sheet says the office prefers to avoid ibuprofen afterwards, since it can slow healing, unless you need it for pain." },
@@ -594,6 +596,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "Homeopathic pellets": { every: "3", perDay: "6", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
+    "Ultra Flora": { brand: "Metagenics · probiotic", how: "4 hours after the antibiotic.", gap: "4", gapOf: "abx",
+      note: "Added by you. Spacing it from the antibiotic keeps the antibiotic from killing the probiotic." },
     "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
       why: "Keeping the jaw closed after surgery can shorten and tighten the muscles." },
     "Salt water rinse": { brand: "From the office’s post-op sheet", how: "1 teaspoon of salt in 8 oz of warm water, 2–3 times a day for 5 days, starting 3 days after surgery. Rinse gently.",
@@ -630,7 +634,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Each supplement has a product key; its doses (items) and Supplements rows point at it.
   const NAME2P = { "D3K2": "d3k2", "Methyl-B12": "b12", "PhytoMulti": "multi", "Bio-D-Mulsion Forte": "biod", "Vitamin C": "vitc",
     "Magnesium glycinate": "mag", "Bone Builder Plus": "bone", "GABA": "gaba", "CBD": "cbd", "Relax Milieu": "relax", "Halcion": "halcion",
-    "Intenzyme Forte": "intz", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
+    "Intenzyme Forte": "intz", "Ultra Flora": "flora", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
     "Homeopathic pellets": "pellets", "Jaw exercises": "jaw", "Salt water rinse": "salt",
     "Antibiotic": "abx", "Ibuprofen": "ibu" };
   const PNAME = {}, PDETAILS = {};
@@ -645,6 +649,25 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   const normEdits = (v) => ({ p: (v && v.p) || {}, i: (v && v.i) || {}, s: (v && v.s) || {}, c: (v && v.c) || {} });
   let EDITS = (function () { try { return normEdits(JSON.parse(localStorage.getItem(LSE) || "{}")); } catch (e) { return normEdits(null); } })();
   let eref = null;
+  // Added supplements that have since been built into the app: the added copy goes, and its checkmarks
+  // move to the built-in dose (u_mw3ca7gx8x7_0 -> flora). Runs at start and on each synced update.
+  const BUILT_IN = { u_mw3ca7gx8x7: "flora" };
+  function migrateEdits() {
+    let ch = false;
+    Object.keys(BUILT_IN).forEach((pk) => { if (EDITS.c[pk]) { delete EDITS.c[pk]; ch = true; } });
+    Object.keys(EDITS.p).forEach((pk) => { const o = EDITS.p[pk]; if (o.gapOf && BUILT_IN[o.gapOf]) { o.gapOf = BUILT_IN[o.gapOf]; ch = true; } });
+    if (ch) saveEdits();
+  }
+  function migrateState() {
+    Object.keys(state).forEach((k) => {
+      const m = /^(u_[a-z0-9]+)_\d+(.*)$/.exec(k.slice(11));
+      if (!m || !BUILT_IN[m[1]]) return;
+      const nk = k.slice(0, 11) + BUILT_IN[m[1]] + m[2];
+      if (!(nk in state)) state[nk] = state[k];
+      delete state[k];
+      stateChanged(nk); stateChanged(k);
+    });
+  }
   function saveEdits() {
     try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
@@ -1110,6 +1133,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("recovery", "tooth", "Jaw exercises", "3 times a day, through " + fShort(dateOf(JAW_LAST_N))),
         infoRow("recovery", "cup", "Salt water rinse", "2–3 times a day, " + fShort(dateOf(SALT_FIRST_N)) + " – " + fShort(dateOf(SALT_LAST_N))),
         infoRow("recovery", "tablet", "Antibiotic", "3 times a day until finished", "As prescribed"),
+        infoRow("recovery", "capsule", "Ultra Flora", "1 tablet a day, 4 hours after the antibiotic"),
         infoRow("recovery", "capsule", "D3K2", "8 pumps before breakfast, until gone"),
         infoRow("recovery", "pump", "Methyl-B12", "2 pumps before breakfast, until gone"),
         infoRow("recovery", "capsule", "PhytoMulti", "2 tablets with breakfast, until gone"),
@@ -2094,6 +2118,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         synced = true;
         state = remote || clean(state);
         Object.keys(early).forEach((k) => { if (early[k]) state[k] = early[k]; else delete state[k]; });
+        migrateState();
         saveLocal(); refreshAll();
         setSync("Checkmarks sync across your devices.");
         if (!remote || Object.keys(early).length) queueSync();
@@ -2101,6 +2126,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       }
       if (pending) return;
       state = remote || {};
+      migrateState();
       saveLocal(); refreshAll();
     }, () => { ref = null; setSync("Checkmarks are saved on this device."); });
     // Edits sync in their own document; the first time, this device's edits seed it.
@@ -2113,11 +2139,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         if (!remote && (Object.keys(EDITS.p).length || Object.keys(EDITS.i).length || Object.keys(EDITS.s).length)) { saveEdits(); return; }
       }
       EDITS = normEdits(remote);
+      migrateEdits();
       try { localStorage.setItem(LSE, JSON.stringify(EDITS)); } catch (e) {}
       if (!editOpen()) refreshEdited();
     }, () => { eref = null; });
   }
 
+  migrateEdits(); migrateState();
   pruneEdits();
   renderCountdown();
   renderStrip();
