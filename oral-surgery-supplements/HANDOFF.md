@@ -51,6 +51,8 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 | Drainage Milieu (Physica, 2 fl oz tincture) | Recovery, anytime | Per bottle until empty | Sheet groups it with Lymph 3 as the "blue bottles." Label directions not found online. |
 | Lymph 3 Chronic (Physica, 2 fl oz tincture) | Recovery, anytime | Per bottle until empty | Label directions not found online. |
 | Renew silver gel (ameo life, extra strength) | Recovery, anytime | Q-tip around gums | "Gently, don't dislodge the clot." |
+| Ultra Flora (Metagenics, probiotic) | Recovery from Nov 3, anytime | 1 tablet a day, 4 hours after the antibiotic | **Not on the office sheet.** Added by the user. Uses the Timing setting (`gap: 4, gapOf: abx`). |
+| Antibiotic (amoxicillin) | From Oct 30, 3 times a day | As prescribed; the dinner dose is set to 1 tablet by the user | From the checklist email. |
 
 App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Between meals, Anytime, 1 hour before, Also today.
 
@@ -194,3 +196,5 @@ Edit → Timing ties one supplement to another: "Take [4 hours] [after] [Antibio
 - **Before:** the row shows "Take before 2:15 PM · 2 h before Antibiotic", using the other supplement's next due time, which needs its "Repeat every" set.
 - With nothing to work from, the row shows just "4 h after Antibiotic". Only the first dose of the day still to take shows timing.
 - The details page shows the rule as "Timing".
+
+Built-in from local changes (Nov 6): Ultra Flora was an added supplement (`u_mw3ca7gx8x7`). On load the app drops that copy and moves its checkmarks to `flora` (`BUILT_IN` in the app).
