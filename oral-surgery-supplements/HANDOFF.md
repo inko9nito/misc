@@ -200,3 +200,11 @@ Edit → Timing ties one supplement to another: "Take [4 hours] [after] [Antibio
 Built-in from local changes (Nov 6): Ultra Flora was an added supplement (`u_mw3ca7gx8x7`). On load the app drops that copy and moves its checkmarks to `flora` (`BUILT_IN` in the app).
 
 Details page footer (sticky): one row with the main button, then square icon buttons for Skip (or Undo skip, tinted) and Reschedule. Labels are in aria-label and title.
+
+## Finished or stopped
+
+Edit → Status (at the top of the sheet): Still taking, Finished (ran out), or Stopped, with a "From" date that defaults to today. It's saved as the product fields `stop` (the first day it's no longer taken) and `stopWhy` (`"done"` for finished; empty means stopped). Added supplements save the same fields on themselves.
+
+- From the stop date on, the supplement's doses are hidden and leave the rings, except doses already taken or skipped. Earlier days are unchanged.
+- The Supplements tab tags its rows "Finished Nov 7" or "Stopped Nov 9" and fades them. The details page shows Status.
+- Like other edits, a status syncs across devices and shows under local changes for Copy for Claude.
