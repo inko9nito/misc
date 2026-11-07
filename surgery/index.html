@@ -223,6 +223,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .nm{font-size:15px;font-weight:500;line-height:1.25}
 .sb{font-size:14px;color:var(--muted)}
 .nth{font-size:13px;font-weight:400;color:var(--muted);white-space:nowrap}
+.item.ended .tile,.item.ended .sb,.item.ended .pill{opacity:.5}
+.end-tag{margin-left:4px;padding:1px 7px;border-radius:999px;background:var(--track);color:var(--ink2);font-size:12px;font-weight:600;white-space:nowrap;vertical-align:1px}
 .pill{align-self:flex-start;margin-top:5px;font-size:12px;font-weight:600;color:var(--ink2);border:1.5px solid var(--line);border-radius:999px;padding:2px 9px}
 .chk{flex:none;width:24px;height:24px;border-radius:50%;border:2px solid var(--chk);display:grid;place-items:center;transition:background-color .15s,border-color .15s}
 .chk svg{width:13px;height:13px;fill:none;stroke:var(--on-accent);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;opacity:0}
@@ -678,7 +680,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (eref) eref.set(JSON.parse(JSON.stringify(EDITS))).catch(() => {});
   }
   // gap, gapDir, gapOf: take this gap hours after (or before) another supplement, e.g. a probiotic 4 hours after the antibiotic.
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf"];
+  // stop, stopWhy: the first day a supplement is no longer taken ("done": ran out, or "stopped").
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf", "stop", "stopWhy"];
   const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
     if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
@@ -706,7 +709,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       g.slice().sort((a, b) => SLOTS.indexOf(a.slot) - SLOTS.indexOf(b.slot)).forEach((it, i) => { it.nth = [i + 1, g.length]; });
     });
     // Doses moved away leave the day (the rest keep their numbers); doses moved here join it.
-    return items.filter((it) => !moveOf(key(n, it))).concat(movedIn(n));
+    // A finished or stopped supplement drops off from its stop day, except doses already logged.
+    const day = iso(dateOf(n)), stops = {};
+    return items.filter((it) => !moveOf(key(n, it))).concat(movedIn(n)).filter((it) => {
+      if (!(it.p in stops)) stops[it.p] = prodInfo(it.p).stop || "";
+      return !stops[it.p] || day < stops[it.p] || resolved(key(n, it));
+    });
   }
   // The doses moved to day n from their own day: same supplement and dose, without a dose number.
   function movedIn(n) {
@@ -1087,8 +1095,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     SUPP_BASE[rk] = { g: g, p: pk, sub: sub, pill: pill };
     const row = Object.assign({ p: pk, rk: rk, icon: icon, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
     const i = suppRows.push(row) - 1;
-    return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
-      '<span class="body"><span class="nm">' + esc(row.name) + '</span><span class="sb">' + esc(row.sub) + '</span>' +
+    const st = statusText(prodInfo(pk));
+    return '<div class="item' + (st ? ' ended' : '') + '"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
+      '<span class="body"><span class="nm">' + esc(row.name) + (st ? ' <span class="end-tag">' + esc(st) + '</span>' : '') + '</span><span class="sb">' + esc(row.sub) + '</span>' +
       (row.pill ? '<span class="pill">' + esc(row.pill) + '</span>' : '') + '</span></button></div>';
   }
   function grp(title, when, rows, sp) {
@@ -1482,7 +1491,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const kv = (k, v) => v ? '<div class="kv"><span class="k">' + k + '</span><span class="v">' + esc(v) + '</span></div>' : "";
     const img = row.img && IMG_L[row.img] ? '<img src="' + IMG_L[row.img] + '" alt="">' : svg(row.icon);
     // Supplement details first, then this dose (or row), as in the Edit sheet.
-    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Repeats", everyText(d.every)) + kv("Timing", timingText(d, row.p)) +
+    const rows = kv("How", d.how) + kv("Label", d.label) + kv("Why", d.why) + kv("Note", [row.pill, d.note].filter(Boolean).join(". ")) + kv("Status", statusText(d)) + kv("Repeats", everyText(d.every)) + kv("Timing", timingText(d, row.p)) +
       (dayCtx ? kv("Today", row.sub) + kv("Dose number", row.nth ? nthText(row) + (row.p === "intz" ? "" : " today") : "") + kv("When", row.slot === "Also today" ? "" : row.slot) : kv("Schedule", row.sub));
     const t = dayCtx && on(dayCtx.k) ? timeOf(dayCtx.k) : null;
     if (dayCtx && row.repeat) return detailRepeatHTML(row, dayCtx, rows, img, d);
@@ -1698,6 +1707,20 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       '<select name="gapDir" aria-label="After or before">' + opt([["after", "after"], ["before", "before"]], d.gapDir || "after") + '</select>' +
       '<select name="gapOf" aria-label="Which supplement">' + opt([["", "Choose…"]].concat(others), d.gapOf) + '</select></div></div>';
   }
+  const STATUS_OPTS = [["", "Still taking"], ["done", "Finished (ran out)"], ["stopped", "Stopped"]];
+  const statusText = (d) => d.stop ? (d.stopWhy === "done" ? "Finished" : "Stopped") + " " + fShort(new Date(d.stop + "T12:00")) : "";
+  function statusField(d) {
+    const why = d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "";
+    const def = iso(dateOf(Math.min(Math.max(todayN, 0), DAYS - 1)));
+    return '<div class="es-sec">Status</div><div class="es-card">' + field("stopWhy", "Status", why, { options: STATUS_OPTS }) +
+      '<div class="ef" data-stop-date' + (why ? '' : ' style="display:none"') + '><label for="ef-stop">From <span>Doses from this day on are hidden, except ones already logged</span></label>' +
+      '<input type="date" id="ef-stop" name="stop" value="' + (d.stop || def) + '" min="' + iso(DAY1) + '" max="' + iso(dateOf(DAYS - 1)) + '"></div></div>';
+  }
+  // The form's status and date as they'll be saved: no date unless finished or stopped.
+  function statusValues(v) {
+    const why = v("stopWhy"), stop = /^\d{4}-\d{2}-\d{2}$/.test(v("stop")) ? v("stop") : "";
+    return why && stop ? { stop: stop, stopWhy: why === "done" ? "done" : "" } : { stop: "", stopWhy: "" };
+  }
   const everyText = (v) => { const h = Number(v); return h ? "Every " + (h === 1 ? "hour" : h + " hours") : ""; };
   function editHTML(row, dayCtx) {
     const d = prodInfo(row.p);
@@ -1719,7 +1742,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
       '<div class="es-tt"><div id="es-t">Edit</div><div class="es-st">' + esc(row.name) + '</div></div>' +
       '<button type="submit" form="es-form" class="es-btn es-save" data-save disabled>Save</button></div>' +
-      '<div class="es-b"><form id="es-form" novalidate>' + prod + mine +
+      '<div class="es-b"><form id="es-form" novalidate>' + statusField(d) + prod + mine +
       '<button type="button" class="es-reset" data-reset>Restore original</button></form></div>';
   }
   const formValues = () => { const f = document.getElementById("es-form"); return f ? JSON.stringify(Array.from(new FormData(f).entries())) : ""; };
@@ -1785,8 +1808,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const v = (n) => { const el = f.elements[n]; return el ? el.value.trim() : ""; };
     const row = editCtx.row, pk = row.p, base = row.base || {};
     const noGap = !v("gap") || !v("gapOf");   // a half-set timing isn't kept
+    const st = statusValues(v);
     PFIELDS.forEach((n) => {
       let val = n === "name" && !v(n) ? (PNAME[pk] || pk) : v(n);
+      if (n === "stop" || n === "stopWhy") val = st[n];
       if (n === "gap" || n === "gapOf") val = noGap ? "" : val;
       if (n === "gapDir") val = noGap || val === "after" ? "" : val;
       setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]);
@@ -1821,7 +1846,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return '<div class="es-h" data-grab><button type="button" class="es-btn" data-cancel>Cancel</button>' +
       '<div class="es-tt"><div id="es-t">' + (pk ? "Edit" : "Add supplement") + '</div>' + (pk ? '<div class="es-st">' + esc(c.name) + '</div>' : '') + '</div>' +
       '<button type="submit" form="es-form" class="es-btn es-save" data-save disabled>' + (pk ? "Save" : "Add") + '</button></div>' +
-      '<div class="es-b"><form id="es-form" novalidate>' + info + sched +
+      '<div class="es-b"><form id="es-form" novalidate>' + (pk ? statusField(c) : '') + info + sched +
       (pk ? '<button type="button" class="es-reset es-del" data-del-custom>Delete supplement</button>' : '') + '</form></div>';
   }
   function saveCustom(f) {
@@ -1831,6 +1856,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const c = { slots: Array.from(f.querySelectorAll('input[name="slots"]:checked')).map((x) => x.value) };
     ["name", "brand", "how", "label", "why", "note", "icon", "sub", "from", "to", "every", "perDay", "pill"].forEach((n) => { if (v(n)) c[n] = v(n); });
     if (v("gap") && v("gapOf")) { c.gap = v("gap"); c.gapOf = v("gapOf"); if (v("gapDir") === "before") c.gapDir = "before"; }
+    const st = statusValues(v); if (st.stop) { c.stop = st.stop; if (st.stopWhy) c.stopWhy = st.stopWhy; }
     if (!c.slots.length) c.slots = ["Anytime"];
     if (c.from && c.to && c.to < c.from) c.to = c.from;
     EDITS.c[pk] = c;
@@ -1854,8 +1880,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     return Object.keys(EDITS.c).map((pk) => {
       const c = EDITS.c[pk], row = { p: pk, rk: "custom:" + pk, icon: c.icon || "capsule", sub: customSchedule(c), pill: c.pill, name: c.name, base: {} };
       const i = suppRows.push(row) - 1;
-      return '<div class="item"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(null, row.icon) +
-        '<span class="body"><span class="nm">' + esc(row.name) + '</span><span class="sb">' + esc(row.sub) + '</span>' +
+      const st = statusText(c);
+      return '<div class="item' + (st ? ' ended' : '') + '"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(null, row.icon) +
+        '<span class="body"><span class="nm">' + esc(row.name) + (st ? ' <span class="end-tag">' + esc(st) + '</span>' : '') + '</span><span class="sb">' + esc(row.sub) + '</span>' +
         (row.pill ? '<span class="pill">' + esc(row.pill) + '</span>' : '') + '</span></button></div>';
     });
   }
@@ -1865,12 +1892,14 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
     set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapOf"].forEach((n) => set(n, d[n]));
-    set("gapDir", d.gapDir || "after");
+    set("gapDir", d.gapDir || "after"); set("stopWhy", d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "");
+    const sd = f.querySelector("[data-stop-date]"); if (sd) sd.style.display = f.elements.stopWhy.value ? "" : "none";
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
   }
   // Everything that shows a supplement's text, drawn again with the edits.
   function refreshEdited() {
+    for (let n = 0; n < DAYS; n++) updateRings(n);   // a status or schedule change can change a day's count
     renderDay();
     if (view === "supps") renderSupps();
     if (!push.hidden) {
@@ -1885,6 +1914,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
     sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added",
+    stop: "Stopped from", stopWhy: "Status (done = finished)",
     gap: "Timing (hours apart)", gapDir: "Timing (before or after)", gapOf: "Timing (apart from)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
@@ -1919,6 +1949,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Icon"]]
         .forEach(([f, l]) => { if (c[f]) parts.push(l + ": " + c[f]); });
       if (timingText(c, pk)) parts.push("Timing: " + timingText(c, pk));
+      if (statusText(c)) parts.push("Status: " + statusText(c));
       add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
     });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
@@ -1987,7 +2018,10 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   push.addEventListener("change", onTime);
   push.addEventListener("input", onTime);
   esheet.addEventListener("input", markDirty);
-  esheet.addEventListener("change", markDirty);
+  esheet.addEventListener("change", (e) => {
+    if (e.target.name === "stopWhy") { const sd = esheet.querySelector("[data-stop-date]"); if (sd) sd.style.display = e.target.value ? "" : "none"; }
+    markDirty();
+  });
   esheet.addEventListener("submit", (e) => { e.preventDefault(); if (!esheet.querySelector("[data-save]").disabled) saveEdit(); });
 
   // Drag the sheet down by its toolbar, or by its form once that's scrolled to the top, to cancel (as HPDE's sheets).
