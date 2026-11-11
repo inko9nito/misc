@@ -215,4 +215,4 @@ Built-in from local changes (Nov 11):
 - D3K2, Intenzyme Forte and homeopathic pellets marked finished from Nov 7.
 - Antibiotic stopped from Nov 11.
 
-Added supplements: the Icon field is now "Form" (Capsules, Tablets, Drops, Pumps, Teaspoons, Pellets, Swab, Cup). It sets both the icon and the dose unit, so a dose of "3" with Tablets shows "3 tablets". A dose with words is shown as typed.
+Every supplement, built-in or added, has a "Form" field in Edit (a product field `icon`; built-ins default to their own icon). Added supplements: the Icon field is now "Form" (Capsules, Tablets, Drops, Pumps, Teaspoons, Pellets, Swab, Cup). It sets both the icon and the dose unit, so a dose of "3" with Tablets shows "3 tablets". A dose with words is shown as typed.
