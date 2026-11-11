@@ -699,7 +699,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   // gap, gapDir, gapOf: take this gap hours after (or before) another supplement, e.g. a probiotic 4 hours after the antibiotic.
   // stop, stopWhy: the first day a supplement is no longer taken ("done": ran out, or "stopped").
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf", "stop", "stopWhy"];
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf", "stop", "stopWhy", "icon"];
+  // A built-in supplement's own form (icon), from its first dose in the schedule.
+  function baseIcon(pk) {
+    const all = BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT, GSE, [intzDose(15)]);
+    const it = all.find((x) => prodOf(x.id) === pk);
+    return it ? it.icon : "capsule";
+  }
   const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
     if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
@@ -711,7 +717,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     const info = prodInfo(pk);
     // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
+    // Form (icon) is set per supplement; a bare-number dose takes its unit from it ("3" -> "3 tablets").
+    const own = Object.assign({}, it, EDITS.i[it.id] || {}), icon = info.icon || own.icon;
+    return Object.assign(own, { p: pk, name: info.name, icon: icon, sub: doseText({ sub: own.sub, icon: icon }), every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
       gap: info.gapOf && info.gapOf !== pk ? Number(info.gap) || 0 : 0, gapDir: info.gapDir === "before" ? "before" : "after", gapOf: info.gapOf || "", base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
@@ -1111,7 +1119,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function infoRow(g, icon, name, sub, pill) {
     const pk = NAME2P[name], rk = g + ":" + pk, base = { sub: sub, pill: pill };
     SUPP_BASE[rk] = { g: g, p: pk, sub: sub, pill: pill };
-    const row = Object.assign({ p: pk, rk: rk, icon: icon, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
+    const ic = prodInfo(pk).icon || icon;
+    const row = Object.assign({ p: pk, rk: rk, icon: ic, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
     const i = suppRows.push(row) - 1;
     const st = statusText(prodInfo(pk));
     return '<div class="item' + (st ? ' ended' : '') + '"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
@@ -1748,11 +1757,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
       field("note", "Note", d.note || "", { long: true }) +
+      field("icon", "Form", d.icon || baseIcon(row.p), { options: ICON_OPTS, hint: "Sets the icon and the dose unit" }) +
       field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
       field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + timingField(d, row.p) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
-      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
+      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub, { hint: "A bare number takes its unit from Form" }) +
         field("slot", "When", row.slot, { options: SLOTS }) + field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
         '<p class="es-note">Changes here apply to this dose on every day.</p>'
       : '<div class="es-sec">This row</div><div class="es-card">' + field("sub", "Schedule", row.sub) +
@@ -1833,7 +1843,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (n === "stop" || n === "stopWhy") val = st[n];
       if (n === "gap" || n === "gapOf") val = noGap ? "" : val;
       if (n === "gapDir") val = noGap || val === "after" ? "" : val;
-      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]);
+      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : n === "icon" ? baseIcon(pk) : (PDETAILS[pk] || {})[n]);
     });
     if (editCtx.dayCtx) ["sub", "slot", "pill"].forEach((n) => setOverride(EDITS.i, row.id, n, v(n), base[n]));
     else ["sub", "pill"].forEach((n) => setOverride(EDITS.s, row.rk, n, v(n), base[n]));
@@ -1911,7 +1921,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
     set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapOf"].forEach((n) => set(n, d[n]));
-    set("gapDir", d.gapDir || "after"); set("stopWhy", d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "");
+    set("gapDir", d.gapDir || "after"); set("icon", baseIcon(pk)); set("stopWhy", d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "");
     const sd = f.querySelector("[data-stop-date]"); if (sd) sd.style.display = f.elements.stopWhy.value ? "" : "none";
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
@@ -1933,7 +1943,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
     sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added",
-    stop: "Stopped from", stopWhy: "Status (done = finished)",
+    icon: "Form", stop: "Stopped from", stopWhy: "Status (done = finished)",
     gap: "Timing (hours apart)", gapDir: "Timing (before or after)", gapOf: "Timing (apart from)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
@@ -1952,7 +1962,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       Object.keys(o).forEach((f) => { const d = orig ? orig[f] : undefined; if (o[f] === (d == null ? "" : d)) { delete o[f]; changed = true; } });
       if (!Object.keys(o).length) { delete bucket[k]; changed = true; }
     };
-    Object.keys(EDITS.p).forEach((pk) => prune(EDITS.p, pk, Object.assign({ name: PNAME[pk] }, PDETAILS[pk] || {})));
+    Object.keys(EDITS.p).forEach((pk) => prune(EDITS.p, pk, Object.assign({ name: PNAME[pk], icon: baseIcon(pk) }, PDETAILS[pk] || {})));
     Object.keys(EDITS.i).forEach((id) => { if (id !== "intz") prune(EDITS.i, id, BASE_ITEMS[id]); });
     Object.keys(EDITS.s).forEach((rk) => prune(EDITS.s, rk, SUPP_BASE[rk]));
     if (changed) saveEdits();
@@ -1972,7 +1982,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
     });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
-      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
+      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : f === "icon" ? baseIcon(pk) : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
     Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
       add(prodOf(id), "This dose (" + itemWhere(id) + ")", f, (BASE_ITEMS[id] || {})[f], EDITS.i[id][f], "dose " + id)));
     Object.keys(EDITS.s).forEach((rk) => Object.keys(EDITS.s[rk]).forEach((f) => {
