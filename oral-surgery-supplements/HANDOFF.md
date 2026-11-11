@@ -52,7 +52,8 @@ Dates: the 2-week prep runs **Mon Oct 19 – Sun Nov 1** (14 days). Night before
 | Lymph 3 Chronic (Physica, 2 fl oz tincture) | Recovery, anytime | Per bottle until empty | Label directions not found online. |
 | Renew silver gel (ameo life, extra strength) | Recovery, anytime | Q-tip around gums | "Gently, don't dislodge the clot." |
 | Ultra Flora (Metagenics, probiotic) | Recovery from Nov 3, anytime | 1 tablet a day, 4 hours after the antibiotic | **Not on the office sheet.** Added by the user. Uses the Timing setting (`gap: 4, gapOf: abx`). |
-| Antibiotic (amoxicillin) | From Oct 30, 3 times a day | As prescribed; the dinner dose is set to 1 tablet by the user | From the checklist email. |
+| Antibiotic (amoxicillin) | Oct 30 – Nov 10, 3 times a day | As prescribed; the dinner dose is set to 1 tablet by the user | From the checklist email. Marked stopped from Nov 11 by the user. |
+| Grapefruit seed extract (tablets) | From Nov 11, before breakfast and at dinner | 3 tablets | **Not on the office sheet.** Added by the user after the antibiotic. Timing: 4 hours before Ultra Flora. |
 
 App slots, in order: Before breakfast, Breakfast, Lunch, Dinner, Bedtime, Between meals, Anytime, 1 hour before, Also today.
 
@@ -208,3 +209,10 @@ Edit → Status (at the top of the sheet): Still taking, Finished (ran out), or 
 - From the stop date on, the supplement's doses are hidden and leave the rings, except doses already taken or skipped. Earlier days are unchanged.
 - The Supplements tab tags its rows "Finished Nov 7" or "Stopped Nov 9" and fades them. The details page shows Status.
 - Like other edits, a status syncs across devices and shows under local changes for Copy for Claude.
+
+Built-in from local changes (Nov 11):
+- Grapefruit seed extract (`u_mwc6x37wnkz` → `gse1`, `gse2`).
+- D3K2, Intenzyme Forte and homeopathic pellets marked finished from Nov 7.
+- Antibiotic stopped from Nov 11.
+
+Added supplements: the Icon field is now "Form" (Capsules, Tablets, Drops, Pumps, Teaspoons, Pellets, Swab, Cup). It sets both the icon and the dose unit, so a dose of "3" with Tablets shows "3 tablets". A dose with words is shown as typed.
