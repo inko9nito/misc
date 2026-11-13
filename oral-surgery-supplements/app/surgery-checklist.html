@@ -524,6 +524,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     { id: "jaw2", slot: "Lunch", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" },
     { id: "jaw3", slot: "Dinner", name: "Jaw exercises", sub: "Open and close gently", icon: "tooth" }
   ];
+  // Added by the user from Nov 11, after the antibiotic: 3 tablets twice a day.
+  const GSE_FIRST_N = SURG_N + 9;   // Wed Nov 11
+  const GSE = [
+    { id: "gse1", slot: "Before breakfast", name: "Grapefruit seed extract", sub: "3 tablets", icon: "tablet" },
+    { id: "gse2", slot: "Dinner", name: "Grapefruit seed extract", sub: "3 tablets", icon: "tablet" }
+  ];
   const SALT = [
     { id: "salt1", slot: "Breakfast", name: "Salt water rinse", sub: "1 tsp salt in 8 oz warm water", icon: "cup" },
     { id: "salt2", slot: "Dinner", name: "Salt water rinse", sub: "1 tsp salt in 8 oz warm water", icon: "cup" }
@@ -532,7 +538,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // What the details page shows for each supplement, keyed by name. From the bottle labels and the office sheet.
   const PUMP3 = "Night before and 1 hour before surgery, 1 pump each time.";
   const DETAILS = {
-    "D3K2": { brand: "Quicksilver Scientific · nanoemulsion", how: "Empty stomach, at least 10 minutes before eating. Hold in your mouth 30 seconds, then swallow.", label: "1 pump = 2,500 IU D3 + 90 mcg K2, so 20,000 IU is 8 pumps." },
+    "D3K2": { stop: "2026-11-07", stopWhy: "done", brand: "Quicksilver Scientific · nanoemulsion", how: "Empty stomach, at least 10 minutes before eating. Hold in your mouth 30 seconds, then swallow.", label: "1 pump = 2,500 IU D3 + 90 mcg K2, so 20,000 IU is 8 pumps." },
     "Methyl-B12": { brand: "Quicksilver Scientific · liposomal spray", how: "Empty stomach, at least 10 minutes before eating. Hold in your mouth 30 seconds, then swallow.", label: "1–2 pumps once a day.", why: "Replaces B12 that nitrous oxide uses up." },
     "PhytoMulti": { brand: "Metagenics · multivitamin with iron", how: "With breakfast. Not with Bone Builder: its calcium blocks iron.", label: "1–2 tablets once a day with food. 2 tablets have 18 mg iron and 1,000 IU vitamin D." },
     "Bio-D-Mulsion Forte": { brand: "Biotics Research · emulsified vitamin D3", how: "With breakfast. Vitamin D absorbs better with some fat.", label: "2 drops = 4,000 IU.", note: "Not on the office sheet." },
@@ -543,17 +549,19 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     "CBD": { brand: "Pump bottle", how: PUMP3 },
     "Relax Milieu": { brand: "Blue pump bottle", how: PUMP3 },
     "Halcion": { brand: "Prescription · the office calls it in", how: "As directed by the office.", note: "The office’s checklist email says Valium; the office called in Halcion. Take only what was prescribed." },
-    "Antibiotic": { every: "8", brand: "Amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
+    "Antibiotic": { stop: "2026-11-11", every: "8", brand: "Amoxicillin", how: "3 times a day, starting 3 days before surgery, or as prescribed. On surgery day, take the first dose 2 hours before.",
       note: "Keep taking it until the prescription is finished, as the label says." },
     "Ibuprofen": { brand: "800 mg", how: "The first pain medicine dose, 2 hours before surgery, from the office’s checklist email. Eat something first.",
       note: "The post-op sheet says the office prefers to avoid ibuprofen afterwards, since it can slow healing, unless you need it for pain." },
-    "Intenzyme Forte": { brand: "Biotics Research · 50 tablets", how: "Empty stomach, between meals. With food it only helps digestion.", label: "10 tablets a dose, 5 doses: Nov 2, 3, 5, 7 and 9." },
+    "Intenzyme Forte": { stop: "2026-11-07", stopWhy: "done", brand: "Biotics Research · 50 tablets", how: "Empty stomach, between meals. With food it only helps digestion.", label: "10 tablets a dose, 5 doses: Nov 2, 3, 5, 7 and 9." },
     "Drainage Milieu": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Lymph 3 Chronic": { brand: "Physica · homeopathic tincture, 2 fl oz", how: "Per bottle until empty." },
     "Renew silver gel": { every: "4", perDay: "4", brand: "ameo life · extra strength", how: "Dab on the surgery site with a Q-tip 3–5 times a day, starting on surgery day. Gently: don’t dislodge the clot." },
-    "Homeopathic pellets": { every: "3", perDay: "6", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
+    "Homeopathic pellets": { stop: "2026-11-07", stopWhy: "done", every: "3", perDay: "6", brand: "6 remedies, 30C: Chamomilla, Arnica montana, Hypericum perforatum, Staphysagria, Symphytum officinale, Ruta graveolens",
       how: "4 pellets of each under the tongue every 3 hours until they’re gone.",
       note: "The post-op sheet says 4 of each every 3 hours; the office’s checklist email says 3 of each every hour. Ask the office which one they want." },
+    "Grapefruit seed extract": { how: "3 tablets before breakfast and at dinner, 4 hours before Ultra Flora.", gap: "4", gapDir: "before", gapOf: "flora",
+      note: "Added by you, from Nov 11, after the antibiotic. It’s antimicrobial, so it’s kept apart from the probiotic." },
     "Ultra Flora": { brand: "Metagenics · probiotic", how: "4 hours after the antibiotic.", gap: "4", gapOf: "abx",
       note: "Added by you. Spacing it from the antibiotic keeps the antibiotic from killing the probiotic." },
     "Jaw exercises": { brand: "From the office’s post-op sheet", how: "3 times a day for the first week, starting on surgery day. Gently open and close to keep the jaw from tightening.",
@@ -562,13 +570,22 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       why: "Flushes out food caught around the surgery site and helps it heal." }
   };
 
+  // An added supplement's dose: a bare number takes its unit from the form chosen, so "3" with Tablets
+  // reads "3 tablets". Anything else is shown as typed.
+  const UNITS = { capsule: ["capsule", "capsules"], tablet: ["tablet", "tablets"], drops: ["drop", "drops"], pump: ["pump", "pumps"],
+    spoon: ["tsp", "tsp"], pellets: ["pellet", "pellets"] };
+  function doseText(c) {
+    const d = (c.sub || "").trim(), u = UNITS[c.icon || "capsule"];
+    if (!u || !/^\d+(\.\d+)?$|^\d+\/\d+$|^\d+\s*[–-]\s*\d+$/.test(d)) return d;
+    return d + " " + (d === "1" ? u[0] : u[1]);
+  }
   // Added supplements: one row per chosen time of day, on each day from its start to its end date.
   function customItemsFor(n) {
     const day = iso(dateOf(n)), out = [];
     Object.keys(EDITS.c).forEach((pk) => {
       const c = EDITS.c[pk];
       if ((c.from && day < c.from) || (c.to && day > c.to)) return;
-      (c.slots && c.slots.length ? c.slots : ["Anytime"]).forEach((sl, i) => out.push({ id: pk + "_" + i, slot: sl, name: c.name, sub: c.sub || "", icon: c.icon || "capsule", pill: c.pill || undefined }));
+      (c.slots && c.slots.length ? c.slots : ["Anytime"]).forEach((sl, i) => out.push({ id: pk + "_" + i, slot: sl, name: c.name, sub: doseText(c), icon: c.icon || "capsule", pill: c.pill || undefined }));
     });
     return out;
   }
@@ -585,6 +602,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     out.push.apply(out, ABX);
     if (n <= JAW_LAST_N) out.push.apply(out, JAW);
     if (n >= SALT_FIRST_N && n <= SALT_LAST_N) out.push.apply(out, SALT);
+    if (n >= GSE_FIRST_N) out.push.apply(out, GSE);
     return out;
   }
 
@@ -592,13 +610,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // Each supplement has a product key; its doses (items) and Supplements rows point at it.
   const NAME2P = { "D3K2": "d3k2", "Methyl-B12": "b12", "PhytoMulti": "multi", "Bio-D-Mulsion Forte": "biod", "Vitamin C": "vitc",
     "Magnesium glycinate": "mag", "Bone Builder Plus": "bone", "GABA": "gaba", "CBD": "cbd", "Relax Milieu": "relax", "Halcion": "halcion",
-    "Intenzyme Forte": "intz", "Ultra Flora": "flora", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
+    "Intenzyme Forte": "intz", "Ultra Flora": "flora", "Grapefruit seed extract": "gse", "Drainage Milieu": "drain", "Lymph 3 Chronic": "lymph", "Renew silver gel": "silver",
     "Homeopathic pellets": "pellets", "Jaw exercises": "jaw", "Salt water rinse": "salt",
     "Antibiotic": "abx", "Ibuprofen": "ibu" };
   const PNAME = {}, PDETAILS = {};
   Object.keys(NAME2P).forEach((nm) => { PNAME[NAME2P[nm]] = nm; PDETAILS[NAME2P[nm]] = DETAILS[nm] || {}; });
   const PROD = { vitc2: "vitc", vitc3: "vitc", mgam: "mag", mgdn: "mag", mgpm: "mag", jaw1: "jaw", jaw2: "jaw", jaw3: "jaw",
-    salt1: "salt", salt2: "salt", abx1: "abx", abx2: "abx", abx3: "abx" };
+    salt1: "salt", salt2: "salt", abx1: "abx", abx2: "abx", abx3: "abx", gse1: "gse", gse2: "gse" };
   const prodOf = (id) => { if (/^u_/.test(id)) return id.split("_").slice(0, 2).join("_"); const b = id.replace(/^[ns]-/, ""); return PROD[b] || b; };
   // What's been changed, over the defaults above: p = a supplement's fields, i = one dose's (by item id, on
   // every day it appears), s = one Supplements row's. A field that's present overrides, even when empty.
@@ -608,19 +626,19 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   let EDITS = (function () { try { return normEdits(JSON.parse(localStorage.getItem(LSE) || "{}")); } catch (e) { return normEdits(null); } })();
   let eref = null;
   // Added supplements that have since been built into the app: the added copy goes, and its checkmarks
-  // move to the built-in dose (u_mw3ca7gx8x7_0 -> flora). Runs at start and on each synced update.
-  const BUILT_IN = { u_mw3ca7gx8x7: "flora" };
+  // move to the built-in doses (u_mw3ca7gx8x7_0 -> flora; u_mwc6x37wnkz_0, _1 -> gse1, gse2, one per time of day). Runs at start and on each synced update.
+  const BUILT_IN = { u_mw3ca7gx8x7: { p: "flora", ids: ["flora"] }, u_mwc6x37wnkz: { p: "gse", ids: ["gse1", "gse2"] } };
   function migrateEdits() {
     let ch = false;
     Object.keys(BUILT_IN).forEach((pk) => { if (EDITS.c[pk]) { delete EDITS.c[pk]; ch = true; } });
-    Object.keys(EDITS.p).forEach((pk) => { const o = EDITS.p[pk]; if (o.gapOf && BUILT_IN[o.gapOf]) { o.gapOf = BUILT_IN[o.gapOf]; ch = true; } });
+    Object.keys(EDITS.p).forEach((pk) => { const o = EDITS.p[pk]; if (o.gapOf && BUILT_IN[o.gapOf]) { o.gapOf = BUILT_IN[o.gapOf].p; ch = true; } });
     if (ch) saveEdits();
   }
   function migrateState() {
     Object.keys(state).forEach((k) => {
-      const m = /^(u_[a-z0-9]+)_\d+(.*)$/.exec(k.slice(11));
-      if (!m || !BUILT_IN[m[1]]) return;
-      const nk = k.slice(0, 11) + BUILT_IN[m[1]] + m[2];
+      const m = /^(u_[a-z0-9]+)_(\d+)(.*)$/.exec(k.slice(11)), b = m && BUILT_IN[m[1]];
+      if (!b) return;
+      const nk = k.slice(0, 11) + (b.ids[+m[2]] || b.ids[0]) + m[3];
       if (!(nk in state)) state[nk] = state[k];
       delete state[k];
       stateChanged(nk); stateChanged(k);
@@ -632,7 +650,13 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   // gap, gapDir, gapOf: take this gap hours after (or before) another supplement, e.g. a probiotic 4 hours after the antibiotic.
   // stop, stopWhy: the first day a supplement is no longer taken ("done": ran out, or "stopped").
-  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf", "stop", "stopWhy"];
+  const PFIELDS = ["name", "brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapDir", "gapOf", "stop", "stopWhy", "icon"];
+  // A built-in supplement's own form (icon), from its first dose in the schedule.
+  function baseIcon(pk) {
+    const all = BEFORE.concat(ABX, NIGHT, SURGERY, RECOVERY, JAW, SALT, GSE, [intzDose(15)]);
+    const it = all.find((x) => prodOf(x.id) === pk);
+    return it ? it.icon : "capsule";
+  }
   const isCustom = (pk) => /^u_/.test(pk || "") && !!EDITS.c[pk];
   function prodInfo(pk) {
     if (isCustom(pk)) return Object.assign({}, EDITS.c[pk]);
@@ -644,7 +668,9 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const pk = prodOf(it.id);
     const info = prodInfo(pk);
     // every: hours between doses (set in Edit as "Repeat every"); 0 means no set times.
-    return Object.assign({}, it, EDITS.i[it.id] || {}, { p: pk, name: info.name, every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
+    // Form (icon) is set per supplement; a bare-number dose takes its unit from it ("3" -> "3 tablets").
+    const own = Object.assign({}, it, EDITS.i[it.id] || {}), icon = info.icon || own.icon;
+    return Object.assign(own, { p: pk, name: info.name, icon: icon, sub: doseText({ sub: own.sub, icon: icon }), every: Number(info.every) || 0, perDay: Number(info.perDay) || 0,
       gap: info.gapOf && info.gapOf !== pk ? Number(info.gap) || 0 : 0, gapDir: info.gapDir === "before" ? "before" : "after", gapOf: info.gapOf || "", base: it });
   }
   // Which dose this is (1 of 3) sits beside the name, not in the Dose text. It's counted per day for a
@@ -1044,7 +1070,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   function infoRow(g, icon, name, sub, pill) {
     const pk = NAME2P[name], rk = g + ":" + pk, base = { sub: sub, pill: pill };
     SUPP_BASE[rk] = { g: g, p: pk, sub: sub, pill: pill };
-    const row = Object.assign({ p: pk, rk: rk, icon: icon, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
+    const ic = prodInfo(pk).icon || icon;
+    const row = Object.assign({ p: pk, rk: rk, icon: ic, img: IMG[pk] ? pk : undefined, base: base }, base, EDITS.s[rk] || {}, { name: prodInfo(pk).name });
     const i = suppRows.push(row) - 1;
     const st = statusText(prodInfo(pk));
     return '<div class="item' + (st ? ' ended' : '') + '"><button type="button" class="open" data-s="' + i + '" aria-haspopup="dialog">' + tile(row.img, icon) +
@@ -1099,6 +1126,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
         infoRow("recovery", "cup", "Salt water rinse", "2–3 times a day, " + fShort(dateOf(SALT_FIRST_N)) + " – " + fShort(dateOf(SALT_LAST_N))),
         infoRow("recovery", "tablet", "Antibiotic", "3 times a day until finished", "As prescribed"),
         infoRow("recovery", "capsule", "Ultra Flora", "1 tablet a day, 4 hours after the antibiotic"),
+        infoRow("recovery", "tablet", "Grapefruit seed extract", "3 tablets before breakfast and at dinner, from " + fShort(dateOf(GSE_FIRST_N))),
         infoRow("recovery", "capsule", "D3K2", "8 pumps before breakfast, until gone"),
         infoRow("recovery", "pump", "Methyl-B12", "2 pumps before breakfast, until gone"),
         infoRow("recovery", "capsule", "PhytoMulti", "2 tablets with breakfast, until gone"),
@@ -1680,11 +1708,12 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       field("brand", "Brand", d.brand || "") + field("how", "How to take it", d.how || "", { long: true }) +
       field("label", "Label", d.label || "", { long: true }) + field("why", "Why", d.why || "", { long: true }) +
       field("note", "Note", d.note || "", { long: true }) +
+      field("icon", "Form", d.icon || baseIcon(row.p), { options: ICON_OPTS, hint: "Sets the icon and the dose unit" }) +
       field("every", "Repeat every", d.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
       field("perDay", "Times a day", d.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) + timingField(d, row.p) + '</div>' +
       '<p class="es-note">Changes here show everywhere ' + esc(d.name) + ' appears.</p>';
     const mine = dayCtx
-      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub) +
+      ? '<div class="es-sec">This dose</div><div class="es-card">' + field("sub", "Dose", row.sub, { hint: "A bare number takes its unit from Form" }) +
         field("slot", "When", row.slot, { options: SLOTS }) + field("pill", "Reminder", row.pill || "", { hint: "Shown in the list" }) + '</div>' +
         '<p class="es-note">Changes here apply to this dose on every day.</p>'
       : '<div class="es-sec">This row</div><div class="es-card">' + field("sub", "Schedule", row.sub) +
@@ -1765,7 +1794,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       if (n === "stop" || n === "stopWhy") val = st[n];
       if (n === "gap" || n === "gapOf") val = noGap ? "" : val;
       if (n === "gapDir") val = noGap || val === "after" ? "" : val;
-      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[n]);
+      setOverride(EDITS.p, pk, n, val, n === "name" ? PNAME[pk] : n === "icon" ? baseIcon(pk) : (PDETAILS[pk] || {})[n]);
     });
     if (editCtx.dayCtx) ["sub", "slot", "pill"].forEach((n) => setOverride(EDITS.i, row.id, n, v(n), base[n]));
     else ["sub", "pill"].forEach((n) => setOverride(EDITS.s, row.rk, n, v(n), base[n]));
@@ -1775,7 +1804,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   }
   /* ---------- Added supplements ---------- */
   const SLOT_CHOICES = ["Before breakfast", "Breakfast", "Lunch", "Dinner", "Bedtime", "Between meals", "Through the day", "Anytime"];
-  const ICON_OPTS = [["capsule", "Capsule"], ["tablet", "Tablet"], ["drops", "Dropper bottle"], ["pump", "Pump bottle"], ["spoon", "Spoon"], ["pellets", "Pellets"], ["swab", "Swab"], ["cup", "Cup"]];
+  const ICON_OPTS = [["capsule", "Capsules"], ["tablet", "Tablets"], ["drops", "Drops"], ["pump", "Pumps"], ["spoon", "Teaspoons"], ["pellets", "Pellets"], ["swab", "Swab"], ["cup", "Cup"]];
   const lastDay = () => iso(dateOf(DAYS - 1));
   function customHTML(pk) {
     const c = pk ? EDITS.c[pk] : { from: iso(dateOf(Math.min(Math.max(todayN, 0), DAYS - 1))), slots: [] };
@@ -1786,8 +1815,8 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const info = '<div class="es-sec">Supplement</div><div class="es-card">' + field("name", "Name", c.name || "", { required: true }) +
       field("brand", "Brand", c.brand || "") + field("how", "How to take it", c.how || "", { long: true }) +
       field("label", "Label", c.label || "", { long: true }) + field("why", "Why", c.why || "", { long: true }) +
-      field("note", "Note", c.note || "", { long: true }) + field("icon", "Icon", c.icon || "capsule", { options: ICON_OPTS }) + '</div>';
-    const sched = '<div class="es-sec">Schedule</div><div class="es-card">' + field("sub", "Dose", c.sub || "", { hint: "e.g. 1 capsule" }) + slots +
+      field("note", "Note", c.note || "", { long: true }) + field("icon", "Form", c.icon || "capsule", { options: ICON_OPTS, hint: "Sets the icon and the dose unit" }) + '</div>';
+    const sched = '<div class="es-sec">Schedule</div><div class="es-card">' + field("sub", "Dose", c.sub || "", { hint: "A number, like 2, or your own words" }) + slots +
       date("from", "Start", c.from) + date("to", "End", c.to, "Leave empty to keep going") +
       field("every", "Repeat every", c.every || "", { options: EVERY_OPTS, hint: "Shows when the next dose is due" }) +
       field("perDay", "Times a day", c.perDay || "", { options: PERDAY_OPTS, hint: "For doses logged again each time" }) +
@@ -1825,7 +1854,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     if (!push.hidden) closeDetail();
     refreshEdited(); refreshAll();
   }
-  const customSchedule = (c) => [c.sub, (c.slots || ["Anytime"]).join(", ")].filter(Boolean).join(" · ") +
+  const customSchedule = (c) => [doseText(c), (c.slots || ["Anytime"]).join(", ")].filter(Boolean).join(" · ") +
     (c.to ? ", " + fShort(new Date(c.from + "T12:00")) + " – " + fShort(new Date(c.to + "T12:00")) : c.from ? ", from " + fShort(new Date(c.from + "T12:00")) : "");
   function customRows() {
     return Object.keys(EDITS.c).map((pk) => {
@@ -1843,7 +1872,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     const row = editCtx.row, pk = row.p, base = row.base || {}, d = PDETAILS[pk] || {};
     const set = (n, val) => { const el = f.elements[n]; if (el) el.value = val == null ? "" : val; };
     set("name", PNAME[pk]); ["brand", "how", "label", "why", "note", "every", "perDay", "gap", "gapOf"].forEach((n) => set(n, d[n]));
-    set("gapDir", d.gapDir || "after"); set("stopWhy", d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "");
+    set("gapDir", d.gapDir || "after"); set("icon", baseIcon(pk)); set("stopWhy", d.stop ? (d.stopWhy === "done" ? "done" : "stopped") : "");
     const sd = f.querySelector("[data-stop-date]"); if (sd) sd.style.display = f.elements.stopWhy.value ? "" : "none";
     set("sub", base.sub); set("pill", base.pill); if (editCtx.dayCtx) set("slot", base.slot);
     markDirty();
@@ -1865,7 +1894,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
   // counts them and its page lists them, with a Copy for Claude button to build them into the app.
   const FIELD_LABEL = { name: "Name", brand: "Brand", how: "How to take it", label: "Label", why: "Why", note: "Note",
     sub: "Dose", slot: "When", pill: "Reminder", every: "Repeat every (hours)", perDay: "Times a day", added: "Added",
-    stop: "Stopped from", stopWhy: "Status (done = finished)",
+    icon: "Form", stop: "Stopped from", stopWhy: "Status (done = finished)",
     gap: "Timing (hours apart)", gapDir: "Timing (before or after)", gapOf: "Timing (apart from)" };
   const GROUP_LABEL = { before: "2 weeks before", night: "Night before", surgery: "Surgery day", recovery: "Recovery" };
   const BASE_ITEMS = {};
@@ -1884,7 +1913,7 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
       Object.keys(o).forEach((f) => { const d = orig ? orig[f] : undefined; if (o[f] === (d == null ? "" : d)) { delete o[f]; changed = true; } });
       if (!Object.keys(o).length) { delete bucket[k]; changed = true; }
     };
-    Object.keys(EDITS.p).forEach((pk) => prune(EDITS.p, pk, Object.assign({ name: PNAME[pk] }, PDETAILS[pk] || {})));
+    Object.keys(EDITS.p).forEach((pk) => prune(EDITS.p, pk, Object.assign({ name: PNAME[pk], icon: baseIcon(pk) }, PDETAILS[pk] || {})));
     Object.keys(EDITS.i).forEach((id) => { if (id !== "intz") prune(EDITS.i, id, BASE_ITEMS[id]); });
     Object.keys(EDITS.s).forEach((rk) => prune(EDITS.s, rk, SUPP_BASE[rk]));
     if (changed) saveEdits();
@@ -1896,15 +1925,15 @@ html.sheet-up .sheet-dim{opacity:.12;pointer-events:auto}
     // An added supplement is one change: everything about it, in one line.
     Object.keys(EDITS.c).forEach((pk) => {
       const c = EDITS.c[pk];
-      const parts = ["Dose: " + (c.sub || "(none)"), "When: " + (c.slots || ["Anytime"]).join(", "), "From " + (c.from || "start") + (c.to ? " to " + c.to : ", ongoing")];
-      [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Icon"]]
+      const parts = ["Dose: " + (doseText(c) || "(none)"), "When: " + (c.slots || ["Anytime"]).join(", "), "From " + (c.from || "start") + (c.to ? " to " + c.to : ", ongoing")];
+      [["brand", "Brand"], ["how", "How"], ["label", "Label"], ["why", "Why"], ["note", "Note"], ["every", "Every (hours)"], ["perDay", "Times a day"], ["pill", "Reminder"], ["icon", "Form"]]
         .forEach(([f, l]) => { if (c[f]) parts.push(l + ": " + c[f]); });
       if (timingText(c, pk)) parts.push("Timing: " + timingText(c, pk));
       if (statusText(c)) parts.push("Status: " + statusText(c));
       add(pk, "New supplement", "added", "", parts.join(" · "), "new " + pk);
     });
     Object.keys(EDITS.p).forEach((pk) => Object.keys(EDITS.p[pk]).forEach((f) =>
-      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
+      add(pk, "Supplement", f, f === "name" ? PNAME[pk] : f === "icon" ? baseIcon(pk) : (PDETAILS[pk] || {})[f], f === "gapOf" ? prodInfo(EDITS.p[pk][f]).name : EDITS.p[pk][f], "supplement " + pk)));
     Object.keys(EDITS.i).forEach((id) => Object.keys(EDITS.i[id]).forEach((f) =>
       add(prodOf(id), "This dose (" + itemWhere(id) + ")", f, (BASE_ITEMS[id] || {})[f], EDITS.i[id][f], "dose " + id)));
     Object.keys(EDITS.s).forEach((rk) => Object.keys(EDITS.s[rk]).forEach((f) => {
