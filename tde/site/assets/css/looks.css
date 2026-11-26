@@ -114,7 +114,7 @@ html[data-look="b"] .mbar { border-top-color: var(--border); }
 @media (max-width: 899px) {
   html[data-look="b"] .ev-media .thumb { aspect-ratio: 4 / 5; }
   html[data-look="b"] .ev-title { padding: 22px; }
-  html[data-look="b"] .hero-copy { padding: 44px 0 210px; }
+  html[data-look="b"] .hero-copy { padding: 44px 0 236px; }
 }
 
 html[data-look="b"] .thumb-pill, html[data-look="b"] .thumb-track { z-index: 1; }
@@ -382,7 +382,7 @@ html[data-look="booking"] .mbar { border-top-color: var(--border); }
   html[data-look="booking"] .hero-photo { top: auto; bottom: 24px; left: max(4vw, 20px); right: max(4vw, 20px); width: auto; height: 230px; background-size: cover; }
   html[data-look="booking"] .hero-copy { padding: 40px 0 290px; }
   html[data-look="showcase"] .hero-copy { padding: 48px 0 28px; }
-  html[data-look="athletic"] .hero-copy { padding: 56px 0 200px; }
+  html[data-look="athletic"] .hero-copy { padding: 56px 0 236px; }
 }
 
 /* =====================================================================
@@ -610,10 +610,9 @@ html[data-look="ride"] .book-total b { font: 700 30px/1 "DM Sans", sans-serif; }
   html[data-look="ledger"] .hero-copy { padding: 120px 0 280px; }
   html[data-look="ledger"] .hero h1 { color: #fff; }
   html[data-look="ledger"] .hero::before { clip-path: polygon(0 0, 100% 0, 100% 64%, 0 72%); }
-  html[data-look="ride"] .hero-photo { top: 0; height: 280px; bottom: auto; background-size: cover; }
+  html[data-look="ride"] .hero-photo { top: 0; height: 280px; bottom: auto; background-size: cover; -webkit-mask-image: linear-gradient(180deg, #000 50%, transparent); mask-image: linear-gradient(180deg, #000 50%, transparent); }
   html[data-look="ride"] .hero-copy { margin: 200px 0 24px; padding: 28px; }
-  html[data-look="console"] .hero-copy { padding: 48px 0 210px; }
-  html[data-look="console"] .hero-photo { width: 100%; }
+  html[data-look="console"] .hero-copy { padding: 48px 0 236px; }
 }
 
 /* =====================================================================
@@ -900,10 +899,17 @@ html[data-look="grid"] .book-opt { border-top-right-radius: 10px; margin-bottom:
 html[data-look="grid"] .book-opt:has(input:checked) { border-color: var(--fg); box-shadow: inset 4px 0 0 var(--accent); }
 html[data-look="grid"] .book-total b { font: 800 36px/1 "Saira", sans-serif; font-stretch: 125%; }
 @media (max-width: 899px) {
-  html[data-look="grid"] .hero-photo { width: 100%; }
+
   html[data-look="grid"] .hero h1 { font-size: clamp(32px, 9vw, 44px); }
   .is-tower .strat small { display: none; }
   .is-tower .strat span { padding: 0 8px; }
   .is-tower .strat b { font-size: 11.5px; letter-spacing: 0.04em; }
   html[data-look="grid"] .level-card.is-tower { padding: 20px 16px 18px; }
+}
+
+/* Phone hero for the looks whose desktop photo fades sideways: fade it in from the top instead, like the base. */
+@media (max-width: 899px) {
+  html:is([data-look="console"], [data-look="grid"]) .hero-photo { width: 100%; -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 62%); mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 62%); }
+  html[data-look="console"] .hero-photo::after { background: linear-gradient(180deg, rgba(0, 0, 0, 0.5), transparent 50%); }
+  html[data-look="grid"] .hero-photo::after { background: linear-gradient(180deg, rgba(21, 21, 30, 0.5), transparent 50%); }
 }

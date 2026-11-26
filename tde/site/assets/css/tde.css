@@ -110,14 +110,15 @@ body.fs .proto-exit { display: inline-flex; }
 .hero .lede { color: var(--on-dark-2); font-size: 19px; line-height: 1.5; max-width: 40ch; margin: 26px 0 34px; }
 .btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
 @media (max-width: 899px) {
+  /* Phone: the photo is a band anchored to the bottom that fills its box, so it fades in from nothing with no hard top edge. */
   .hero-photo {
-    top: 260px; left: 0; width: 100%;
-    background-position: 42% 100%; background-size: auto 74%;
-    -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.55) 26%, #000 50%);
-    mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.55) 26%, #000 50%);
+    top: auto; bottom: 0; left: 0; width: 100%; height: 340px;
+    background-position: 42% 72%; background-size: cover;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 62%);
+    mask-image: linear-gradient(180deg, transparent 0, rgba(0, 0, 0, 0.35) 22%, rgba(0, 0, 0, 0.85) 48%, #000 62%);
   }
-  .hero-photo::after { background: linear-gradient(180deg, rgba(22, 9, 53, 0.8) 0, rgba(22, 9, 53, 0.4) 40%, rgba(13, 8, 25, 0.2) 75%); }
-  .hero-copy { padding: 56px 0 200px; }
+  .hero-photo::after { background: linear-gradient(180deg, rgba(22, 9, 53, 0.55) 0, rgba(22, 9, 53, 0.15) 45%, rgba(13, 8, 25, 0.2) 100%); }
+  .hero-copy { padding: 56px 0 236px; }
   .hero .btn-outline { background: rgba(13, 8, 25, 0.55); }
 }
 
