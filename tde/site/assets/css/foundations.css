@@ -1,10 +1,10 @@
 /* Foundation options for the TDE design system (issue #29). Exploration only.
  * Each block restyles the same pages on a foundation from Open Design Agent Kit
- * (BMW M, Ferrari, Tesla) or Porsche's public design system. TDE's logo, purple, red,
+ * (BMW M, Ferrari) or Porsche's public design system. TDE's logo, purple, red,
  * run-group colors and "white below the hero" stay in every option.
- * <html data-ds="bmwm|ferrari|tesla|porsche" data-type="foundation|saira">
+ * <html data-ds="bmwm|ferrari|porsche" data-type="foundation|saira">
  * Free stand-ins for proprietary fonts: Barlow (BMW Type Next), Archivo (FerrariSans),
- * Figtree (Universal Sans), Inter Tight (Porsche Next).
+ * Inter Tight (Porsche Next).
  */
 
 @font-face { font-family: "Barlow"; src: url(../fonts/barlow-latin-300-normal.woff2) format("woff2"); font-weight: 300; font-display: swap; }
@@ -13,7 +13,6 @@
 @font-face { font-family: "Barlow"; src: url(../fonts/barlow-latin-600-normal.woff2) format("woff2"); font-weight: 600; font-display: swap; }
 @font-face { font-family: "Barlow"; src: url(../fonts/barlow-latin-700-normal.woff2) format("woff2"); font-weight: 700 900; font-display: swap; }
 @font-face { font-family: "Archivo"; src: url(../fonts/archivo.woff2) format("woff2-variations"), url(../fonts/archivo.woff2) format("woff2"); font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
-@font-face { font-family: "Figtree"; src: url(../fonts/figtree.woff2) format("woff2-variations"), url(../fonts/figtree.woff2) format("woff2"); font-weight: 300 900; font-display: swap; }
 @font-face { font-family: "Inter Tight"; src: url(../fonts/inter-tight.woff2) format("woff2-variations"), url(../fonts/inter-tight.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
 
 /* Shared: in foundation type, the hero's red phrase is color only (no fake italic). */
@@ -164,87 +163,6 @@ html[data-ds="ferrari"] .book-total b { font: 500 34px/1 "Archivo", sans-serif; 
   html[data-ds="ferrari"] .hero-copy { padding: 48px 0 160px; }
 }
 @media (max-width: 600px) { html[data-ds="ferrari"] .event-card { grid-template-columns: minmax(0, 1fr); gap: 16px; } }
-
-/* =====================================================================
- * 3 · Tesla — radical subtraction
- * No borders, shadows or patterns. Photography carries the emotion. Flat purple
- * chrome, quiet gray tiles, one accent (red) on main buttons only, 4px buttons,
- * 12px tiles, medium-weight Figtree with a low display ceiling.
- * ===================================================================== */
-html[data-ds="tesla"] {
-  --font-display: "Figtree", -apple-system, Arial, sans-serif;
-  --font-body: "Figtree", -apple-system, Arial, sans-serif;
-  --display-style: normal; --display-weight: 600; --display-stretch: 100%; --tracking-display: -0.4px;
-  --fg: #171a20; --fg-2: #393c41; --muted: #5c5e62; --muted-2: #4a4c51; --meta: #6b6d71;
-  --border: #ececec; --border-soft: #f0f0f0; --border-strong: #d0d1d2; --surface-tint: #f4f4f4; --surface-warm: #f4f4f4;
-  --radius-sm: 4px; --radius-md: 4px; --radius-lg: 12px; --radius-xl: 12px; --radius-pill: 4px;
-  --motion-base: 330ms;
-}
-html[data-ds="tesla"] .site-hdr { background: var(--brand-purple); background-image: none; border-bottom: 0; }
-html[data-ds="tesla"] .nav-links a { font-weight: 500; font-size: 14.5px; padding: 6px 12px; border-radius: 4px; }
-html[data-ds="tesla"] .nav-links { gap: 2px; }
-html[data-ds="tesla"] .nav-links a:hover { background: rgba(255, 255, 255, 0.1); text-decoration: none; }
-html[data-ds="tesla"] .ticker { background: var(--brand-purple); color: rgba(255, 255, 255, 0.7); font-size: 12px; padding: 0 0 12px; }
-html[data-ds="tesla"] .hero { background: var(--brand-purple); background-image: none; }
-html[data-ds="tesla"] .hero-photo { width: 72%; }
-html[data-ds="tesla"] .hero-copy { padding: 120px 0 132px; max-width: 520px; }
-html[data-ds="tesla"] .hero h1 { font-size: clamp(36px, 4.4vw, 52px); line-height: 1.06; font-weight: 600; }
-html[data-ds="tesla"] .hero .lede { font-size: 17px; color: rgba(255, 255, 255, 0.82); }
-html[data-ds="tesla"] .btn { border-radius: 4px; font-weight: 500; font-size: 14.5px; min-height: 44px; min-width: 190px; padding: 0 22px; }
-html[data-ds="tesla"] .btn-sm { min-width: 150px; }
-html[data-ds="tesla"] .btn-outline { background: rgba(255, 255, 255, 0.92); color: var(--fg); box-shadow: none; }
-html[data-ds="tesla"] .btn-quiet { background: var(--surface-tint); color: var(--fg-2); box-shadow: none; }
-html[data-ds="tesla"] .event-card .btn-quiet { background: #fff; }
-html[data-ds="tesla"] .section { border-top: 0; padding: 72px 0; }
-html[data-ds="tesla"] .section h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 600; }
-html[data-ds="tesla"] .event-list { gap: 20px; }
-html[data-ds="tesla"] .event-card { border: 0; background: var(--surface-tint); border-radius: 12px; }
-html[data-ds="tesla"] .event-card .body { padding: 22px 26px; }
-html[data-ds="tesla"] .event-when { color: var(--fg-2); font-weight: 500; }
-html[data-ds="tesla"] .event-name { font-weight: 600; font-size: 21px; }
-html[data-ds="tesla"] .thumb-pill { border-radius: 4px; font-weight: 600; box-shadow: none; }
-html[data-ds="tesla"] .eb { border: 0; background: #fff; }
-html[data-ds="tesla"] .event-card .eb { background: #fff; }
-html[data-ds="tesla"] .newband { border-radius: 12px; background: var(--brand-purple); padding: 40px; }
-html[data-ds="tesla"] .level-card { border: 0; background: var(--surface-tint); border-radius: 12px; padding: 26px; }
-html[data-ds="tesla"] .level-list { border-top-color: #e4e4e4; }
-html[data-ds="tesla"] .level-list li { border-bottom-color: #e4e4e4; }
-html[data-ds="tesla"] .steps { border-bottom-color: #c9c9cc; }
-html[data-ds="tesla"] .step-block { border-color: #c9c9cc; background: repeating-linear-gradient(135deg, #e2e2e4 0 2px, transparent 2px 9px); }
-html[data-ds="tesla"] .site-ftr { border-top: 0; text-align: center; }
-html[data-ds="tesla"] .site-ftr .wrap { justify-content: center; }
-html[data-ds="tesla"] .site-ftr a { text-decoration: none; }
-html[data-ds="tesla"] .facts, html[data-ds="tesla"] .facts li, html[data-ds="tesla"] .kv, html[data-ds="tesla"] .kv div, html[data-ds="tesla"] .sched li, html[data-ds="tesla"] .credit td, html[data-ds="tesla"] .toc, html[data-ds="tesla"] .ev-questions { border-color: transparent; }
-html[data-ds="tesla"] .facts li { padding: 10px 0; }
-html[data-ds="tesla"] .facts svg { color: var(--fg); }
-html[data-ds="tesla"] .kv div:nth-child(odd), html[data-ds="tesla"] .sched li:nth-child(odd), html[data-ds="tesla"] .credit tbody tr:nth-child(odd) td { background: var(--surface-tint); }
-html[data-ds="tesla"] .kv div, html[data-ds="tesla"] .sched li { padding-left: 12px; padding-right: 12px; border-radius: 4px; }
-html[data-ds="tesla"] .credit td { padding-left: 12px; padding-right: 12px; }
-html[data-ds="tesla"] .credit th { border-bottom: 0; padding: 8px 12px; }
-html[data-ds="tesla"] .ev-sec { border-top: 0; margin-top: 56px; padding-top: 0; }
-html[data-ds="tesla"] .toc { background: var(--surface-tint); border-radius: 4px; padding: 4px; gap: 2px; }
-html[data-ds="tesla"] .toc a { font-weight: 500; border-radius: 4px; }
-html[data-ds="tesla"] .toc a:hover { background: #fff; }
-html[data-ds="tesla"] .event-main h1 { font-weight: 600; }
-html[data-ds="tesla"] .event-main h2 { font-weight: 600; font-size: 26px; }
-html[data-ds="tesla"] .sched time, html[data-ds="tesla"] .crumb a, html[data-ds="tesla"] .facts a, html[data-ds="tesla"] .venue a, html[data-ds="tesla"] .ev-sec-hd a { color: var(--fg); }
-html[data-ds="tesla"] .rg li, html[data-ds="tesla"] .disclose { border: 0; background: var(--surface-tint); border-radius: 12px; }
-html[data-ds="tesla"] .book { box-shadow: none; border: 0; background: var(--surface-tint); border-radius: 12px; padding: 22px; }
-html[data-ds="tesla"] .book-tabs { background: #e8e8e8; border-radius: 4px; }
-html[data-ds="tesla"] .book-tabs button { border-radius: 4px; font-weight: 500; }
-html[data-ds="tesla"] .book-tabs button[aria-pressed="true"] { box-shadow: none; }
-html[data-ds="tesla"] .book-opt { border: 0; border-radius: 4px; box-shadow: none; }
-html[data-ds="tesla"] .book-opt:has(input:checked) { box-shadow: inset 0 0 0 2px var(--fg); }
-html[data-ds="tesla"] .book-opt input { accent-color: var(--fg); }
-html[data-ds="tesla"] .book-note { background: #fff; border-radius: 4px; }
-html[data-ds="tesla"] .book-field input { border: 0; border-radius: 4px; }
-html[data-ds="tesla"] .book-opt .tip { background: var(--surface-tint); border-radius: 4px; }
-html[data-ds="tesla"] .book-total { border-top-color: #e2e2e2; }
-html[data-ds="tesla"] .book-total b { font: 600 30px/1 "Figtree", sans-serif; }
-@media (max-width: 899px) {
-  html[data-ds="tesla"] .hero-photo { width: 100%; }
-  html[data-ds="tesla"] .hero-copy { padding: 44px 0 170px; }
-}
 
 /* =====================================================================
  * 4 · Porsche-inspired — precise, quiet luxury

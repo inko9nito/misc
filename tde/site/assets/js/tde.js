@@ -336,7 +336,7 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
     const states = document.body.dataset.event
       ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";
-    const foundations = `<b style="margin-left:12px">Foundation</b>${[["", "Current"], ["bmwm", "BMW M"], ["ferrari", "Ferrari"], ["tesla", "Tesla"], ["porsche", "Porsche"]].map(([v, l]) => link(l, "ds", v)).join("")}`;
+    const foundations = `<b style="margin-left:12px">Foundation</b>${[["", "Current"], ["bmwm", "BMW M"], ["ferrari", "Ferrari"], ["porsche", "Porsche"]].map(([v, l]) => link(l, "ds", v)).join("")}`;
     const types = cur("ds") ? `<b style="margin-left:12px">Headings</b>${link("Foundation", "type", "foundation")}${link("Saira", "type", "saira")}` : "";
     const bar = document.createElement("nav");
     bar.className = "proto-bar";

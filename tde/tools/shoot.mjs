@@ -1,6 +1,6 @@
 // Full-page screenshots of the TDE site for review on a phone.
 // Usage: node tde/tools/shoot.mjs [outDir] [--today=2026-11-26] [--only=index,event-dec-12]
-//        [--ds=bmwm|ferrari|tesla|porsche] [--type=foundation|saira] [--devices=phone,desktop]
+//        [--ds=bmwm|ferrari|porsche] [--type=foundation|saira] [--devices=phone,desktop]
 // Needs Playwright with Chromium (preinstalled in Claude Code cloud sessions).
 // Phone: 390×844 at 2×, split into parts so no image is taller than 8000px.
 // Desktop: 1280 wide at 1×. The prototype bar and the phone booking bar are hidden.
