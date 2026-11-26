@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "kind": "own",
+  "name": "The Drivers Edge",
+  "sources": {
+    "urls": [
+      "https://thedriversedge.net"
+    ],
+    "extractedAt": "2026-11-26",
+    "bundleDir": "tde/site"
+  },
+  "descriptor": {
+    "moods": [
+      "bold",
+      "motorsport",
+      "confident",
+      "approachable"
+    ],
+    "industries": [
+      "motorsport",
+      "driving school",
+      "events",
+      "education"
+    ],
+    "surfaces": [
+      "marketing site",
+      "event page",
+      "booking"
+    ]
+  },
+  "marks": [],
+  "fonts": [
+    {
+      "family": "Saira",
+      "weights": [
+        800,
+        850
+      ],
+      "source": "google",
+      "stylesheet": "https://fonts.google.com/specimen/Saira",
+      "licence": "free"
+    },
+    {
+      "family": "Inter",
+      "weights": [
+        400,
+        500,
+        600,
+        700,
+        800
+      ],
+      "source": "google",
+      "stylesheet": "https://fonts.google.com/specimen/Inter",
+      "licence": "free"
+    }
+  ],
+  "components": {
+    "button.primary": {
+      "height": 48,
+      "paddingX": 22,
+      "fontWeight": 700,
+      "fontSize": 15,
+      "textTransform": "none",
+      "borderWidth": 0,
+      "radius": 10,
+      "background": "#d11f1f",
+      "color": "#ffffff"
+    },
+    "button.secondary": {
+      "height": 44,
+      "paddingX": 18,
+      "fontWeight": 700,
+      "fontSize": 15,
+      "textTransform": "none",
+      "borderWidth": 1.5,
+      "borderColor": "#cfc8e2",
+      "radius": 10,
+      "background": "#ffffff",
+      "color": "#160935"
+    },
+    "input": {
+      "height": 46,
+      "paddingX": 12,
+      "fontSize": 16,
+      "borderWidth": 1.5,
+      "borderColor": "#d9d3ea",
+      "radius": 10,
+      "background": "#ffffff",
+      "focus": "#24104e"
+    },
+    "card": {
+      "borderWidth": 1,
+      "borderColor": "#e6e0f0",
+      "radius": 16,
+      "background": "#ffffff"
+    },
+    "nav": {
+      "background": "#24104e",
+      "color": "#ffffff",
+      "sticky": false
+    },
+    "badge": {
+      "fontWeight": 700,
+      "fontSize": 12.5,
+      "radius": 999,
+      "paddingY": 6,
+      "paddingX": 11
+    }
+  },
+  "voice": {
+    "headingCase": "sentence",
+    "person": "second",
+    "exclamations": false,
+    "emoji": false
+  },
+  "imagery": {
+    "hero": "photo",
+    "imageRadius": 16,
+    "aspectRatios": [
+      "900/516"
+    ],
+    "icons": {
+      "set": "custom",
+      "style": "outline",
+      "strokeWidth": 1.8
+    }
+  },
+  "motion": {
+    "reducedMotion": true
+  }
+}

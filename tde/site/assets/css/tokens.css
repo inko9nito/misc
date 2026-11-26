@@ -1,0 +1,132 @@
+/* The Drivers Edge (TDE) design tokens.
+ *
+ * Source of truth for the TDE design system. The site loads this file, and
+ * tde/tools/sync-design-system.sh copies it to .open-design/design-systems/tde/tokens.css
+ * so Open Design Agent Kit generates with the same values.
+ *
+ * One :root block only (Open Design's token contract reads nothing else).
+ * Contract tokens come first; TDE-specific tokens follow under "TDE".
+ */
+
+:root {
+  /* Identity (Open Design contract) */
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-warm: #faf8fd;
+  --surface-tint: #f5f2fa;
+  --fg: #160935;
+  --fg-2: #2e2645;
+  --muted: #5d5868;
+  --muted-2: #4b4462;
+  --meta: #76708a;
+  --border: #e6e0f0;
+  --border-soft: #eee9f5;
+  --border-strong: #cfc8e2;
+  --accent: #d11f1f;
+  --accent-on: #ffffff;
+  --accent-hover: #b01818;
+  --accent-active: #9b1515;
+  --success: #1d6b38;
+  --warn: #9a6b00;
+  --danger: #b01818;
+
+  /* Type */
+  --font-display: "Saira", "Arial Black", Impact, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --text-xs: 12.5px;
+  --text-sm: 14.5px;
+  --text-base: 16px;
+  --text-lg: 17.5px;
+  --text-xl: 21px;
+  --text-2xl: 27px;
+  --text-3xl: 38px;
+  --text-4xl: 64px;
+  --leading-body: 1.55;
+  --leading-read: 1.65;
+  --leading-tight: 1.05;
+  --tracking-display: -0.5px;
+
+  /* Space */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --section-y-desktop: 64px;
+  --section-y-tablet: 52px;
+  --section-y-phone: 44px;
+  --container-max: 1240px;
+  --container-gutter-desktop: 48px;
+  --container-gutter-tablet: 28px;
+  --container-gutter-phone: 18px;
+
+  /* Shape and depth */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-card: 0 16px 36px -30px rgba(36, 16, 78, 0.6);
+  --elev-raised: 0 18px 40px -30px rgba(36, 16, 78, 0.55);
+  --focus-ring: 0 0 0 3px #ff3b3b;
+
+  /* Motion */
+  --motion-fast: 150ms;
+  --motion-base: 240ms;
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --motion-bounce: 0;
+
+  /* TDE · brand */
+  --brand-purple: #24104e;
+  --brand-purple-deep: #160935;
+  --brand-purple-night: #0f0a1e;
+  --brand-red: #d11f1f;
+  --brand-red-on-dark: #ff3b3b;
+  --brand-red-soft-on-dark: #ff8a8a;
+  --on-dark: #ffffff;
+  --on-dark-muted: #d9d3ea;
+  --on-dark-quiet: #cfc8e2;
+  --carbon: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.045) 0 5px, transparent 5px 10px), repeating-linear-gradient(-45deg, rgba(0, 0, 0, 0.22) 0 5px, transparent 5px 10px);
+  --photo-floor: #05030b;
+  --photo-vignette: radial-gradient(85% 120% at 100% 100%, #05030b 30%, rgba(5, 3, 11, 0.75) 52%, rgba(5, 3, 11, 0) 78%), linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6));
+
+  /* TDE · display type settings (Saira) */
+  --display-style: italic;
+  --display-weight: 850;
+  --display-stretch: 112%;
+  --wordmark-stretch: 125%;
+
+  /* TDE · early-bird (one style everywhere) */
+  --earlybird-bg: #fff6d6;
+  --earlybird-border: #f3dc8a;
+  --earlybird-fg: #4d3600;
+  --earlybird-icon: #9a6b00;
+
+  /* TDE · status badges */
+  --soon-bg: #ece6fb;
+  --soon-fg: #2a1660;
+  --soon-icon: #5b3fc0;
+  --sold-bg: #e9e6ee;
+  --sold-fg: #3b3546;
+  --sold-pill: #17131f;
+  --required-bg: #fde4e4;
+  --required-fg: #9b1515;
+
+  /* TDE · run groups (brighter than the brand purple on purpose) */
+  --group-purple: #8b5cf6;
+  --group-orange: #f97316;
+  --group-pink: #ec4899;
+  --group-green: #22a35a;
+  --group-blue: #3b82f6;
+  --group-yellow: #eab308;
+  --group-red: #dc2626;
+  --group-on-yellow: #1b1530;
+  --group-on-color: #ffffff;
+}

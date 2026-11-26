@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Drivers Edge redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Saira:ital,wdth,wght@1,125,500;1,125,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: a principal designer's case study — direct, evidence first, then the work.
+   IDEA: a track-day paddock sheet: grid slots, run groups, timing board.
+   PICTURE: the two redesigned pages as working mockups; the registration card really works.
+   COLOUR and TYPE: TDE brand — deep purple carbon #24104e, red #d11f1f, white; Saira wide italic for the wordmark, Barlow Condensed + Inter.
+   LAYOUT: verdict, audit table, users, then the two mockups in browser frames, then how we'd prove it. */
+:root{color-scheme:light dark;--bg:light-dark(#f3f1ec,#111215);--ink:light-dark(#17181c,#ecebe7);--mute:light-dark(#55565c,#a9a9ae);--line:light-dark(#d9d6cf,#2c2e33);--card:light-dark(#fff,#1a1c20);--acc:light-dark(#d11f1f,#ff5a5a);--asph:#15171b;--sig:#ff5a5a}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3,.cond{font-family:"Barlow Condensed",Inter,sans-serif;font-weight:700;line-height:1.05;text-wrap:balance;margin:0}
+h1{font-size:clamp(36px,5vw,52px)}h2{font-size:clamp(28px,3.4vw,38px);margin-bottom:12px}h3{font-size:22px}
+p{margin:0 0 12px;max-width:68ch}.mute{color:var(--mute)}.small{font-size:13px}
+.band{padding:clamp(28px,4vw,64px) max(5vw,16px)}.wrap{max-width:1240px;margin:0 auto}
+.scroll{overflow-x:auto}.scroll a{flex:none}html{scroll-padding-top:72px}
+nav.toc{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);display:flex;gap:4px;padding:6px max(5vw,16px)}
+nav.toc a{color:var(--ink);text-decoration:none;padding:10px 12px;border-radius:8px;font-weight:500;font-size:15px;white-space:nowrap}nav.toc a:hover{background:var(--line)}
+.hero{background:var(--asph);color:#f3f1ec;position:relative;overflow:hidden}
+.hero .verdict{font-size:19px;max-width:60ch;color:#d6d4cf;margin-top:16px}
+.stripe{position:absolute;right:-60px;top:0;bottom:0;width:340px;background:repeating-linear-gradient(90deg,#f3f1ec 0 28px,#15171b 28px 56px);opacity:.08;transform:skewX(-18deg)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:28px}
+.kpi{border-top:3px solid var(--sig);padding-top:10px}.kpi b{font:700 34px/1 "Barlow Condensed",sans-serif;display:block}.kpi span{color:#bdbbb6;font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card)}
+th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}th{font-size:13px;color:var(--mute);font-weight:600}
+.sev{display:inline-block;font-size:12px;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.s1{background:#fde4e4;color:#9b1515}.s2{background:#fbefc9;color:#6b4a00}.s3{background:#e4e6ea;color:#33363d}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px}
+.card h3{margin-bottom:6px}.card ul{margin:8px 0 0;padding-left:18px}.card li{margin-bottom:4px}
+.browser{border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 20px 50px -30px rgba(0,0,0,.45);background:#fff;color:#17181c;margin-top:20px}
+.bar{background:#e7e5e0;padding:10px 14px;display:flex;gap:8px;align-items:center;font-size:13px;color:#55565c}
+.bar i{width:11px;height:11px;border-radius:50%;background:#c9c6bf;display:inline-block}.bar span{background:#fff;border-radius:6px;padding:3px 10px;margin-left:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.site-h{display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;padding:12px 28px;background-color:#24104e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 5px,transparent 5px 10px),repeating-linear-gradient(-45deg,rgba(0,0,0,.22) 0 5px,transparent 5px 10px);color:#f3f1ec;border-bottom:3px solid #d11f1f}
+.logo{display:flex;flex-direction:column;gap:3px;line-height:1}.logo .wm{font:italic 800 26px/1 Saira,"Barlow Condensed",sans-serif;font-stretch:125%;letter-spacing:-.5px;color:#fff;white-space:nowrap}.logo .wm em{font-style:italic;color:#ff3b3b}.logo .tg{font:italic 500 8.5px/1 Saira,sans-serif;font-stretch:125%;letter-spacing:.2px;color:#d9d3ea;white-space:nowrap}.logo .tg b{font-weight:800;color:#fff}
+.site-h .links{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:15px;flex:1}.site-h .links a{color:#e3e1dc;text-decoration:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;border-radius:10px;font-weight:600;font-size:15px;border:0;cursor:pointer;text-decoration:none;font-family:inherit}
+.btn.p{background:#d11f1f;color:#fff}.btn.p:hover{background:#b01818}.btn.g{background:transparent;color:inherit;box-shadow:inset 0 0 0 1.5px currentColor}
+.btn:focus-visible,input:focus-visible,label.opt:focus-within{outline:3px solid #e1251b;outline-offset:2px}
+.m-hero{background-color:#24104e;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.045) 0 5px,transparent 5px 10px),repeating-linear-gradient(-45deg,rgba(0,0,0,.22) 0 5px,transparent 5px 10px);color:#f3f1ec;padding:56px 28px 64px;display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:36px;align-items:center}
+.m-hero h2{font-size:clamp(34px,4.6vw,56px);margin:0 0 14px}.m-hero p{color:#cfcdc8;font-size:17px}
+.track{width:100%;height:auto;display:block}
+.m-sec{padding:40px 28px}.m-sec h3{font-size:30px;margin-bottom:18px}
+.ev{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:20px;align-items:center;border:1px solid #dedbd4;border-radius:14px;padding:18px 20px;margin-bottom:12px}
+.date{background:#24104e;color:#fff;border-radius:10px;text-align:center;padding:10px 4px}.date b{font:700 34px/1 "Barlow Condensed",sans-serif;display:block}.date span{font-size:12px;font-weight:600}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.tag{font-size:13px;background:#efede8;border-radius:6px;padding:3px 8px;color:#33363d}.tag.o{background:#fde4e4;color:#9b1515;font-weight:600}
+.price{text-align:right;white-space:nowrap}.price b{font:700 28px/1 "Barlow Condensed",sans-serif;display:block;margin-bottom:8px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;counter-reset:s}
+.step{background:#f6f4f0;border-radius:12px;padding:18px}.step b{display:block;font-size:17px;margin-bottom:4px}
+.ladder{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin-top:8px}.ladder div{padding:12px;color:#fff;font-weight:600;font-size:14px}.ladder small{display:block;font-weight:400;opacity:.92}
+.foot{background:#1a0b3a;color:#cfc8e2;padding:24px 28px;font-size:14px;display:flex;flex-wrap:wrap;gap:8px 22px}.foot a{color:#e3e1dc}
+.crumb{font-size:13px;color:#55565c;padding:14px 28px 0}.crumb a{color:#55565c}
+.e-head{padding:10px 28px 24px;border-bottom:1px solid #e4e1da}.e-head h2{font-size:clamp(32px,4vw,48px);margin:6px 0 10px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 26px;font-size:15px;color:#33363d}.facts b{color:#17181c}
+.e-body{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:32px;padding:28px}
+.e-body h3{font-size:26px;margin:28px 0 12px}.e-body h3:first-child{margin-top:0}
+.sched{list-style:none;margin:0;padding:0}.sched li{display:grid;grid-template-columns:84px minmax(0,1fr);gap:14px;padding:10px 0;border-bottom:1px solid #ecE9e3}.sched time{font:700 20px/1.2 "Barlow Condensed",sans-serif;white-space:nowrap}
+.check{list-style:none;padding:0;margin:0}.check li{padding:8px 0 8px 30px;position:relative}.check li::before{content:"";position:absolute;left:4px;top:13px;width:14px;height:8px;border-left:2.5px solid #d11f1f;border-bottom:2.5px solid #d11f1f;transform:rotate(-45deg)}
+details{border-bottom:1px solid #e4e1da;padding:12px 0}summary{cursor:pointer;font-weight:600;min-height:28px}
+.reg{position:sticky;top:64px;align-self:start;border:1px solid #dedbd4;border-radius:16px;padding:20px;background:#fff;box-shadow:0 16px 40px -28px rgba(0,0,0,.5)}
+.reg h4{margin:16px 0 8px;font-size:14px;font-weight:700}.reg h4:first-of-type{margin-top:0}
+.eb{background:#fde4e4;color:#9b1515;border-radius:10px;padding:10px 12px;font-size:14px;font-weight:600;margin-bottom:14px}
+label.opt{display:grid;grid-template-columns:22px minmax(0,1fr) auto;column-gap:10px;row-gap:3px;align-items:start;border:1.5px solid #dedbd4;border-radius:12px;padding:12px 14px;margin-bottom:8px;cursor:pointer}
+label.opt:has(input:checked){border-color:#17181c;background:#f6f4f0;box-shadow:inset 0 0 0 1px #17181c}
+label.opt>span:not(.pr){display:contents}label.opt>input{grid-column:1;grid-row:1;width:18px;height:18px;margin:2px 0 0;accent-color:#17181c}label.opt b{grid-column:2;grid-row:1;font-size:15px;line-height:1.35}label.opt .pr{grid-column:3;grid-row:1;font-weight:700;white-space:nowrap;line-height:1.35}label.opt small,label.opt .also,label.opt .eqb{grid-column:2/-1;display:block;font-size:13px;line-height:1.45;color:#55565c}
+.field{display:block;margin-bottom:10px}.field span{display:block;font-size:13px;font-weight:600;margin-bottom:4px}
+.field input[type=text]{width:100%;font:16px Inter,sans-serif;padding:10px 12px;border:1.5px solid #cfccc5;border-radius:10px;min-height:44px}
+.row{display:flex;gap:8px}.row input{flex:1}
+.total{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #e4e1da;margin-top:12px;padding-top:12px}.total b{font:700 32px/1 "Barlow Condensed",sans-serif}
+.note{font-size:13px;color:#55565c;margin-top:10px}
+.browser{container-type:inline-size;margin-top:0}.reg{position:static}
+@container (max-width:900px){.m-hero,.e-body{grid-template-columns:minmax(0,1fr)}}
+@container (max-width:600px){.ev{grid-template-columns:72px minmax(0,1fr)}.price{grid-column:1/-1;text-align:left;display:flex;justify-content:space-between;align-items:center}.price b{margin:0}.ladder{grid-template-columns:repeat(2,minmax(0,1fr))}.m-sec,.m-hero,.e-body{padding-left:18px;padding-right:18px}.site-h,.crumb,.e-head,.foot{padding-left:18px;padding-right:18px}.m-hero{padding-top:36px;padding-bottom:40px}}
+.menu{display:none;align-items:center;justify-content:center;width:44px;height:44px;border:0;border-radius:10px;background:transparent;color:#f3f1ec;cursor:pointer;margin-left:auto}
+@container (max-width:760px){.site-h{flex-wrap:wrap}.site-h .links{display:none;order:3;flex-basis:100%;flex-direction:column;gap:0;border-top:1px solid #2c2f36;margin-top:6px}.site-h .links a{padding:12px 0;font-size:16px}.site-h.open .links{display:flex}.site-h .signin{display:none}.menu{display:inline-flex}}
+#ov{position:fixed;inset:0;z-index:50;background:#fff;display:flex;flex-direction:column}#ov[hidden]{display:none}
+.ovbar{display:flex;align-items:center;gap:8px;padding:8px 12px;background:#15171b;color:#f3f1ec;flex:none}.ovbar b{flex:1;font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ovbar .btn{min-height:40px;padding:0 14px;font-size:14px}.ovbar .btn.g{color:#f3f1ec}
+.ovbody{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}.ovbody .frame{width:100%!important;transform:none!important}.ovbody .browser{border:0!important;border-radius:0!important;box-shadow:none}.ovbody .bar{display:none}
+.gsw{width:14px;height:14px;border-radius:4px;display:inline-block;vertical-align:-2px;margin-right:6px}
+.kind{display:inline-block;font-size:12px;font-weight:600;border-radius:99px;padding:1px 8px;margin-top:4px;background:#efede8;color:#33363d}.kind.solo{background:#1f2937;color:#fff}
+.assign{background:#f6f4f0;border-radius:10px;padding:10px 12px;font-size:14px;margin:4px 0 10px}.assign b{white-space:nowrap}
+.tdec{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:#33363d;margin:6px 0 2px}.tdec span{white-space:nowrap}.tdec .gsw{width:10px;height:10px;margin-right:4px;vertical-align:0}
+.seg2{display:grid;grid-template-columns:1fr 1fr;background:#efede8;border-radius:12px;padding:4px;margin-bottom:10px}
+.seg2 button{font:600 15px Inter,sans-serif;min-height:44px;border:0;border-radius:9px;background:transparent;color:#33363d;cursor:pointer}
+.seg2 button[aria-pressed=true]{background:#fff;color:#17181c;box-shadow:0 1px 3px rgba(0,0,0,.2)}.seg2 button:focus-visible{outline:3px solid #e1251b}
+label.opt.ret{align-items:center;padding:10px 12px;margin-bottom:6px}label.opt.ret b{font-size:15px}
+.dchip{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:#55565c;margin-right:8px}.dchip .gsw{width:10px;height:10px;margin-right:4px}
+.sys{margin-top:12px}.sys .cond{font-size:18px;margin:0 0 2px}
+[hidden]{display:none!important}
+.also{margin-top:4px;padding-top:6px;border-top:1px dashed #dedbd4}.dt{white-space:nowrap}.dt .gsw{width:9px;height:9px;margin:0 4px 0 0;vertical-align:0}
+.eqt{font:600 12.5px Inter,sans-serif;color:#33363d;background:none;border:0;padding:4px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}.eqt:focus-visible{outline:3px solid #e1251b}
+.variants{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:22px;margin-top:18px;align-items:start}
+.vcol h3{font-size:24px;margin-bottom:4px}.vcol>p{font-size:14px;color:var(--mute);margin-bottom:12px}
+.mini{background:#fff;color:#17181c;border:1px solid #dedbd4;border-radius:16px;padding:16px;box-shadow:0 14px 34px -26px rgba(0,0,0,.5)}
+.mini .assign{margin-top:8px}.pc{font-size:14px;margin-top:12px}.pc b{display:block}
+.map{background:#f6f4f0;border-radius:10px;padding:4px 12px;margin-bottom:10px;border:0}.map summary{font-size:14px;padding:8px 0;min-height:auto}
+.map table{background:transparent;font-size:13px;margin:4px 0 8px}.map td{padding:5px 0;border-color:#e4e1da}
+.banner{background:#eef6f0;border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:10px;color:#1f4d33}.banner.g{background:#f6f4f0;color:#33363d}
+.sugg{font-size:11px;font-weight:700;background:#1f4d33;color:#fff;border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:2px}
+.prev{display:flex;align-items:center;gap:8px;font-size:13px;color:#55565c;margin-bottom:10px}.prev .seg2{flex:1;margin:0}.prev .seg2 button{min-height:36px;font-size:13px}
+.ib{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;margin:-6px 0 -6px 2px;vertical-align:middle;border:0;border-radius:50%;background:none;color:#5b5c61;cursor:pointer}.ib:hover,.ib[aria-expanded=true]{color:#17181c;background:#ebe8e2}.ib:focus-visible{outline:3px solid #e1251b}
+label.opt .tipx{grid-column:2/-1;display:block;font-size:13px;line-height:1.45;color:#33363d;background:#fff;border:1px solid #dedbd4;border-radius:8px;padding:6px 10px;margin-top:4px}
+.ctl{display:flex;flex-wrap:wrap;gap:10px;margin:8px 0 22px}
+.seg{display:inline-flex;background:var(--line);border-radius:12px;padding:3px}
+.seg button{font:600 14px Inter,sans-serif;min-height:40px;padding:0 14px;border:0;border-radius:9px;background:transparent;color:var(--ink);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.18)}.seg button:focus-visible{outline:3px solid #e1251b}
+.stages{display:grid;gap:28px;align-items:start}.stages.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr))}
+.col h3{font-size:22px;margin-bottom:4px}.col>p{margin-bottom:12px}
+.stage{position:relative;overflow:hidden}.stage.actual{overflow-x:auto}
+.frame{transform-origin:0 0}.frame.phone .browser{border-radius:34px;border:10px solid #15171b}.frame.phone .bar{display:none}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--mute);font-weight:600}.stack td:empty{display:none}
+}
+@media(prefers-reduced-motion:no-preference){.total b{transition:color .3s}.total b.flash{color:#d11f1f}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head>
+<body>
+
+<header class="band hero"><div class="stripe" aria-hidden="true"></div><div class="wrap" style="position:relative">
+<p class="small" style="color:#ff9a6b;font-weight:600">UX redesign · thedriversedge.net · homepage + event registration</p>
+<h1>The content is good. The site makes drivers dig for it.</h1>
+<p class="verdict">31 years of coaching, a clear curriculum, real schedules — but a first-time driver has to decode two color systems, guess which of three prices applies, and pick from a dropdown with ~80 options before they can book a $275–$365 day. The redesign keeps every fact and changes the order: answer “is this for me, what does it cost, what do I bring” before asking for money.</p>
+<div class="kpis"><div class="kpi"><b>~80 → 3</b><span>run-group choices on a 1-day event, each defined</span></div><div class="kpi"><b>2 → 1</b><span>run-group naming systems</span></div><div class="kpi"><b>0 → 1</b><span>price shown per option</span></div><div class="kpi"><b>11 → 6</b><span>top-level nav items</span></div></div>
+</div></header>
+
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="ovt" hidden><div class="ovbar"><b id="ovt"></b><button type="button" class="btn g" id="ovsw"></button><button type="button" class="btn p" id="ovx">Close</button></div><div class="ovbody" id="ovb"></div></div>
+<nav class="toc scroll" aria-label="Sections"><a href="#designs">Designs</a><a href="#step1">Step 1 options</a><a href="#audit">Audit</a><a href="#users">Users &amp; goals</a><a href="#decisions">Key decisions</a><a href="#prove">Validation</a></nav>
+
+<section class="band" id="designs"><div class="wrap">
+<h2>The redesign at a glance</h2>
+<div class="ctl">
+<div class="seg" aria-label="Pages"><button type="button" data-pg="both" aria-pressed="true">Both pages</button><button type="button" data-pg="home" aria-pressed="false">Homepage</button><button type="button" data-pg="event" aria-pressed="false">Event page</button></div>
+<div class="seg" aria-label="Device"><button type="button" data-vw="desk" aria-pressed="true">Desktop</button><button type="button" data-vw="phone" aria-pressed="false">Phone</button></div>
+<div class="seg" aria-label="Zoom"><button type="button" data-fit="fit" aria-pressed="true">Fit to screen</button><button type="button" data-fit="actual" aria-pressed="false">Actual size</button></div>
+</div>
+<div class="stages" id="stages">
+<div class="col" id="c-home"><h3>Homepage — from brochure to event finder</h3><p class="mute small">Events and prices move to the first screen; a “First time?” path catches new drivers before they bounce.</p><button type="button" class="btn p open" data-open="home" style="margin-bottom:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="margin-right:8px"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Open full screen</button><div class="stage" data-k="home"><div class="frame"><div class="browser">
+<div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>thedriversedge.net</span></div>
+<div class="site-h"><div class="logo" role="img" aria-label="The Drivers Edge — High Performance Driving Events"><span class="wm">THEDRIVERS<em>EDGE</em></span><span class="tg">HIGH<b>PERFORMANCE</b>DRIVING<b>EVENTS</b></span></div><div class="links"><a href="#designs">Events</a><a href="#designs">New drivers</a><a href="#designs">Tracks</a><a href="#designs">Rules &amp; forms</a><a href="#designs">Shop</a><a href="#designs">About</a></div><a class="btn g signin" href="#designs" style="min-height:38px;padding:0 14px;font-size:14px">Sign in</a><button type="button" class="menu" aria-label="Menu" aria-expanded="false"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
+<div class="m-hero"><div>
+<h2>Learn to drive your car fast, on a real track, with a coach beside you.</h2>
+<p>High-performance driving school in Texas for 31 years. Novice to advanced, in your own car.</p>
+<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:20px"><a class="btn p" href="#designs" data-go="event">See upcoming events</a><a class="btn g" href="#designs">First time? Start here</a></div>
+</div>
+<svg class="track" viewBox="0 0 420 300" aria-hidden="true"><circle cx="210" cy="215" r="187" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2"/><line x1="45.6" y1="274.9" x2="70.0" y2="266.0" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="37.7" y1="245.4" x2="53.4" y2="242.6" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="35.0" y1="215.0" x2="61.0" y2="215.0" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="37.7" y1="184.6" x2="53.4" y2="187.4" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="45.6" y1="155.1" x2="70.0" y2="164.0" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="58.4" y1="127.5" x2="72.3" y2="135.5" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="75.9" y1="102.5" x2="95.9" y2="119.2" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="97.5" y1="80.9" x2="107.8" y2="93.2" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="122.5" y1="63.4" x2="135.5" y2="86.0" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="150.1" y1="50.6" x2="155.6" y2="65.6" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="179.6" y1="42.7" x2="184.1" y2="68.3" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="210.0" y1="40.0" x2="210.0" y2="56.0" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="240.4" y1="42.7" x2="235.9" y2="68.3" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="269.9" y1="50.6" x2="264.4" y2="65.6" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="297.5" y1="63.4" x2="284.5" y2="86.0" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="322.5" y1="80.9" x2="312.2" y2="93.2" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="344.1" y1="102.5" x2="324.1" y2="119.2" stroke="rgba(255,255,255,.55)" stroke-width="3" stroke-linecap="butt"/><line x1="361.6" y1="127.5" x2="347.7" y2="135.5" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linecap="butt"/><line x1="374.4" y1="155.1" x2="342.5" y2="166.8" stroke="#ff3b3b" stroke-width="9" stroke-linecap="butt"/><line x1="382.3" y1="184.6" x2="348.9" y2="190.5" stroke="#ff3b3b" stroke-width="9" stroke-linecap="butt"/><line x1="385.0" y1="215.0" x2="351.0" y2="215.0" stroke="#ff3b3b" stroke-width="9" stroke-linecap="butt"/><line x1="382.3" y1="245.4" x2="348.9" y2="239.5" stroke="#ff3b3b" stroke-width="9" stroke-linecap="butt"/><line x1="374.4" y1="274.9" x2="342.5" y2="263.2" stroke="#ff3b3b" stroke-width="9" stroke-linecap="butt"/><line x1="210" y1="215" x2="342.5" y2="138.5" stroke="#ff3b3b" stroke-width="6" stroke-linecap="round"/><circle cx="210" cy="215" r="16" fill="#1a0b3a" stroke="#ff3b3b" stroke-width="4"/><text x="210" y="273" text-anchor="middle" fill="#d9d3ea" font-size="13" font-family="Inter">Motorsport Ranch 1.7 · Cresson</text></svg>
+</div>
+
+<div class="m-sec"><h3>Upcoming events</h3>
+<article class="ev"><div class="date"><span>SAT · DEC</span><b>12</b><span>2026</span></div><div><b style="font-size:18px">Saturday Track — Motorsport Ranch 1.7</b><div class="small" style="color:#55565c">Cresson, TX · One day · 6:30 am – 5:00 pm</div><div class="tags"><span class="tag o">Registration open · early-bird ends Dec 2</span></div></div><div class="price"><span class="small" style="color:#55565c">from</span><b>$275</b><a class="btn p" href="#designs" data-go="event">View &amp; book</a></div></article>
+<article class="ev"><div class="date"><span>FEB 6–7</span><b>6</b><span>2027</span></div><div><b style="font-size:18px">Two-day school — Houston MSR 2.4 mi, 17 turns</b><div class="small" style="color:#55565c">Angleton, TX · Two days · classroom + track</div><div class="tags"><span class="tag o">Registration open · early-bird ends Jan 27</span></div></div><div class="price"><span class="small" style="color:#55565c">from</span><b>$265</b><a class="btn g" href="#designs">View &amp; book</a></div></article>
+<p class="small" style="color:#55565c">Full 2027 calendar lives here too — the Google Doc goes away.</p>
+</div>
+
+<div class="m-sec" style="background:#f6f4f0"><h3>New to track driving?</h3>
+<div class="steps"><div class="step"><b>1. Pick an event</b>One-day or two-day. Any street car in good shape can qualify.</div><div class="step"><b>2. Choose “New driver”</b>You get an instructor in the car all day. We confirm your group before the event.</div><div class="step"><b>3. Prep and show up</b>Checklist of what to bring, tech inspection, and a helmet to rent if you need one.</div></div>
+<p style="margin-top:18px;font-weight:600">Run groups by event type</p>
+<div class="sys"><p class="cond">1-day Saturday Track</p><div class="ladder" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))"><div style="background:#8b5cf6">Purple<small>Newer drivers · full-time coach</small></div><div style="background:#f97316;color:#17181c">Orange<small style="opacity:1">Proven · part-time coach</small></div><div style="background:#ec4899">Pink<small>Advanced · solo</small></div></div></div>
+<div class="sys"><p class="cond">2-day schools</p><div class="ladder"><div style="background:#22a35a">Green<small>New · full-time coach</small></div><div style="background:#3b82f6">Blue<small>Coached · may go P/T solo</small></div><div style="background:#eab308;color:#17181c">Yellow<small style="opacity:1">P/T coach or solo</small></div><div style="background:#dc2626">Red<small>Advanced solo</small></div></div></div>
+<p class="small" style="color:#55565c;margin:6px 0 0">Each event uses one set. You’ll only see that event’s groups when you book.</p>
+</div>
+<div class="foot"><span>Get your life on track · 903.303.3000</span><a href="#designs">Gift certificates</a><a href="#designs">Charity fund</a><a href="#designs">Cancellation policy</a><a href="#designs">Privacy</a></div>
+</div></div></div></div>
+<div class="col" id="c-event"><h3>Event page — a booking flow, not a product listing</h3><p class="mute small">Questions answered in the order people ask them; the booking card works — pick a level and add-ons.</p><button type="button" class="btn p open" data-open="event" style="margin-bottom:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" style="margin-right:8px"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg>Open full screen</button><div class="stage" data-k="event"><div class="frame"><div class="browser">
+<div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>thedriversedge.net/events/2026-12-12-motorsport-ranch</span></div>
+<div class="crumb"><a href="#designs" data-go="home">Events</a> › Dec 12, 2026</div>
+<div class="e-head"><h2>Saturday Track at Motorsport Ranch 1.7</h2>
+<div class="facts"><span><b>Sat, Dec 12, 2026</b> · 6:30 am – 5:00 pm CT</span><span><b>Cresson, TX</b> · 9012 Performance Ct</span><span><b>5 sessions</b> per group + classroom</span><span><b>Novice → Advanced</b></span></div></div>
+
+<div class="e-body"><div>
+<h3>What the day is</h3>
+<p>One high-intensity day built for maximum seat time. Same curriculum as the multi-day school: five track sessions for your group, classroom between them, and an instructor in your car unless you’re solo-approved.</p>
+
+<h3>Schedule</h3>
+<ul class="sched"><li><time>6:30</time><span>Gates open</span></li><li><time>7:00</time><span>Sign-in and tech inspection</span></li><li><time>7:30</time><span>Drivers’ meeting — required</span></li><li><time>8:00</time><span>Track goes hot · groups rotate between track and classroom</span></li><li><time>11:35</time><span>Lunch, 30 minutes</span></li><li><time>5:00</time><span>Track cold</span></li></ul>
+<p class="small" style="color:#55565c;margin-top:8px">All times Central.</p>
+
+<h3>What to bring</h3>
+<ul class="check"><li>Helmet — yours, or rent one at the track ($25, add it when you book)</li><li>Your car, tech-inspected within 30 days before the event (form in Rules &amp; forms)</li><li>Driver’s license, water, sunscreen, layers</li><li>Staying over? RVs can park overnight — no hookups, restrooms only</li></ul>
+
+<h3>Questions people ask</h3>
+<details><summary>Am I solo-approved?</summary><p style="margin-top:8px">Not if you’re new to TDE, haven’t been evaluated, haven’t driven this track and direction, or haven’t driven with us in 12+ months. If unsure, pick the instructed option — we’ll move you and refund the difference.</p></details>
+<details><summary>Who decides my group?</summary><p style="margin-top:8px">You request a group; TDE confirms it by email before the event, based on your history and the day’s mix of drivers. If we move you, any price difference is refunded or charged then.</p></details>
+<details><summary>What if I need to cancel?</summary><p style="margin-top:8px">Summary of the cancellation policy goes here, in two sentences, with a link to the full text.</p></details>
+</div>
+
+<form class="reg" id="reg" aria-label="Book this event">
+<div class="eb" id="eb">Early-bird pricing ends Wed, Dec 2</div>
+<h4>1 · Your run group</h4>
+<div class="seg2" role="group" aria-label="Have you driven with TDE before?"><button type="button" data-mode="new" aria-pressed="true">New to TDE</button><button type="button" data-mode="ret" aria-pressed="false">Returning driver</button></div>
+<p class="small" id="modehint" style="color:#55565c;margin:0 0 8px"></p>
+<div id="levels" role="radiogroup" aria-label="Run group"></div>
+<label class="field" id="expf" hidden><span>Where have you driven, and about how many track days?</span><input type="text" placeholder="e.g. NASA HPDE2, about 8 days at COTA and MSR Houston"></label>
+<div class="assign" id="assign" aria-live="polite"></div>
+<label class="opt" id="soloq" hidden style="grid-template-columns:22px minmax(0,1fr)"><input type="checkbox" id="soloc"><span><b>I’m solo-approved for this track</b><small>Signed off by TDE at Motorsport Ranch 1.7, clockwise, and driven with TDE in the last 12 months. Not sure? Pick the instructed group — we’ll move you and refund the difference.</small></span></label>
+<h4>2 · Your car</h4>
+<label class="field"><span>Car number painted on your car</span><div class="row"><input type="text" id="num" inputmode="numeric" placeholder="e.g. 47"><button class="btn g" type="button" id="chk" style="min-height:44px;padding:0 12px;font-size:14px">Check</button></div></label>
+<p class="small" id="chkmsg" style="color:#55565c;margin:-4px 0 8px" aria-live="polite">No number yet? Leave blank and we’ll assign one.</p>
+<label class="opt" style="grid-template-columns:22px minmax(0,1fr)"><input type="checkbox" id="share"><span><b>Sharing this car</b><small>Another driver uses it in a different group</small></span></label>
+<label class="field" id="sharef" hidden><span>Other driver’s name</span><input type="text"></label>
+<h4>3 · Add-ons</h4>
+<div id="adds"></div>
+<label class="field"><span>One thing you want to get better at (optional)</span><input type="text" placeholder="e.g. braking later into Turn 1"></label>
+<div class="total"><span>Total</span><b id="tot">$0</b></div>
+<button class="btn p" type="submit" style="width:100%;margin-top:12px">Reserve my spot</button>
+<p class="note" id="done" aria-live="polite">Questions? Call 903.303.3000</p>
+</form>
+</div>
+<p class="small" style="color:#55565c;padding:0 28px 20px">Prices per group are sample values to confirm with TDE — the live page shows $275–$365 without saying which group costs what.</p>
+</div></div></div></div>
+</div>
+</div></section>
+
+<section class="band" id="step1"><div class="wrap">
+<h2>Step 1, three ways: helping returning drivers find their group</h2>
+<p class="mute">A 1-day event only offers Purple, Orange and Pink. A driver whose last event was a 2-day school only knows “I was Green.” Each version below keeps one set of colors on screen and solves that differently. All three work — try the Returning tab.</p>
+<div class="variants" id="variants"></div>
+<h3 style="margin:34px 0 10px">How each handles the three common cases</h3>
+<div><table class="stack"><thead><tr><th>Case</th><th>A · Spelled out</th><th>B · Accordion</th><th>C · Remembered</th></tr></thead><tbody>
+<tr><td><b>Brand new to TDE</b></td><td>Same in all three: the New tab asks about experience, never shows group colors or the solo option</td><td>Same</td><td>Same</td></tr>
+<tr><td><b>Returning, same event type</b> (Purple last time, booking a 1-day)</td><td>Picks Purple at a glance; the extra line is easy to skip</td><td>Picks Purple; never opens the accordion</td><td>Purple is pre-selected; one glance and go</td></tr>
+<tr><td><b>Returning from a 2-day school</b> (Green, booking a 1-day)</td><td>Sees “Green” printed under Purple — found by scanning, no extra tap</td><td>Taps the info icon next to a group to check — one tap</td><td>Signed in: Purple is pre-selected with “You drove Green last time.” Guest: falls back to A</td></tr>
+<tr><td><b>Cost</b></td><td>Busiest of the three; three extra lines</td><td>Cleanest cards; the answer is one tap away for the few who need it</td><td>Needs sign-in and order history wired up; best experience when it works</td></tr>
+</tbody></table></div>
+<p style="margin-top:16px"><b>Recommendation:</b> ship B — clean cards, with the 2-day colors one tap away behind an info icon. Plan C as the next step for signed-in drivers. Switch to A only if testing shows returning drivers miss the icon. The event mockup above uses B.</p>
+</div></section>
+
+<section class="band" id="audit"><div class="wrap">
+<h2>1 · Heuristic audit: what’s costing bookings</h2>
+<p class="mute">Ranked by how likely each issue is to stop someone from finishing registration. Taken from the live pages, Nov 24 2026.</p>
+<div style="margin-top:16px"><table class="stack"><thead><tr><th>Severity</th><th>Finding</th><th>Why it matters</th><th>Fix in redesign</th></tr></thead><tbody>
+<tr><td><span class="sev s1">Blocker</span></td><td>1-day events run Purple/Orange/Pink, 2-day schools run Green → Red — but this 1-day page shows both, and its dropdown offers the 2-day colors (numbered 4,1,2,3,5,6)</td><td>The single most important choice uses vocabulary the buyer can’t map. Novices guess or call.</td><td>Each event lists only its own groups: Purple/Orange/Pink on 1-day events, Green → Red on 2-day schools. Never both on one page</td></tr>
+<tr><td><span class="sev s1">Blocker</span></td><td>Second dropdown with ~80 entries — duplicates, typos, COVID-era and Sat/Sun-only options on a one-day event</td><td>Signals a neglected site at the moment of payment; erodes trust in a safety-critical activity</td><td>Delete. Options generated from the event’s actual groups</td></tr>
+<tr><td><span class="sev s1">Blocker</span></td><td>“$275 – $365” with a Sale badge and no original price; nothing says which price goes with which option</td><td>Price ambiguity is the top cause of checkout abandonment</td><td>Price on every option, live total, early-bird savings stated with its deadline</td></tr>
+<tr><td><span class="sev s2">Major</span></td><td>Jargon — SOLO, P/T, “TDE standards” — undefined on the page</td><td>New drivers are the growth audience and the least able to decode it</td><td>Plain-language levels; solo rules in an expandable “Am I solo-approved?”</td></tr>
+<tr><td><span class="sev s2">Major</span></td><td>Unlabeled fields: shared car, “Painted on number,” Car# with “Check availability”</td><td>Users stall or enter junk; staff clean it up by phone</td><td>Helper text, grouped as “Your car,” shared-driver field appears only when needed</td></tr>
+<tr><td><span class="sev s2">Major</span></td><td>Cancellation, helmet and tech requirements only in footer links or not at all</td><td>Expensive, non-refundable-feeling purchase with unknown rules → hesitation</td><td>“What to bring” checklist and policy summary next to the button</td></tr>
+<tr><td><span class="sev s2">Major</span></td><td>Full event calendar lives in an external Google Doc</td><td>Leaves the site at the top of the funnel; drifts out of date</td><td>Upcoming events listed on the homepage with status and price</td></tr>
+<tr><td><span class="sev s3">Polish</span></td><td>11-item nav duplicated in a user menu; dead “#” links; Google+ share; empty sign-in box</td><td>Noise, and broken bits read as “is this business still active?”</td><td>6 grouped nav items; share reduced to Add to calendar + copy link</td></tr>
+<tr><td><span class="sev s3">Polish</span></td><td>Dates in three formats, no years on registration dates, no time zone, lunch “approximately 11:35”</td><td>People plan travel around these</td><td>One format (Sat, Dec 12, 2026), Central time stated once, lunch with an end time</td></tr>
+</tbody></table></div>
+</div></section>
+
+<section class="band" id="users" style="background:var(--card)"><div class="wrap">
+<h2>2 · Who’s booking, and what they need to know first</h2>
+<p class="mute">Three audiences with different questions. The page order follows the first-timer, because returning drivers can skip ahead and first-timers can’t.</p>
+<div class="grid3" style="margin-top:16px">
+<div class="card"><h3>The first-timer</h3><p class="small mute">Owns a fun car, has never driven a track.</p><ul><li>Is this safe and am I good enough?</li><li>What does it really cost, all in?</li><li>What do I bring, and do I need a helmet?</li></ul></div>
+<div class="card"><h3>The returning student</h3><p class="small mute">Has done 2–5 events, still instructed.</p><ul><li>Which group am I in now?</li><li>When does early-bird end?</li><li>Book in under two minutes</li></ul></div>
+<div class="card"><h3>The solo driver</h3><p class="small mute">Signed off to drive without an instructor.</p><ul><li>Am I still solo-approved at this track?</li><li>Get the solo discount without calling</li><li>Car number and shared-car setup</li></ul></div>
+</div>
+<p class="small mute" style="margin-top:14px">These are assumptions based on the content. A real engagement starts by checking them: 5–6 calls with recent customers, plus TDE staff on what people phone about most.</p>
+</div></section>
+
+<section class="band" id="decisions"><div class="wrap">
+<h2>3 · Key decisions and the trade-offs behind them</h2>
+<div class="grid3" style="margin-top:14px">
+<div class="card"><h3>Two doors: new or returning</h3><p>Step 1 starts with a tab, not a sentence. New drivers describe their experience in plain words and TDE places them. Returning drivers pick the group they already know, and only that event’s set is shown: Purple, Orange and Pink on 1-day events; Green → Red on 2-day schools. TDE still confirms every placement.</p></div>
+<div class="card"><h3>Price on every option</h3><p>Showing $365 next to “New driver” may feel worse than “from $275.” It isn’t: an honest number beats a surprise at checkout, and the early-bird line gives a reason to book now.</p></div>
+<div class="card"><h3>Questions before the button</h3><p>Schedule, checklist and solo rules sit beside the form so nobody leaves the page to find them. Long policy text stays on its own page, summarized in two lines here.</p></div>
+<div class="card"><h3>Kill the Google Doc</h3><p>An events list on the site is one source of truth, indexable by search, and keeps people in the funnel. Needs the event records cleaned up in WooCommerce first.</p></div>
+<div class="card"><h3>Keep the brand, fix the voice</h3><p>Same logo, deep purple carbon fiber, red redline and white — plus the tachometer motif from their artwork. What changes is how it’s used: red only for actions and urgency, purple for the frame, plenty of white for reading. The run-group swatches are kept brighter than the brand purple so “Purple group” never reads as decoration.</p></div>
+<div class="card"><h3>Mobile first for the card</h3><p>Registrations likely spike on phones the night registration opens. One column, 44 px targets, numeric keypad for car number, total always visible.</p></div>
+</div>
+</div></section>
+
+<section class="band" id="prove" style="background:var(--card)"><div class="wrap">
+<h2>4 · How I’d validate it</h2>
+<div class="grid3" style="margin-top:14px">
+<div class="card"><h3>Before building</h3><ul><li>Pull 12 months of orders: how many picked a group staff later changed?</li><li>Log a week of phone calls by topic</li><li>Five moderated tests: “book the Dec 12 event as a first-timer”</li></ul></div>
+<div class="card"><h3>What to measure</h3><ul><li>Event page → completed booking rate</li><li>Time to book for returning drivers</li><li>Calls about run groups and pricing</li><li>Bookings needing a group correction</li></ul></div>
+<div class="card"><h3>Ship order</h3><ul><li>Week 1: clean the dropdowns, price per option, fix dead links — no redesign needed</li><li>Then: new event template</li><li>Then: homepage events list, retire the Google Doc</li></ul></div>
+</div>
+</div></section>
+
+<script>{
+
+const DG={pu:["Purple","#8b5cf6"],or:["Orange","#f97316"],pk:["Pink","#ec4899"]};
+const sw=c=>`<i class="gsw" style="background:${c}" aria-hidden="true"></i>`;
+const NEW=[{id:"n1",n:"First time on a track",d:"Coach in your car every session.",g:"pu",p:365},{id:"n2",n:"I’ve done track days with other groups",d:"Tell us where you’ve driven and TDE places you.",g:"pu",p:365,ask:1}];
+const TWO={gr:["Green","#22a35a"],eb:["early Blue","#3b82f6"],ab:["Blue advanced or P/T","#3b82f6"],yn:["Yellow non-solo or P/T","#eab308"],ys:["Yellow solo","#eab308"],rs:["Red solo","#dc2626"]};
+const RET=[{id:"pu",c:"#8b5cf6",n:"Purple",d:"Newer drivers. Coach in the car every session.",g:"pu",p:365,two:["gr","eb"]},{id:"or",c:"#f97316",n:"Orange",d:"Proven experience. Coach rides part-time.",g:"or",p:325,two:["ab","yn"]},{id:"pk",c:"#ec4899",n:"Pink",d:"Advanced. Full-time solo to TDE standards.",g:"pk",p:275,solo:1,two:["ys","rs"]}];
+const twoL=l=>l.two.map(x=>`<span class="dt">${sw(TWO[x][1])}${TWO[x][0]}</span>`).join(', ');
+const alsoL=l=>`<span class="also">At 2-day schools: ${twoL(l)}</span>`;
+const IC='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.01"/></svg>';
+const ibtn=(l,open,attr)=>`<button type="button" class="ib" ${attr}="${l.id}" aria-expanded="${!!open}" aria-label="${l.n}: 2-day school equivalents">${IC}</button>`;
+const tipx=l=>`<span class="tipx">At 2-day schools: ${twoL(l)}</span>`;
+const OPEN={};
+let L=NEW,mode='new';
+const A=[{id:"helmet",n:"Helmet rental",d:"Fitted at the track",p:25},{id:"cap",n:"TDE ball cap",d:"One size",p:20}];
+const lv=document.getElementById('levels'),ad=document.getElementById('adds'),tot=document.getElementById('tot');
+const render=()=>{L=mode==='new'?NEW:RET;document.querySelectorAll('#reg .seg2 button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));document.getElementById('modehint').textContent=mode==='new'?'Welcome. Tell us your experience and we’ll put you in the right group.':'Choose the group you run in at 1-day events.';const prev=document.querySelector('#reg input[name=lvl]:checked'),pv=prev&&L.some(x=>x.id===prev.value)?prev.value:L[0].id;lv.innerHTML=L.map((l,i)=>mode==='new'?`<label class="opt"><input type="radio" name="lvl" value="${l.id}"${l.id===pv?' checked':''}><span><b>${l.n}</b><small>${l.d}</small></span><span class="pr">$${l.p}</span></label>`:`<label class="opt"><input type="radio" name="lvl" value="${l.id}"${l.id===pv?' checked':''}><span><b>${sw(l.c)}${l.n}${ibtn(l,OPEN[l.id],'data-ib')}</b><small>${l.d}</small>${OPEN[l.id]?tipx(l):''}</span><span class="pr">$${l.p}</span></label>`).join('');calc()};
+ad.innerHTML=A.map(a=>`<label class="opt"><input type="checkbox" name="add" value="${a.id}"><span><b>${a.n}</b><small>${a.d}</small></span><span class="pr">+$${a.p}</span></label>`).join('');
+const calc=()=>{const l=L.find(x=>x.id===document.querySelector('input[name=lvl]:checked').value);const g=DG[l.g];document.getElementById('assign').innerHTML=l.ask?`You’ll start in <b>${sw(DG.pu[1])}Purple</b> or <b>${sw(DG.or[1])}Orange</b>. TDE reviews your experience and confirms by email.`:`On Dec 12 you’ll run in <b>${sw(g[1])}${g[0]}</b>. TDE confirms by email before the event.`;document.getElementById('expf').hidden=!l.ask;document.getElementById('soloq').hidden=!(mode==='ret'&&l.solo);let t=l.p;document.querySelectorAll('input[name=add]:checked').forEach(c=>{t+=A.find(a=>a.id===c.value).p});tot.textContent='$'+t;tot.classList.add('flash');setTimeout(()=>tot.classList.remove('flash'),300)};
+document.getElementById('reg').addEventListener('change',calc);
+document.querySelectorAll('#reg .seg2 button').forEach(b=>b.addEventListener('click',()=>{mode=b.dataset.mode;lv.innerHTML='';render()}));render();
+lv.addEventListener('click',e=>{const b=e.target.closest('.ib');if(!b)return;e.preventDefault();OPEN[b.dataset.ib]=!OPEN[b.dataset.ib];render();const n=lv.querySelector(`[data-ib="${b.dataset.ib}"]`);n&&n.focus()});
+const share=document.getElementById('share'),sf=document.getElementById('sharef');share.addEventListener('change',()=>{sf.hidden=!share.checked});
+document.getElementById('chk').addEventListener('click',()=>{const v=document.getElementById('num').value.trim();document.getElementById('chkmsg').textContent=v?`#${v.replace(/[^0-9]/g,'')||'?'} is available for this event (demo).`:'Enter a number first.'});
+document.getElementById('reg').addEventListener('submit',e=>{e.preventDefault();const l=L.find(x=>x.id===document.querySelector('input[name=lvl]:checked').value);const m=document.getElementById('done');if(mode==='ret'&&l.solo&&!document.getElementById('soloc').checked){m.textContent='Confirm you’re solo-approved for this track, or choose an instructed group.';document.getElementById('soloc').focus();return}m.textContent='Prototype only — next screen would be waiver + payment.'});
+const d=Math.ceil((new Date('2026-12-02T23:59:00-06:00')-new Date())/864e5);if(d>0)document.getElementById('eb').textContent=`Early-bird pricing ends Wed, Dec 2 · ${d} day${d===1?'':'s'} left`;else if(d<=0)document.getElementById('eb').textContent='Early-bird pricing has ended';
+const P={pg:'both',vw:innerWidth<700?'phone':'desk',fit:'fit'};
+const cols={home:document.getElementById('c-home'),event:document.getElementById('c-event')},st=document.getElementById('stages');
+const lay=()=>{for(const st of document.querySelectorAll('.stage')){const f=st.firstElementChild;if(!f)continue;const w=P.vw==='desk'?1280:390;f.style.width=w+'px';f.classList.toggle('phone',P.vw==='phone');const k=P.fit==='fit'?Math.min(1,st.clientWidth/w):1;f.style.transform=k<1?`scale(${k})`:'';st.classList.toggle('actual',k===1&&w>st.clientWidth);st.style.height=Math.ceil(f.offsetHeight*k)+(k===1&&w>st.clientWidth?16:0)+'px'}};
+const apply=()=>{cols.home.hidden=P.pg==='event';cols.event.hidden=P.pg==='home';st.classList.toggle('two',P.pg==='both');document.querySelectorAll('.seg button').forEach(b=>{const [k,v]=Object.entries(b.dataset)[0];b.setAttribute('aria-pressed',String(P[k]===v))});lay()};
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{const [k,v]=Object.entries(b.dataset)[0];P[k]=v;apply()}));
+const ov=document.getElementById('ov'),ovb=document.getElementById('ovb'),T={home:'Homepage',event:'Event page'};let cur=null;
+const close=()=>{if(!cur)return;const f=ovb.firstElementChild;if(f)document.querySelector(`.stage[data-k="${cur}"]`).appendChild(f);ov.hidden=true;document.body.style.overflow='';const b=document.querySelector(`[data-open="${cur}"]`);cur=null;lay();b&&b.focus()};
+const open=k=>{if(cur)close();const st=document.querySelector(`.stage[data-k="${k}"]`);ovb.appendChild(st.firstElementChild);cur=k;document.getElementById('ovt').textContent=T[k]+' — full screen';document.getElementById('ovsw').textContent=k==='home'?'Event page':'Homepage';ov.hidden=false;document.body.style.overflow='hidden';ovb.scrollTop=0;document.getElementById('ovx').focus();lay()};
+document.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>open(b.dataset.open)));
+document.getElementById('ovx').addEventListener('click',close);
+document.getElementById('ovsw').addEventListener('click',()=>open(cur==='home'?'event':'home'));
+ov.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+document.querySelectorAll('[data-go]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();if(cur){open(a.dataset.go);return}P.pg=a.dataset.go;apply();document.getElementById('designs').scrollIntoView()}));
+const ro=new ResizeObserver(()=>lay());document.querySelectorAll('.stage,.frame').forEach(x=>ro.observe(x));
+document.querySelectorAll('.seg button').forEach(b=>{const [k,v]=Object.entries(b.dataset)[0];if(k==='pg')b.dataset.pg=v});
+document.querySelectorAll('.menu').forEach(m=>m.addEventListener('click',()=>{const h=m.closest('.site-h');const o=h.classList.toggle('open');m.setAttribute('aria-expanded',String(o));lay()}));
+
+const VG=RET;
+const VN=NEW;
+const VI={A:["A · Spelled out","Each group lists its 2-day colors under the description. Nothing to open.","Scannable for every returning driver","One extra line per group"],B:["B · Info icon","Each group has an info icon next to its name that reveals its 2-day colors in place.","Clean list, detail on demand","One tap to check"],C:["C · Remembered","Signed-in drivers get their group pre-selected from their last event. Guests see version A.","Zero thinking for returning drivers","Needs sign-in and history data"]};
+const vs={A:{m:"ret",sel:"pu"},B:{m:"ret",sel:"pu",op:{}},C:{m:"ret",sel:"pu",si:1}};
+
+const vrow=(v,g,st,extra)=>`<label class="opt"><input type="radio" name="v${v}" value="${g.id}"${st.sel===g.id?' checked':''}><span><b>${sw(g.c)}${g.n}${v==='B'?ibtn(g,st.op[g.id],'data-eq'):''}${extra&&g.id==='pu'?'<span class="sugg">Suggested</span>':''}</b><small>${g.d}</small>${(v==='A'||(v==='C'&&!st.si))?alsoL(g):''}${v==='B'&&st.op[g.id]?tipx(g):''}</span><span class="pr">$${g.p}</span></label>`;
+const vbody=v=>{const st=vs[v];let h=`<div class="seg2" role="group" aria-label="Have you driven with TDE before?"><button type="button" data-vm="new" aria-pressed="${st.m==='new'}">New to TDE</button><button type="button" data-vm="ret" aria-pressed="${st.m==='ret'}">Returning driver</button></div>`;
+if(st.m==='new'){const n=VN.find(x=>x.id===st.sel)||VN[0];h+=VN.map(x=>`<label class="opt"><input type="radio" name="v${v}" value="${x.id}"${n.id===x.id?' checked':''}><span><b>${x.n}</b><small>${x.d}</small></span><span class="pr">$${x.p}</span></label>`).join('');h+=`<div class="assign">${n.ask?`You’ll start in <b>${sw(DG.pu[1])}Purple</b> or <b>${sw(DG.or[1])}Orange</b>. TDE confirms by email.`:`You’ll run in <b>${sw(DG.pu[1])}Purple</b>. TDE confirms by email.`}</div>`;return h}
+if(v==='C')h+=`<div class="prev">Preview as<div class="seg2"><button type="button" data-si="1" aria-pressed="${!!st.si}">Signed in</button><button type="button" data-si="0" aria-pressed="${!st.si}">Guest</button></div></div>`+(st.si?`<div class="banner">Welcome back. Last event: <b>Green</b> at a 2-day school. Green runs as <b>Purple</b> at 1-day events, so we’ve picked it for you.</div>`:`<div class="banner g">Sign in and we’ll pick your group from your last event.</div>`);
+
+h+=VG.map(g=>vrow(v,g,st,v==='C'&&st.si)).join('');const g=VG.find(x=>x.id===st.sel)||VG[0];
+if(g.solo)h+=`<label class="opt" style="grid-template-columns:22px minmax(0,1fr)"><input type="checkbox"><span><b>I’m solo-approved for this track</b><small>Not sure? Choose Orange — TDE will move you and refund the difference.</small></span></label>`;
+h+=`<div class="assign">You’re requesting <b>${sw(g.c)}${g.n}</b>. TDE confirms by email before the event.</div>`;return h};
+const vwrap=document.getElementById('variants');vwrap.innerHTML=Object.keys(VI).map(v=>`<div class="vcol"><h3>${VI[v][0]}</h3><p>${VI[v][1]}</p><div class="mini" data-v="${v}"></div><div class="pc"><b>+ ${VI[v][2]}</b><span class="mute">− ${VI[v][3]}</span></div></div>`).join('');
+const vdraw=v=>{const m=vwrap.querySelector(`.mini[data-v="${v}"]`);const open=m.querySelector('details[open]');m.innerHTML=vbody(v);if(open){const d=m.querySelector('details');d&&(d.open=true)}};
+['A','B','C'].forEach(vdraw);
+vwrap.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const v=b.closest('.mini').dataset.v,st=vs[v];if(b.dataset.eq){e.preventDefault();st.op[b.dataset.eq]=!st.op[b.dataset.eq];vdraw(v);const n=vwrap.querySelector(`.mini[data-v="${v}"] [data-eq="${b.dataset.eq}"]`);n&&n.focus();return}if(b.dataset.vm){st.m=b.dataset.vm;st.sel=st.m==='new'?'n1':'pu'}if(b.dataset.si){st.si=b.dataset.si==='1';st.sel='pu'}vdraw(v)});
+vwrap.addEventListener('change',e=>{const r=e.target;if(r.type!=='radio')return;const v=r.closest('.mini').dataset.v;vs[v].sel=r.value;vdraw(v)});
+apply();
+}</script>
+</body>
+</html>
