@@ -384,3 +384,234 @@ html[data-look="booking"] .mbar { border-top-color: var(--border); }
   html[data-look="showcase"] .hero-copy { padding: 48px 0 28px; }
   html[data-look="athletic"] .hero-copy { padding: 56px 0 200px; }
 }
+
+/* =====================================================================
+ * More foundations (Nov 2026): Console (PlayStation), Ledger (Stripe), Ride (Uber)
+ * ===================================================================== */
+@font-face { font-family: "DM Sans"; src: url(../fonts/dm-sans.woff2) format("woff2-variations"), url(../fonts/dm-sans.woff2) format("woff2"); font-weight: 100 1000; font-display: swap; }
+@font-face { font-family: "Inter"; src: url(../fonts/inter.woff2) format("woff2-variations"), url(../fonts/inter.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+html:is([data-look="console"], [data-look="ledger"], [data-look="ride"]) :is(.eyebrow, .label, .event-when, .crumb, .nav-links a, .toc a, .facts a, .kv dt, .book h3, .book-hd span, .credit th, .level-card .count, .sched-day, .venue a, .ftr-cols h3, .book-total span, .arrow-link, .mbar small, .thumb-pill, .badge, .badge-req, .eb i, .btn, .book-tabs button) { text-transform: none; letter-spacing: 0; }
+
+/* ---------------- Console (PlayStation): black hero, white content, purple footer; light display; pills that grow ---------------- */
+html[data-look="console"] {
+  --font-display: "Inter Tight", Arial, sans-serif;
+  --font-body: "Inter Tight", Arial, sans-serif;
+  --display-weight: 300; --display-weight-strong: 500; --tracking-display: -0.02em;
+  --fg: #000000; --fg-2: #1f1f1f; --muted: #5a5a5a; --muted-2: #3d3d3d; --meta: #6b6b6b;
+  --border: #dedede; --border-soft: #ececec; --border-strong: #8a8a8a; --surface-tint: #f3f3f3;
+  --label: 500 14px/1.3 "Inter Tight", Arial, sans-serif;
+}
+html[data-look="console"] .site-hdr { background: #000; }
+html[data-look="console"] .nav-links a { font: 500 14px "Inter Tight", sans-serif; }
+html[data-look="console"] .hero { background: #000; }
+html[data-look="console"] .hero-photo { width: 70%; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 40%); mask-image: linear-gradient(90deg, transparent 0, #000 40%); }
+html[data-look="console"] .hero-photo::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0.5), transparent 50%); }
+html[data-look="console"] .hero h1 { font-size: clamp(44px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.03em; }
+html[data-look="console"] .hero h1 b { font-weight: 500; }
+html[data-look="console"] .hero .eyebrow { color: #c7c7c7; font-size: 16px; }
+html[data-look="console"] h2 { font-size: clamp(34px, 4.2vw, 54px); }
+html[data-look="console"] .btn { border-radius: 999px; font: 500 17px/1 "Inter Tight", sans-serif; letter-spacing: 0.02em; min-height: 50px; padding: 0 26px; transition: transform 180ms var(--ease-standard), box-shadow 180ms var(--ease-standard), background-color 180ms; }
+html[data-look="console"] .btn:hover { transform: scale(1.06); box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--accent); }
+html[data-look="console"] .btn-sm { min-height: 44px; font-size: 15.5px; }
+html[data-look="console"] .btn-outline { box-shadow: inset 0 0 0 2px #fff; }
+html[data-look="console"] .btn-quiet { box-shadow: inset 0 0 0 2px var(--fg); }
+html[data-look="console"] .section-hd .eyebrow { color: var(--accent); font-weight: 600; }
+html[data-look="console"] .event-list { gap: 28px; }
+html[data-look="console"] .event-card { border-radius: 24px; overflow: hidden; transition: transform 220ms var(--ease-standard), box-shadow 220ms; }
+html[data-look="console"] .event-card:hover { transform: scale(1.015); box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14); border-color: var(--border); }
+html[data-look="console"] .event-ttl { padding: 24px 28px 0; }
+html[data-look="console"] .event-more { padding: 0 28px 28px; }
+html[data-look="console"] .event-name { font: 300 clamp(30px, 3vw, 38px)/1.08 "Inter Tight", sans-serif; letter-spacing: -0.02em; }
+html[data-look="console"] .event-when { font-weight: 600; }
+html[data-look="console"] .thumb-pill { right: 14px; top: 14px; border-radius: 999px; font: 600 13px/1 "Inter Tight", sans-serif; }
+html[data-look="console"] .eb { border-left: 0; border-radius: 14px; }
+html[data-look="console"] .eb i, html[data-look="console"] .badge { border-radius: 999px; }
+html[data-look="console"] .cta-band { background: #000; }
+html[data-look="console"] .cta-band::after { background: linear-gradient(90deg, #000 25%, rgba(0, 0, 0, 0.45) 70%, rgba(0, 0, 0, 0.2)); }
+html[data-look="console"] .levels { gap: 24px; }
+html[data-look="console"] .level-card { border: 1px solid var(--border); border-radius: 24px; padding: 30px; }
+html[data-look="console"] .level-card .h3d { border-bottom-color: var(--border); font-weight: 400; }
+html[data-look="console"] .steps { border-bottom: 1px solid var(--border); }
+html[data-look="console"] .step-cap { border-radius: 4px; }
+html[data-look="console"] .step-block { border-radius: 8px 8px 0 0; }
+html[data-look="console"] .site-ftr { background: var(--brand-purple); color: #d9d3ea; }
+html[data-look="console"] .site-ftr .ftr-cols { border-bottom-color: rgba(255, 255, 255, 0.2); }
+html[data-look="console"] .ev-media .thumb { border-radius: 24px; }
+html[data-look="console"] .ev-title h1 { font-size: clamp(36px, 4.2vw, 54px); line-height: 1.04; }
+html[data-look="console"] .ev-title h1 b { font-weight: 500; }
+html[data-look="console"] .facts a, html[data-look="console"] .venue a { font: 600 15px "Inter Tight", sans-serif; }
+html[data-look="console"] .toc a { font-weight: 500; font-size: 15px; }
+html[data-look="console"] .event-main h2 { font-size: clamp(30px, 3.2vw, 40px); }
+html[data-look="console"] .book { border: 1px solid var(--border); border-radius: 24px; overflow: hidden; }
+html[data-look="console"] .book-hd { background: #000; padding: 20px 24px; }
+html[data-look="console"] .book-hd span { font: 500 15px "Inter Tight", sans-serif; }
+html[data-look="console"] .book-hd b { font: 300 28px/1 "Inter Tight", sans-serif; }
+html[data-look="console"] .book h3 { font: 600 15px "Inter Tight", sans-serif; color: var(--fg); }
+html[data-look="console"] .book-tabs { border-radius: 999px; overflow: hidden; box-shadow: inset 0 0 0 1.5px var(--fg); }
+html[data-look="console"] .book-tabs button { font: 500 15px "Inter Tight", sans-serif; }
+html[data-look="console"] .book-opt { margin-bottom: 8px; border-radius: 16px; }
+html[data-look="console"] .book-note, html[data-look="console"] .book-opt .tip, html[data-look="console"] .book-field input { border-radius: 14px; }
+html[data-look="console"] .book-total b { font: 300 40px/1 "Inter Tight", sans-serif; }
+html[data-look="console"] .book-go:hover { transform: scale(1.03); }
+
+/* ---------------- Ledger (Stripe): light 300 headlines in deep purple, a brand gradient, 6px radius, purple-tinted layered shadows ---------------- */
+html[data-look="ledger"] {
+  --font-display: "Inter", Arial, sans-serif;
+  --font-body: "Inter", Arial, sans-serif;
+  --display-weight: 300; --display-weight-strong: 400; --tracking-display: -0.03em;
+  --fg: #160935; --fg-2: #3c3557; --muted: #5b5675; --muted-2: #4a4466; --meta: #6b6685;
+  --border: #e3e0ee; --border-soft: #ecebf3; --border-strong: #b9b3d6; --surface-tint: #f6f5fb;
+  --label: 500 14px/1.3 "Inter", Arial, sans-serif;
+  --shadow-ledger: 0 50px 100px -20px rgba(36, 16, 78, 0.25), 0 30px 60px -30px rgba(0, 0, 0, 0.3);
+  --shadow-ledger-sm: 0 13px 27px -5px rgba(36, 16, 78, 0.2), 0 8px 16px -8px rgba(0, 0, 0, 0.25);
+}
+html[data-look="ledger"] .site-hdr { background: transparent; position: relative; z-index: 2; border-bottom: 0; margin-bottom: -68px; }
+html[data-look="ledger"] .nav-links a { font: 500 15px "Inter", sans-serif; color: #fff; }
+html[data-look="ledger"] .hero { background: #fff; color: var(--fg); overflow: hidden; }
+html[data-look="ledger"] .hero::before { content: ""; position: absolute; inset: 0; clip-path: polygon(0 0, 100% 0, 100% 50%, 46% 100%, 0 100%); background: linear-gradient(115deg, var(--brand-purple-deep) 0%, var(--brand-purple) 30%, #5b3fc0 55%, #d11f1f 82%, #ff6a3d 100%); }
+html[data-look="ledger"] .hero-photo { top: 120px; bottom: 64px; right: max(4vw, 20px); width: min(46%, 580px); border-radius: 8px; -webkit-mask-image: none; mask-image: none; box-shadow: var(--shadow-ledger); background-position: 55% 55%; }
+html[data-look="ledger"] .hero-photo::after { background: none; }
+html[data-look="ledger"] .hero-copy { padding: 168px 0 96px; max-width: 560px; }
+html[data-look="ledger"] .hero .eyebrow { color: rgba(255, 255, 255, 0.85); font-weight: 500; }
+html[data-look="ledger"] .hero h1 { color: #fff; font-size: clamp(42px, 5.4vw, 72px); line-height: 1.03; letter-spacing: -0.035em; }
+html[data-look="ledger"] .hero h1 b { color: #fff; font-weight: 500; }
+html[data-look="ledger"] .hero .lede { color: rgba(255, 255, 255, 0.86); }
+html[data-look="ledger"] .btn { border-radius: 6px; font: 500 16px/1 "Inter", sans-serif; min-height: 46px; padding: 0 20px; }
+html[data-look="ledger"] .btn-red::after, html[data-look="ledger"] .btn-white::after { content: "›"; font-size: 20px; margin-left: 2px; line-height: 0; }
+html[data-look="ledger"] .hero .btn-red { background: #fff; color: var(--fg); }
+html[data-look="ledger"] .btn-outline { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6); }
+html[data-look="ledger"] .btn-quiet { box-shadow: inset 0 0 0 1px var(--border-strong); color: var(--brand-purple); }
+html[data-look="ledger"] h2 { font-size: clamp(34px, 4.2vw, 54px); line-height: 1.06; }
+html[data-look="ledger"] .section-hd .eyebrow { color: #5b3fc0; font-weight: 600; }
+html[data-look="ledger"] .section + .section { border-top: 0; }
+html[data-look="ledger"] .event-list { gap: 32px; }
+html[data-look="ledger"] .event-card { border-radius: 8px; box-shadow: var(--shadow-ledger-sm); overflow: hidden; border-color: var(--border); }
+html[data-look="ledger"] .event-card:hover { box-shadow: var(--shadow-ledger); border-color: var(--border); }
+html[data-look="ledger"] .event-name { font: 300 clamp(30px, 3vw, 36px)/1.1 "Inter", sans-serif; letter-spacing: -0.03em; }
+html[data-look="ledger"] .event-when { color: #5b3fc0; font-weight: 600; }
+html[data-look="ledger"] .thumb-pill { right: 12px; top: 12px; border-radius: 4px; font: 600 12.5px/1 "Inter", sans-serif; }
+html[data-look="ledger"] .eb { border-left: 0; border-radius: 6px; }
+html[data-look="ledger"] .eb i, html[data-look="ledger"] .badge { border-radius: 4px; }
+html[data-look="ledger"] .cta-band { margin: 0 max(4vw, 20px); border-radius: 8px; box-shadow: var(--shadow-ledger); }
+html[data-look="ledger"] .cta-band::after { background: linear-gradient(115deg, rgba(22, 9, 53, 0.96) 30%, rgba(91, 63, 192, 0.6) 70%, rgba(209, 31, 31, 0.35)); }
+html[data-look="ledger"] #run-groups { background: var(--surface-tint); margin-top: 96px; }
+html[data-look="ledger"] .levels { gap: 28px; }
+html[data-look="ledger"] .level-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 30px; box-shadow: var(--shadow-ledger-sm); }
+html[data-look="ledger"] .level-card .h3d { border-bottom-color: var(--border); font-weight: 400; }
+html[data-look="ledger"] .steps { border-bottom: 1px solid var(--border-strong); }
+html[data-look="ledger"] .step-cap { border-radius: 3px; }
+html[data-look="ledger"] .step-block { border-radius: 4px 4px 0 0; }
+html[data-look="ledger"] .ev-media .thumb { border-radius: 8px; box-shadow: var(--shadow-ledger-sm); }
+html[data-look="ledger"] .ev-title h1 { font-size: clamp(36px, 4vw, 52px); line-height: 1.05; }
+html[data-look="ledger"] .ev-title h1 b { font-weight: 400; }
+html[data-look="ledger"] .event-page .site-hdr, html[data-look="ledger"] body[data-event] .site-hdr { background: var(--brand-purple-deep); margin-bottom: 0; }
+html[data-look="ledger"] .crumb a { color: #5b3fc0; }
+html[data-look="ledger"] .facts a, html[data-look="ledger"] .venue a { color: #5b3fc0; font: 500 15px "Inter", sans-serif; text-decoration: none; }
+html[data-look="ledger"] .facts a::after, html[data-look="ledger"] .venue a::after { content: " ›"; }
+html[data-look="ledger"] .facts svg { color: #5b3fc0; }
+html[data-look="ledger"] .toc a { font-size: 15px; font-weight: 500; }
+html[data-look="ledger"] .toc a:hover { border-bottom-color: #5b3fc0; }
+html[data-look="ledger"] :is(.kv, .rg, .sched, .checklist, .facts) { border-top-color: var(--border-strong); }
+html[data-look="ledger"] .event-main h2 { font-size: clamp(30px, 3.2vw, 40px); }
+html[data-look="ledger"] .book { border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-ledger); }
+html[data-look="ledger"] .book-hd { background: linear-gradient(115deg, var(--brand-purple-deep), #5b3fc0 70%, #d11f1f); border-radius: 7px 7px 0 0; }
+html[data-look="ledger"] .book-hd span { font: 500 15px "Inter", sans-serif; }
+html[data-look="ledger"] .book-hd b { font: 300 26px/1 "Inter", sans-serif; }
+html[data-look="ledger"] .book h3 { font: 600 14px "Inter", sans-serif; color: var(--fg); }
+html[data-look="ledger"] .book-tabs { border-radius: 6px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--border-strong); }
+html[data-look="ledger"] .book-tabs button { font: 500 15px "Inter", sans-serif; }
+html[data-look="ledger"] .book-tabs button[aria-pressed="true"] { background: var(--brand-purple-deep); }
+html[data-look="ledger"] .book-opt { margin-bottom: 8px; border-radius: 6px; }
+html[data-look="ledger"] .book-opt:has(input:checked) { border-color: #5b3fc0; box-shadow: inset 0 0 0 1px #5b3fc0; }
+html[data-look="ledger"] .book-opt input { accent-color: #5b3fc0; }
+html[data-look="ledger"] .book-note, html[data-look="ledger"] .book-opt .tip, html[data-look="ledger"] .book-field input { border-radius: 6px; }
+html[data-look="ledger"] .book-total { border-top-color: var(--border); }
+html[data-look="ledger"] .book-total b { font: 300 38px/1 "Inter", sans-serif; letter-spacing: -0.03em; }
+html[data-look="ledger"] .site-ftr { background: var(--brand-purple-deep); }
+
+/* ---------------- Ride (Uber): black and white, pills everywhere, a white panel on the photo, soft card shadows ---------------- */
+html[data-look="ride"] {
+  --font-display: "DM Sans", Arial, sans-serif;
+  --font-body: "DM Sans", Arial, sans-serif;
+  --display-weight: 700; --display-weight-strong: 700; --tracking-display: -0.025em;
+  --fg: #000000; --fg-2: #1a1a1a; --muted: #545454; --muted-2: #333333; --meta: #6b6b6b;
+  --border: #e2e2e2; --border-soft: #eeeeee; --border-strong: #afafaf; --surface-tint: #f3f3f3;
+  --label: 500 14px/1.3 "DM Sans", Arial, sans-serif;
+  --shadow-ride: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+html[data-look="ride"] .site-hdr { background: #000; }
+html[data-look="ride"] .nav-links a { font: 500 15px "DM Sans", sans-serif; color: #fff; padding: 8px 14px; border-radius: 999px; border: 0; }
+html[data-look="ride"] .nav-links { gap: 2px; }
+html[data-look="ride"] .nav-links a:hover { background: #333; }
+/* Hero: full photo, a white request-style panel on top of it */
+html[data-look="ride"] .hero { background: #000; }
+html[data-look="ride"] .hero-photo { width: 100%; -webkit-mask-image: none; mask-image: none; background-position: 70% 50%; }
+html[data-look="ride"] .hero-photo::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0.35), transparent 60%); }
+html[data-look="ride"] .hero-copy { background: #fff; color: var(--fg); border-radius: 16px; padding: 40px; margin: 72px 0; max-width: 500px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); }
+html[data-look="ride"] .hero .eyebrow { color: var(--accent); }
+html[data-look="ride"] .hero h1 { font-size: clamp(38px, 4.2vw, 54px); line-height: 1.05; }
+html[data-look="ride"] .hero h1 b { color: var(--accent); }
+html[data-look="ride"] .hero .lede { color: var(--muted-2); font-size: 17px; margin: 16px 0 26px; }
+html[data-look="ride"] .btn { border-radius: 999px; font: 500 16px/1 "DM Sans", sans-serif; min-height: 50px; padding: 0 24px; }
+html[data-look="ride"] .btn-sm { min-height: 44px; }
+html[data-look="ride"] .btn-red { background: #000; }
+html[data-look="ride"] .btn-red:hover { background: #333; }
+html[data-look="ride"] .hero .btn-red { background: var(--accent); }
+html[data-look="ride"] .btn-outline, html[data-look="ride"] .btn-quiet { background: var(--surface-tint); color: var(--fg); box-shadow: none; }
+html[data-look="ride"] .btn-outline:hover, html[data-look="ride"] .btn-quiet:hover { background: #e2e2e2; color: var(--fg); }
+html[data-look="ride"] .cta-band .btn-white:hover { background: #e2e2e2; }
+html[data-look="ride"] .book-go.btn-red { background: var(--accent); }
+html[data-look="ride"] h2 { font-size: clamp(32px, 3.8vw, 48px); line-height: 1.08; }
+html[data-look="ride"] .section-hd .eyebrow { color: var(--muted); }
+html[data-look="ride"] .section + .section { border-top: 0; }
+html[data-look="ride"] .event-list { gap: 24px; }
+html[data-look="ride"] .event-card { border-radius: 16px; box-shadow: var(--shadow-ride); overflow: hidden; border-color: var(--border); }
+html[data-look="ride"] .event-card:hover { box-shadow: 0 8px 28px rgba(0, 0, 0, 0.16); border-color: var(--border); }
+html[data-look="ride"] .event-name { font: 700 clamp(26px, 2.6vw, 32px)/1.1 "DM Sans", sans-serif; letter-spacing: -0.02em; }
+html[data-look="ride"] .event-when { color: var(--accent); }
+html[data-look="ride"] .thumb-pill { right: 12px; top: 12px; border-radius: 999px; background: #fff; color: #000; font: 600 13px/1 "DM Sans", sans-serif; padding: 8px 12px; }
+html[data-look="ride"] .thumb.is-sold .thumb-pill { background: #000; color: #fff; }
+html[data-look="ride"] .eb { border-left: 0; border-radius: 12px; }
+html[data-look="ride"] .eb i, html[data-look="ride"] .badge { border-radius: 999px; }
+html[data-look="ride"] .cta-band { background: #000; }
+html[data-look="ride"] .cta-band::after { background: linear-gradient(90deg, #000 25%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.15)); }
+html[data-look="ride"] .levels { gap: 24px; }
+html[data-look="ride"] .level-card { border: 1px solid var(--border); border-radius: 16px; padding: 28px; box-shadow: var(--shadow-ride); }
+html[data-look="ride"] .level-card .h3d { border-bottom-color: var(--border); font-weight: 700; }
+html[data-look="ride"] .steps { border-bottom: 1px solid var(--border-strong); }
+html[data-look="ride"] .step-cap { border-radius: 4px; }
+html[data-look="ride"] .step-block { border-radius: 8px 8px 0 0; }
+html[data-look="ride"] .level-list b, html[data-look="ride"] .rg b { font-weight: 700; font-size: 19px; }
+html[data-look="ride"] .site-ftr { background: #000; }
+html[data-look="ride"] .ev-media .thumb { border-radius: 16px; }
+html[data-look="ride"] .ev-title h1 { font-size: clamp(32px, 3.6vw, 46px); line-height: 1.06; }
+html[data-look="ride"] .ev-title h1 b { display: inline; }
+html[data-look="ride"] .facts a, html[data-look="ride"] .venue a { font: 600 15px "DM Sans", sans-serif; }
+html[data-look="ride"] .toc { gap: 8px; border: 0; padding: 4px 0; }
+html[data-look="ride"] .toc a { background: var(--surface-tint); border-radius: 999px; border: 0; padding: 10px 16px; margin: 0; font-weight: 500; font-size: 15px; color: var(--fg); }
+html[data-look="ride"] .toc a:hover { background: #e2e2e2; }
+html[data-look="ride"] :is(.kv, .rg, .sched, .checklist, .facts) { border-top-color: var(--border-strong); }
+html[data-look="ride"] .event-main h2 { font-size: clamp(26px, 2.8vw, 34px); }
+html[data-look="ride"] .sched time { font: 700 19px/1.2 "DM Sans", sans-serif; }
+html[data-look="ride"] .book { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-ride); }
+html[data-look="ride"] .book-hd { background: #000; }
+html[data-look="ride"] .book-hd span { font: 500 15px "DM Sans", sans-serif; }
+html[data-look="ride"] .book-hd b { font: 700 24px/1 "DM Sans", sans-serif; }
+html[data-look="ride"] .book h3 { font: 700 15px "DM Sans", sans-serif; color: var(--fg); }
+html[data-look="ride"] .book-tabs { background: var(--surface-tint); border-radius: 999px; padding: 4px; box-shadow: none; }
+html[data-look="ride"] .book-tabs button { border-radius: 999px; font: 500 15px "DM Sans", sans-serif; }
+html[data-look="ride"] .book-tabs button[aria-pressed="true"] { background: #000; }
+html[data-look="ride"] .book-opt { margin-bottom: 8px; border-radius: 12px; }
+html[data-look="ride"] .book-note, html[data-look="ride"] .book-opt .tip, html[data-look="ride"] .book-field input { border-radius: 12px; }
+html[data-look="ride"] .book-total { border-top-color: var(--border); }
+html[data-look="ride"] .book-total b { font: 700 30px/1 "DM Sans", sans-serif; }
+@media (max-width: 899px) {
+  html[data-look="ledger"] .hero-photo { top: auto; bottom: 28px; left: max(4vw, 20px); right: max(4vw, 20px); width: auto; height: 220px; background-size: cover; }
+  html[data-look="ledger"] .hero-copy { padding: 120px 0 280px; }
+  html[data-look="ledger"] .hero h1 { color: #fff; }
+  html[data-look="ledger"] .hero::before { clip-path: polygon(0 0, 100% 0, 100% 64%, 0 72%); }
+  html[data-look="ride"] .hero-photo { top: 0; height: 280px; bottom: auto; background-size: cover; }
+  html[data-look="ride"] .hero-copy { margin: 200px 0 24px; padding: 28px; }
+  html[data-look="console"] .hero-copy { padding: 48px 0 210px; }
+  html[data-look="console"] .hero-photo { width: 100%; }
+}
