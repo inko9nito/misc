@@ -790,3 +790,120 @@ html[data-look="trail"] .book-total b { font: 400 34px/1 "Figtree", sans-serif; 
   html[data-look="trail"] .hero-copy { padding: 260px 0 48px; }
   html[data-look="trail"] .hero-photo::after { background: linear-gradient(0deg, rgba(10, 10, 9, 0.9) 35%, rgba(10, 10, 9, 0.15) 75%, rgba(10, 10, 9, 0.35)); }
 }
+
+/* ---------------- Grid (Formula 1): red header, wide bold type, carbon black, cards with one rounded top-right corner, timing-tower run groups ---------------- */
+@font-face { font-family: "Saira"; font-style: normal; src: url(../fonts/saira.woff2) format("woff2-variations"), url(../fonts/saira.woff2) format("woff2"); font-weight: 100 900; font-stretch: 50% 125%; font-display: swap; }
+@font-face { font-family: "Titillium Web"; src: url(../fonts/titillium-web-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Titillium Web"; src: url(../fonts/titillium-web-latin-600-normal.woff2) format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Titillium Web"; src: url(../fonts/titillium-web-latin-700-normal.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+html[data-look="grid"] {
+  --font-display: "Saira", "Arial Black", Arial, sans-serif;
+  --font-body: "Titillium Web", Arial, sans-serif;
+  --display-weight: 700; --display-weight-strong: 800; --tracking-display: -0.01em;
+  --accent: #e10600; --accent-hover: #b80500; --accent-active: #990400;
+  --fg: #15151e; --fg-2: #2a2a33; --muted: #5c5c66; --muted-2: #43434c; --meta: #6f6f78;
+  --border: #d8d8dd; --border-soft: #ebebee; --border-strong: #949498; --surface-tint: #f3f3f4; --surface-warm: #f3f3f4;
+  --label: 700 12.5px/1.2 "Titillium Web", Arial, sans-serif; --tracking-label: 0.08em;
+  --grid-carbon: #15151e; --grid-panel: #1f1f28; --grid-corner: 14px;
+}
+html[data-look="grid"] :is(h1, h2, .event-name, .h3d, .book-hd b, .book-total b) { font-stretch: 125%; }
+html[data-look="grid"] .site-hdr { background: var(--accent); border-bottom: 0; }
+html[data-look="grid"] .site-hdr .logo .wm em, html[data-look="grid"] .site-ftr .logo .wm em { color: var(--grid-carbon); }
+html[data-look="grid"] .site-hdr .logo .tg { color: rgba(255, 255, 255, 0.8); }
+html[data-look="grid"] .nav-links a { color: #fff; font: 700 14px "Titillium Web", sans-serif; letter-spacing: 0.02em; text-transform: none; }
+html[data-look="grid"] .nav-links a:hover { border-bottom-color: #fff; }
+/* Hero: carbon, photo on the right, a red speed line under the headline */
+html[data-look="grid"] .hero { background: var(--grid-carbon); }
+html[data-look="grid"] .hero-photo { width: 68%; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 38%); mask-image: linear-gradient(90deg, transparent 0, #000 38%); }
+html[data-look="grid"] .hero-photo::after { background: linear-gradient(90deg, rgba(21, 21, 30, 0.6), transparent 50%), linear-gradient(0deg, rgba(21, 21, 30, 0.5), transparent 40%); }
+html[data-look="grid"] .hero h1 { font-size: clamp(40px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.01em; }
+html[data-look="grid"] .hero h1 b { color: #fff; display: inline; }
+html[data-look="grid"] .hero h1::after { content: ""; display: block; width: 120px; height: 6px; margin-top: 26px; background: var(--accent); border-top-right-radius: 6px; }
+html[data-look="grid"] .hero .eyebrow { color: #fff; }
+html[data-look="grid"] .hero .eyebrow::before, html[data-look="grid"] .section-hd .eyebrow::before, html[data-look="grid"] .cta-band .eyebrow::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 10px; vertical-align: -1px; border-top: 3px solid var(--accent); border-right: 3px solid var(--accent); border-top-right-radius: 6px; }
+html[data-look="grid"] h2 { font-size: clamp(30px, 3.6vw, 48px); line-height: 1.04; }
+html[data-look="grid"] .section-hd .eyebrow { color: var(--fg); }
+/* Buttons: red, bold, one rounded corner like the cards */
+html[data-look="grid"] .btn { border-radius: 0 10px 0 0; font: 700 15px/1 "Titillium Web", sans-serif; text-transform: none; letter-spacing: 0.02em; min-height: 50px; padding: 0 26px; }
+html[data-look="grid"] .btn-red::after { content: "›"; font-size: 22px; line-height: 0; margin-left: 2px; }
+html[data-look="grid"] .btn-quiet { box-shadow: inset 0 0 0 2px var(--fg); }
+html[data-look="grid"] .btn-outline { box-shadow: inset 0 0 0 2px #fff; }
+html[data-look="grid"] .arrow-link { text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 15px; }
+html[data-look="grid"] .arrow-link::after { content: "›"; font-size: 20px; color: var(--accent); }
+/* Event cards: full border, the top-right corner rounded; hover lights the top and right edges red */
+html[data-look="grid"] .event-list { gap: 24px; }
+html[data-look="grid"] .event-card { border: 1px solid var(--border); border-top-right-radius: var(--grid-corner); overflow: hidden; box-shadow: inset -2px 2px 0 0 transparent; transition: box-shadow 160ms, border-color 160ms; }
+html[data-look="grid"] .event-card:hover { border-color: var(--border); box-shadow: inset -3px 3px 0 0 var(--accent); }
+html[data-look="grid"] .event-name { font: 700 clamp(24px, 2.4vw, 30px)/1.08 "Saira", sans-serif; font-stretch: 125%; letter-spacing: -0.01em; }
+html[data-look="grid"] .event-when { color: var(--accent); }
+html[data-look="grid"] .thumb-pill { right: auto; left: 0; top: 14px; background: var(--grid-carbon); color: #fff; border-left: 4px solid var(--accent); font: 700 13px/1 "Titillium Web", sans-serif; letter-spacing: 0.04em; text-transform: none; padding: 8px 12px; }
+html[data-look="grid"] .eb { border-left: 0; border-top-right-radius: 10px; }
+html[data-look="grid"] .cta-band { background: var(--grid-carbon); }
+html[data-look="grid"] .cta-band::after { background: linear-gradient(90deg, var(--grid-carbon) 25%, rgba(21, 21, 30, 0.5) 65%, rgba(21, 21, 30, 0.15)); }
+html[data-look="grid"] .cta-band .eyebrow { color: #fff; }
+html[data-look="grid"] .site-ftr { background: var(--grid-carbon); position: relative; }
+html[data-look="grid"] .site-ftr::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 8px; background: repeating-conic-gradient(#fff 0 25%, var(--grid-carbon) 0 50%) 0 0 / 8px 8px; opacity: 0.5; }
+
+/* Run groups: the timing tower */
+html[data-look="grid"] #run-groups { background: var(--grid-carbon); color: #fff; border-top: 0; }
+html[data-look="grid"] #run-groups .section-hd .eyebrow, html[data-look="grid"] #run-groups h2 { color: #fff; }
+html[data-look="grid"] #run-groups .section-sub, html[data-look="grid"] #run-groups .levels-note { color: #b9b9c2; }
+html[data-look="grid"] .levels { gap: 28px; }
+html[data-look="grid"] .level-card.is-tower { background: var(--grid-panel); border-top-right-radius: 18px; padding: 26px 26px 22px; border-top: 3px solid var(--accent); border-right: 3px solid var(--accent); }
+html[data-look="grid"] .is-tower .h3d { color: #fff; border-bottom: 0; font-size: 22px; padding-bottom: 0; }
+html[data-look="grid"] .is-tower .count { color: #9c9ca6; }
+/* Stint bar, like a tyre-strategy chart: one stint per group, chequered at the finish */
+.is-tower .strat { display: flex; gap: 4px; margin: 22px 0 8px; height: 44px; }
+.is-tower .strat span { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 12px; background: color-mix(in srgb, var(--c) 22%, #1f1f28); border-left: 4px solid var(--c); border-radius: 0 8px 8px 0; }
+.is-tower .strat b { font: 700 13px/1.1 "Titillium Web", sans-serif; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; }
+.is-tower .strat small { font: 400 11.5px/1.2 "Titillium Web", sans-serif; color: #c7c7d0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.is-tower .strat em { flex: 0 0 22px; background: repeating-conic-gradient(#fff 0 25%, #15151e 0 50%) 0 0 / 11px 11px; border-radius: 0 6px 6px 0; }
+.is-tower .strat-ends { display: flex; justify-content: space-between; font: 600 11.5px "Titillium Web", sans-serif; letter-spacing: 0.08em; text-transform: uppercase; color: #9c9ca6; margin-bottom: 18px; }
+.is-tower .tower { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.is-tower .tower li { display: grid; grid-template-columns: 40px 5px minmax(0, 1fr) 38px; align-items: center; gap: 0 14px; background: #15151e; border-radius: 0 10px 10px 0; padding: 12px 14px 12px 0; }
+.is-tower .pos { font: 800 20px/1 "Saira", sans-serif; font-stretch: 125%; color: #15151e; background: #fff; align-self: stretch; display: grid; place-items: center; margin: -12px 0; }
+.is-tower .team { align-self: stretch; background: var(--c); margin: -12px 0; }
+.is-tower .who b { display: block; font: 700 17px/1.1 "Saira", sans-serif; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.02em; color: #fff; }
+.is-tower .who span { display: block; font: 400 14.5px/1.4 "Titillium Web", sans-serif; color: #b9b9c2; margin-top: 3px; }
+/* Coaching badge drawn like a tyre: full ring = coach every session, half = part-time, thin = solo */
+.tyre { display: inline-grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; font: 800 14px/1 "Saira", sans-serif; font-style: normal; color: #fff; background: radial-gradient(circle, #15151e 0 54%, transparent 55%), var(--ring); }
+.tyre-full { --ring: #e10600; }
+.tyre-part { --ring: conic-gradient(#e10600 0 50%, #55555f 0 100%); }
+.tyre-solo { --ring: #9c9ca6; background: radial-gradient(circle, #15151e 0 62%, transparent 63%), var(--ring); }
+.is-tower .tyre-key { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 16px 0 0; font: 400 13px "Titillium Web", sans-serif; color: #b9b9c2; }
+.is-tower .tyre-key span { display: inline-flex; align-items: center; gap: 8px; }
+.is-tower .tyre-key .tyre { width: 22px; height: 22px; font-size: 10px; }
+/* Event page run groups get the same timing-tower rows */
+html[data-look="grid"] .rg { counter-reset: pos; border-top: 0; display: grid; gap: 4px; }
+html[data-look="grid"] .rg li { counter-increment: pos; grid-template-columns: 40px 5px minmax(0, 1fr); gap: 0 14px; padding: 14px 16px 14px 0; border: 0; background: var(--surface-tint); border-radius: 0 10px 10px 0; }
+html[data-look="grid"] .rg li::before { content: counter(pos); display: grid; place-items: center; background: var(--grid-carbon); color: #fff; font: 800 19px/1 "Saira", sans-serif; font-stretch: 125%; margin: -14px 0; }
+html[data-look="grid"] .rg i { height: auto; margin: -14px 0; }
+html[data-look="grid"] .rg b { font: 700 17px/1.15 "Saira", sans-serif; font-stretch: 125%; text-transform: uppercase; letter-spacing: 0.02em; }
+
+/* Event page */
+html[data-look="grid"] .ev-media .thumb { border-top-right-radius: 18px; }
+html[data-look="grid"] .ev-title h1 { font-size: clamp(30px, 3.4vw, 44px); line-height: 1.05; }
+html[data-look="grid"] .ev-title h1 b { color: var(--accent); }
+html[data-look="grid"] .event-main h2 { font-size: clamp(24px, 2.6vw, 32px); }
+html[data-look="grid"] .facts { border-top: 3px solid var(--fg); }
+html[data-look="grid"] .facts a, html[data-look="grid"] .venue a { color: var(--fg); text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 15px; }
+html[data-look="grid"] .toc a { text-transform: none; letter-spacing: 0; font-weight: 700; font-size: 15px; }
+html[data-look="grid"] .toc a:hover { border-bottom-color: var(--accent); }
+html[data-look="grid"] .book { border: 1px solid var(--border); border-top-right-radius: 18px; overflow: hidden; }
+html[data-look="grid"] .book-hd { background: var(--grid-carbon); border-bottom: 4px solid var(--accent); }
+html[data-look="grid"] .book-hd span { text-transform: none; letter-spacing: 0.02em; font-size: 14px; }
+html[data-look="grid"] .book-hd b { font: 700 24px/1 "Saira", sans-serif; font-stretch: 125%; }
+html[data-look="grid"] .book h3 { color: var(--fg); }
+html[data-look="grid"] .book-tabs { box-shadow: inset 0 0 0 2px var(--fg); }
+html[data-look="grid"] .book-tabs button { text-transform: none; letter-spacing: 0.02em; font: 700 14px "Titillium Web", sans-serif; }
+html[data-look="grid"] .book-opt { border-top-right-radius: 10px; margin-bottom: 6px; }
+html[data-look="grid"] .book-opt:has(input:checked) { border-color: var(--fg); box-shadow: inset 4px 0 0 var(--accent); }
+html[data-look="grid"] .book-total b { font: 800 36px/1 "Saira", sans-serif; font-stretch: 125%; }
+@media (max-width: 899px) {
+  html[data-look="grid"] .hero-photo { width: 100%; }
+  html[data-look="grid"] .hero h1 { font-size: clamp(32px, 9vw, 44px); }
+  .is-tower .strat small { display: none; }
+  .is-tower .strat span { padding: 0 8px; }
+  .is-tower .strat b { font-size: 11.5px; letter-spacing: 0.04em; }
+  html[data-look="grid"] .level-card.is-tower { padding: 20px 16px 18px; }
+}

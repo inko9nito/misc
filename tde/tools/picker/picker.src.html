@@ -72,7 +72,7 @@ body { background: var(--ink); color: var(--text); font: 14px/1.35 var(--font-ui
     <div class="sheet-ft">
       <label class="wide-only" for="cmp">Side by side with</label>
       <select class="wide-only" id="cmp"><option value="">Nothing</option></select>
-      <span class="keys">← → or 1–0 to switch · H to hide</span>
+      <span class="keys">← → or 1–0 to switch, G for Grid · H to hide</span>
     </div>
   </div>
   <div class="bar" role="toolbar" aria-label="Style switcher">
@@ -110,7 +110,8 @@ const OPTS = [
   { id: "ledger",   look: "ledger",   name: "Ledger",        after: "after Stripe",      desc: "Diagonal purple-to-red gradient hero, light deep-purple headlines, tinted shadows." },
   { id: "ride",     look: "ride",     name: "Ride",          after: "after Uber",        desc: "Black and white pills, headline in a white panel over a full photo." },
   { id: "kit",      look: "kit",      name: "Kit",           after: "after Adidas",      desc: "Italic condensed caps, square everything, black buttons with an offset outline and arrow, yellow new-drivers band." },
-  { id: "trail",    look: "trail",    name: "Trail",         after: "after Rivian",      desc: "Calm warm neutrals, full-bleed photo under the header, light Figtree type, pill buttons." }
+  { id: "trail",    look: "trail",    name: "Trail",         after: "after Rivian",      desc: "Calm warm neutrals, full-bleed photo under the header, light Figtree type, pill buttons." },
+  { id: "grid",     look: "grid",     name: "Grid",          after: "after Formula 1",   desc: "Red header, wide bold type, carbon black, one rounded corner. Run groups as a timing tower with a stint bar." }
 ];
 const $ = s => document.querySelector(s);
 const narrow = () => innerWidth <= 700;
@@ -121,7 +122,7 @@ if (!SITE[state.page]) state.page = "index.html";
 if (!OPTS.some(o => o.id === state.opt)) state.opt = "a";
 const fromHash = location.hash.slice(1); if (OPTS.some(o => o.id === fromHash)) state.opt = fromHash;
 
-$("#list").innerHTML = OPTS.map((o, i) => `<button class="item" role="option" data-id="${o.id}"><kbd>${(i + 1) % 10}</kbd><b>${o.name}<span>${o.after}</span></b><small>${o.desc}</small></button>`).join("");
+$("#list").innerHTML = OPTS.map((o, i) => `<button class="item" role="option" data-id="${o.id}"><kbd>${i < 10 ? (i + 1) % 10 : o.id[0].toUpperCase()}</kbd><b>${o.name}<span>${o.after}</span></b><small>${o.desc}</small></button>`).join("");
 $("#cmp").innerHTML += OPTS.map(o => `<option value="${o.id}">${o.name}</option>`).join("");
 
 const query = o => `?clean&today=2026-11-26${o.look ? `&look=${o.look}` : ""}`;
@@ -219,6 +220,7 @@ function onKey(e) {
   if (e.key === "ArrowRight") go(1);
   else if (e.key === "ArrowLeft") go(-1);
   else if (/^[0-9]$/.test(e.key)) { const i = (+e.key + 9) % 10; if (!OPTS[i]) return; state.opt = OPTS[i].id; if (state.cmp === state.opt) state.cmp = ""; render(); }
+  else if (e.key === "g" || e.key === "G") { state.opt = "grid"; render(); }
   else if (e.key === "h" || e.key === "H") setHidden(!$("#dock").hidden);
   else if (e.key === "Escape") toggleSheet(false);
   else return;

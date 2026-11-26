@@ -128,7 +128,23 @@
     return `<div class="steps steps-${v}" style="--n:${n}" aria-hidden="true">${keys.map(col).join("")}</div>`;
   };
 
+  // Grid look (after F1): a stint bar like a tyre-strategy chart, then a timing-tower list.
+  // The round badge works like a tyre compound: C coach every session, P part-time coach, S solo.
+  const COACH = { full: ["C", "Coach every session", "Coached"], part: ["P", "Part-time coach", "Part-time coach"], solo: ["S", "Solo", "Solo"] };
+  const towerCard = fk => {
+    const f = D.formats[fk];
+    const strat = `<div class="strat" aria-hidden="true">${f.groups.map(k => `<span style="--c:${D.groups[k].color}"><b>${D.groups[k].name}</b><small>${COACH[D.groups[k].coach][2]}</small></span>`).join("")}<em></em></div>` +
+      `<div class="strat-ends" aria-hidden="true"><span>New driver</span><span>Solo-approved</span></div>`;
+    const rows = f.groups.map((k, i) => {
+      const g = D.groups[k], c = COACH[g.coach];
+      return `<li style="--c:${g.color}"><span class="pos">${i + 1}</span><i class="team"></i><div class="who"><b>${g.name}</b><span>${g.desc}</span></div><span class="tyre tyre-${g.coach}" title="${c[1]}" aria-label="${c[1]}">${c[0]}</span></li>`;
+    }).join("");
+    const key = Object.values(COACH).map(([l, n], i) => `<span><i class="tyre tyre-${Object.keys(COACH)[i]}">${l}</i>${n}</span>`).join("");
+    return `<div class="level-card is-tower"><h3 class="h3d">${f.label}<span class="count">${f.groups.length} groups</span></h3>${strat}<ol class="tower">${rows}</ol><p class="tyre-key">${key}</p></div>`;
+  };
+
   const levelCard = (fk, v) => {
+    if (!v && document.documentElement.dataset.look === "grid") return towerCard(fk);
     const f = D.formats[fk];
     return `<div class="level-card"><h3 class="h3d">${f.label}<span class="count">${f.groups.length} groups</span></h3>${steps(f.groups, v)}` +
       `<ul class="level-list">${f.groups.map(k => `<li><i style="--c:${D.groups[k].color}"></i><div><b>${D.groups[k].name}</b><span>${D.groups[k].desc}</span></div></li>`).join("")}</ul></div>`;
@@ -338,7 +354,7 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       const on = cur(key) === val;
       return `<a href="${withParams(here, extra)}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
     };
-    const looks = `<b style="margin-left:12px">Option</b>${[["", "A · Precision"], ["b", "B · Porsche"], ["athletic", "Athletic"], ["showcase", "Showcase"], ["booking", "Booking"], ["console", "Console"], ["ledger", "Ledger"], ["ride", "Ride"], ["kit", "Kit"], ["trail", "Trail"]].map(([v, l]) => link(l, "look", v)).join("")}`;
+    const looks = `<b style="margin-left:12px">Option</b>${[["", "A · Precision"], ["b", "B · Porsche"], ["athletic", "Athletic"], ["showcase", "Showcase"], ["booking", "Booking"], ["console", "Console"], ["ledger", "Ledger"], ["ride", "Ride"], ["kit", "Kit"], ["trail", "Trail"], ["grid", "Grid"]].map(([v, l]) => link(l, "look", v)).join("")}`;
     const states = document.body.dataset.event
       ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";

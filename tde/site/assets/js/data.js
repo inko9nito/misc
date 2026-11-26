@@ -13,13 +13,13 @@ window.TDE_DATA = {
   earlyBirdSaving: 30,
 
   groups: {
-    purple: { name: "Purple", color: "var(--group-purple)", desc: "New drivers, and drivers new to TDE. A certified coach rides with you every session.", short: "Newer drivers. Coach in the car every session." },
-    orange: { name: "Orange", color: "var(--group-orange)", desc: "Proven, credible track experience. A coach rides with you for part of the day.", short: "Proven experience. Coach rides part-time." },
-    pink:   { name: "Pink",   color: "var(--group-pink)",   desc: "Advanced and solo-approved to TDE standards. You drive on your own.", short: "Advanced. Full-time solo to TDE standards." },
-    green:  { name: "Green",  color: "var(--group-green)",  desc: "New to track driving. A certified coach rides with you every session.", short: "New to track driving. Coach in the car every session." },
-    blue:   { name: "Blue",   color: "var(--group-blue)",   desc: "Building consistency with a coach. Some drivers earn part-time solo.", short: "Building consistency. Some drivers earn part-time solo." },
-    yellow: { name: "Yellow", color: "var(--group-yellow)", desc: "Experienced. Part-time coaching, or solo once TDE signs you off.", short: "Experienced. Part-time coach, or solo once TDE signs you off." },
-    red:    { name: "Red",    color: "var(--group-red)",    desc: "Most advanced. Solo-approved by TDE.", short: "Most advanced. Solo-approved by TDE." }
+    purple: { name: "Purple", coach: "full", color: "var(--group-purple)", desc: "New drivers, and drivers new to TDE. A certified coach rides with you every session.", short: "Newer drivers. Coach in the car every session." },
+    orange: { name: "Orange", coach: "part", color: "var(--group-orange)", desc: "Proven, credible track experience. A coach rides with you for part of the day.", short: "Proven experience. Coach rides part-time." },
+    pink:   { name: "Pink", coach: "solo",   color: "var(--group-pink)",   desc: "Advanced and solo-approved to TDE standards. You drive on your own.", short: "Advanced. Full-time solo to TDE standards." },
+    green:  { name: "Green", coach: "full",  color: "var(--group-green)",  desc: "New to track driving. A certified coach rides with you every session.", short: "New to track driving. Coach in the car every session." },
+    blue:   { name: "Blue", coach: "full",   color: "var(--group-blue)",   desc: "Building consistency with a coach. Some drivers earn part-time solo.", short: "Building consistency. Some drivers earn part-time solo." },
+    yellow: { name: "Yellow", coach: "part", color: "var(--group-yellow)", desc: "Experienced. Part-time coaching, or solo once TDE signs you off.", short: "Experienced. Part-time coach, or solo once TDE signs you off." },
+    red:    { name: "Red", coach: "solo",    color: "var(--group-red)",    desc: "Most advanced. Solo-approved by TDE.", short: "Most advanced. Solo-approved by TDE." }
   },
 
   // The two formats. Never show both color sets on the same event.
