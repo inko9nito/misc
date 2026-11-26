@@ -97,7 +97,8 @@
   --photo-floor: #05030b;
   --photo-vignette: radial-gradient(85% 120% at 100% 100%, #05030b 30%, rgba(5, 3, 11, 0.75) 52%, rgba(5, 3, 11, 0) 78%), linear-gradient(180deg, rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.6));
 
-  /* TDE · display type settings (Saira) */
+  /* TDE · brand type (wordmark, ticker, date stamps) and heading settings */
+  --font-brand: "Saira", "Arial Black", Impact, sans-serif;
   --display-style: italic;
   --display-weight: 850;
   --display-stretch: 112%;

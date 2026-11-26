@@ -307,20 +307,41 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       m.setAttribute("aria-expanded", String(open));
     }));
 
+    // Carry preview settings (today, foundation, heading type) across pages.
+    const carried = ["today", "ds", "type"].filter(k => params.get(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
+    const withParams = (href, extra = []) => {
+      const [path, hash] = href.split("#");
+      const q = [...carried.filter(c => !extra.some(x => x.split("=")[0] === c.split("=")[0])), ...extra].filter(x => !/=$/.test(x));
+      return `${path}${q.length ? `?${q.join("&")}` : ""}${hash ? `#${hash}` : ""}`;
+    };
+    document.addEventListener("click", e => {
+      const a = e.target.closest("a[href]");
+      const h = a && a.getAttribute("href");
+      if (!h || !carried.length || !/^[\w-]+\.html/.test(h) || a.dataset.carried) return;
+      a.setAttribute("href", withParams(h));
+      a.dataset.carried = "1";
+    }, true);
+
     if (params.has("clean")) return;
     const here = location.pathname.split("/").pop() || "index.html";
     const pages = [["index.html", "Home"], ...D.events.map(e => [e.page, `${e.formatLabel} event`]), ["design-system.html", "Design system"]];
-    const keep = params.get("today") ? `?today=${encodeURIComponent(params.get("today"))}` : "";
+    const cur = k => params.get(k) || "";
+    const link = (label, key, val) => {
+      const extra = [`${key}=${val}`];
+      if (key === "ds" && !val) extra.push("type=");
+      if (key !== "state" && cur("state")) extra.push(`state=${cur("state")}`);
+      const on = cur(key) === val || (key === "type" && !cur("type") && val === "foundation");
+      return `<a href="${withParams(here, extra)}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
+    };
     const states = document.body.dataset.event
-      ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => {
-          const on = (params.get("state") || "") === s;
-          return `<a href="?${s ? `state=${s}` : ""}${keep ? `&${keep.slice(1)}` : ""}"${on ? ' aria-current="page"' : ""}>${l}</a>`;
-        }).join("")}`
+      ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";
+    const foundations = `<b style="margin-left:12px">Foundation</b>${[["", "Current"], ["bmwm", "BMW M"], ["ferrari", "Ferrari"], ["tesla", "Tesla"], ["porsche", "Porsche"]].map(([v, l]) => link(l, "ds", v)).join("")}`;
+    const types = cur("ds") ? `<b style="margin-left:12px">Headings</b>${link("Foundation", "type", "foundation")}${link("Saira", "type", "saira")}` : "";
     const bar = document.createElement("nav");
     bar.className = "proto-bar";
     bar.setAttribute("aria-label", "Prototype pages");
-    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${p}${keep}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
+    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${withParams(p)}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${foundations}${types}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
     document.body.prepend(bar);
     const exit = document.createElement("button");
     exit.type = "button";

@@ -1,5 +1,6 @@
 // Full-page screenshots of the TDE site for review on a phone.
 // Usage: node tde/tools/shoot.mjs [outDir] [--today=2026-11-26] [--only=index,event-dec-12]
+//        [--ds=bmwm|ferrari|tesla|porsche] [--type=foundation|saira] [--devices=phone,desktop]
 // Needs Playwright with Chromium (preinstalled in Claude Code cloud sessions).
 // Phone: 390×844 at 2×, split into parts so no image is taller than 8000px.
 // Desktop: 1280 wide at 1×. The prototype bar and the phone booking bar are hidden.
@@ -17,6 +18,10 @@ const out = resolve(args.find(a => !a.startsWith("--")) || join(here, "../screen
 const opt = k => (args.find(a => a.startsWith(`--${k}=`)) || "").split("=")[1];
 const today = opt("today") || "2026-11-26";
 const only = opt("only") ? opt("only").split(",") : null;
+const ds = opt("ds"), type = opt("type");
+const devices = opt("devices") ? opt("devices").split(",") : ["phone", "desktop"];
+const look = `${ds ? `&ds=${ds}` : ""}${ds && type ? `&type=${type}` : ""}`;
+const tag = ds ? `${ds}${type === "saira" ? "-saira" : ""}-` : "";
 
 const shots = [
   ["index", "index.html"],
@@ -38,11 +43,11 @@ const server = createServer((req, res) => {
 const origin = `http://127.0.0.1:${server.address().port}`;
 mkdirSync(out, { recursive: true });
 const browser = await chromium.launch();
-for (const [dev, viewport, scale] of [["phone", { width: 390, height: 844 }, 2], ["desktop", { width: 1280, height: 860 }, 1]]) {
+for (const [dev, viewport, scale] of [["phone", { width: 390, height: 844 }, 2], ["desktop", { width: 1280, height: 860 }, 1]].filter(d => devices.includes(d[0]))) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, reducedMotion: "reduce", isMobile: dev === "phone", hasTouch: dev === "phone" });
   const page = await ctx.newPage();
   for (const [name, file, q] of shots) {
-    const url = `${origin}/${file}?clean&today=${today}${q ? `&${q}` : ""}`;
+    const url = `${origin}/${file}?clean&today=${today}${look}${q ? `&${q}` : ""}`;
     await page.goto(url, { waitUntil: "load" });
     await page.addStyleTag({ content: ".mbar{display:none!important}body.has-mbar{padding-bottom:0!important}" });
     await page.evaluate(() => document.fonts.ready);
@@ -53,7 +58,7 @@ for (const [dev, viewport, scale] of [["phone", { width: 390, height: 844 }, 2],
     for (let i = 0; i < parts; i++) {
       const y = i * step, height = Math.min(step, h - y);
       const suffix = parts > 1 ? `-${i + 1}of${parts}` : "";
-      const path = join(out, `${name}-${dev}${suffix}.jpg`);
+      const path = join(out, `${tag}${name}-${dev}${suffix}.jpg`);
       await page.screenshot({ path, fullPage: true, clip: { x: 0, y, width: viewport.width, height }, type: "jpeg", quality: 86 });
       console.log(path, `${viewport.width * scale}×${Math.round(height * scale)}`);
     }
