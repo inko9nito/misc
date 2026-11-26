@@ -338,7 +338,7 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       const on = cur(key) === val;
       return `<a href="${withParams(here, extra)}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
     };
-    const looks = `<b style="margin-left:12px">Option</b>${[["", "A · Precision"], ["b", "B · Porsche"], ["athletic", "Athletic"], ["showcase", "Showcase"], ["booking", "Booking"], ["console", "Console"], ["ledger", "Ledger"], ["ride", "Ride"]].map(([v, l]) => link(l, "look", v)).join("")}`;
+    const looks = `<b style="margin-left:12px">Option</b>${[["", "A · Precision"], ["b", "B · Porsche"], ["athletic", "Athletic"], ["showcase", "Showcase"], ["booking", "Booking"], ["console", "Console"], ["ledger", "Ledger"], ["ride", "Ride"], ["kit", "Kit"], ["trail", "Trail"]].map(([v, l]) => link(l, "look", v)).join("")}`;
     const states = document.body.dataset.event
       ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";

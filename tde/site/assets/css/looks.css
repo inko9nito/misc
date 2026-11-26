@@ -615,3 +615,178 @@ html[data-look="ride"] .book-total b { font: 700 30px/1 "DM Sans", sans-serif; }
   html[data-look="console"] .hero-copy { padding: 48px 0 210px; }
   html[data-look="console"] .hero-photo { width: 100%; }
 }
+
+/* =====================================================================
+ * Kit (after Adidas) and Trail (after Rivian), Nov 2026
+ * ===================================================================== */
+@font-face { font-family: "Barlow Condensed"; font-style: italic; src: url(../fonts/barlow-condensed-latin-700-italic.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+@font-face { font-family: "Barlow Condensed"; font-style: italic; src: url(../fonts/barlow-condensed-latin-800-italic.woff2) format("woff2"); font-weight: 800 900; font-display: swap; }
+@font-face { font-family: "Figtree"; src: url(../fonts/figtree.woff2) format("woff2-variations"), url(../fonts/figtree.woff2) format("woff2"); font-weight: 300 900; font-display: swap; }
+
+/* ---------------- Kit (Adidas): white and black, square everything, italic condensed caps, buttons with an offset outline and an arrow ---------------- */
+html[data-look="kit"] {
+  --font-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --display-weight: 800; --display-weight-strong: 800; --tracking-display: 0;
+  --fg: #000000; --fg-2: #1a1a1a; --muted: #555555; --muted-2: #3a3a3a; --meta: #767677;
+  --border: #d3d7da; --border-soft: #eceff1; --border-strong: #767677; --surface-tint: #eceff1; --surface-warm: #eceff1;
+  --label: 700 13px/1.2 "Barlow", Arial, sans-serif; --tracking-label: 0.1em;
+}
+html[data-look="kit"] :is(h1, h2, .event-name, .h3d) { font-style: italic; text-transform: uppercase; }
+html[data-look="kit"] .site-hdr { background: #fff; color: #000; border-bottom: 1px solid var(--border); }
+html[data-look="kit"] .site-hdr .logo .wm, html[data-look="kit"] .site-hdr .logo .tg b { color: #000; }
+html[data-look="kit"] .site-hdr .logo .wm em { color: var(--accent); }
+html[data-look="kit"] .site-hdr .logo .tg { color: var(--muted); }
+html[data-look="kit"] .nav-links a { color: #000; font: 700 14px "Barlow", sans-serif; letter-spacing: 0.06em; }
+html[data-look="kit"] .nav-links a:hover { color: #000; border-bottom-color: #000; }
+/* Hero: the photo fills the band; big italic caps on it */
+html[data-look="kit"] .hero { background: #000; }
+html[data-look="kit"] .hero-photo { width: 100%; -webkit-mask-image: none; mask-image: none; background-position: 64% 55%; }
+html[data-look="kit"] .hero-photo::after { background: linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.1) 65%), linear-gradient(0deg, rgba(0, 0, 0, 0.5), transparent 45%); }
+html[data-look="kit"] .hero-copy { padding: 150px 0 72px; max-width: 860px; }
+html[data-look="kit"] .hero h1 { font-size: clamp(56px, 7.4vw, 104px); line-height: 0.86; letter-spacing: 0; }
+html[data-look="kit"] .hero h1 b { color: #fff; }
+html[data-look="kit"] .hero .eyebrow { color: #fff; }
+html[data-look="kit"] .hero .lede { color: #fff; font-size: 18px; }
+html[data-look="kit"] h2 { font-size: clamp(42px, 5.2vw, 72px); line-height: 0.9; }
+/* Buttons: square, caps, an arrow, and an outline offset to the lower right that closes on hover */
+html[data-look="kit"] .btn { position: relative; font: 700 14px/1 "Barlow", sans-serif; letter-spacing: 0.12em; min-height: 50px; padding: 0 20px; justify-content: space-between; gap: 28px; }
+html[data-look="kit"] .btn::after { content: "→"; font-size: 18px; letter-spacing: 0; }
+html[data-look="kit"] .btn::before { content: ""; position: absolute; inset: 0; border: 1px solid #000; transform: translate(4px, 4px); pointer-events: none; transition: transform var(--motion-fast) var(--ease-standard); }
+html[data-look="kit"] .btn:hover::before { transform: translate(0, 0); }
+html[data-look="kit"] .btn-red, html[data-look="kit"] .btn-quiet { background: #000; color: #fff; box-shadow: none; }
+html[data-look="kit"] .btn-red:hover, html[data-look="kit"] .btn-quiet:hover { background: #000; color: #a7a8aa; }
+html[data-look="kit"] .hero .btn::before, html[data-look="kit"] .cta-band .btn::before, html[data-look="kit"] .btn-white::before, html[data-look="kit"] .btn-outline::before { border-color: #fff; }
+html[data-look="kit"] .hero .btn-red, html[data-look="kit"] .btn-white { background: #fff; color: #000; }
+html[data-look="kit"] .hero .btn-red::before, html[data-look="kit"] .btn-white::before { border-color: #fff; }
+html[data-look="kit"] .hero .btn-red:hover, html[data-look="kit"] .btn-white:hover { background: #fff; color: #767677; }
+html[data-look="kit"] .btn-outline { background: transparent; color: #fff; box-shadow: inset 0 0 0 1px #fff; }
+html[data-look="kit"] .btn-outline::before { display: none; }
+html[data-look="kit"] .btn-outline:hover { background: #fff; color: #000; }
+html[data-look="kit"] .btn[aria-disabled="true"]::before, html[data-look="kit"] .btn:disabled::before { display: none; }
+html[data-look="kit"] .book-go.btn-red { width: calc(100% - 4px); }
+html[data-look="kit"] .arrow-link { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
+html[data-look="kit"] .section-hd .eyebrow { color: #000; }
+html[data-look="kit"] .event-list { gap: 20px; }
+html[data-look="kit"] .event-card { border-color: var(--border); }
+html[data-look="kit"] .event-card:hover { border-color: #000; }
+html[data-look="kit"] .event-name { font: italic 800 clamp(32px, 3.2vw, 42px)/0.92 "Barlow Condensed", sans-serif; letter-spacing: 0; }
+html[data-look="kit"] .event-when { color: #000; }
+html[data-look="kit"] .thumb-pill { background: #fff; color: #000; left: 0; right: auto; top: 0; font: 700 12px/1 "Barlow", sans-serif; letter-spacing: 0.1em; padding: 9px 10px; }
+html[data-look="kit"] .thumb.is-sold .thumb-pill { background: #000; color: #fff; }
+html[data-look="kit"] .eb { border-left: 0; background: var(--surface-tint); }
+/* New drivers: a bright member-style band, black type, no photo */
+html[data-look="kit"] .cta-band { background: #ede734; color: #000; }
+html[data-look="kit"] .cta-band::before, html[data-look="kit"] .cta-band::after { display: none; }
+html[data-look="kit"] .cta-band .eyebrow, html[data-look="kit"] .cta-band p { color: #000; }
+html[data-look="kit"] .cta-band h2 { max-width: 14ch; }
+html[data-look="kit"] .cta-band .btn-white, html[data-look="kit"] .cta-band .btn-red { background: #000; color: #fff; }
+html[data-look="kit"] .cta-band .btn::before { border-color: #000; }
+html[data-look="kit"] .cta-band .btn-outline { color: #000; box-shadow: inset 0 0 0 1px #000; }
+html[data-look="kit"] .cta-band .btn-outline:hover { background: #000; color: #fff; }
+html[data-look="kit"] .level-card { border: 1px solid var(--border); padding: 28px; }
+html[data-look="kit"] .level-card .h3d { font-family: "Barlow Condensed", sans-serif; font-weight: 800; font-size: 30px; letter-spacing: 0; border-bottom-color: var(--border); }
+html[data-look="kit"] .level-list b, html[data-look="kit"] .rg b { font: italic 800 23px/1 "Barlow Condensed", sans-serif; text-transform: uppercase; }
+html[data-look="kit"] .site-ftr { background: #000; color: #a7a8aa; }
+html[data-look="kit"] .ev-title h1 { font-size: clamp(46px, 5.2vw, 72px); line-height: 0.88; }
+html[data-look="kit"] .ev-title h1 b { color: #000; }
+html[data-look="kit"] .event-main h2 { font-size: clamp(36px, 4vw, 52px); }
+html[data-look="kit"] .toc a:hover { border-bottom-color: #000; }
+html[data-look="kit"] .facts a, html[data-look="kit"] .venue a { text-decoration: underline; text-underline-offset: 4px; }
+html[data-look="kit"] .book { border: 1px solid #000; }
+html[data-look="kit"] .book-hd { background: #000; }
+html[data-look="kit"] .book-hd b { font: italic 800 30px/1 "Barlow Condensed", sans-serif; }
+html[data-look="kit"] .book-tabs button[aria-pressed="true"] { background: #000; color: #fff; }
+html[data-look="kit"] .book-opt:has(input:checked) { border-color: #000; box-shadow: inset 0 0 0 1px #000; }
+html[data-look="kit"] .book-total b { font: italic 800 44px/1 "Barlow Condensed", sans-serif; }
+
+/* ---------------- Trail (Rivian): calm, warm neutrals, big quiet photography, light geometric type, pill buttons ---------------- */
+html:is([data-look="trail"]) :is(.eyebrow, .label, .event-when, .crumb, .nav-links a, .toc a, .facts a, .kv dt, .book h3, .book-hd span, .credit th, .level-card .count, .sched-day, .venue a, .ftr-cols h3, .book-total span, .arrow-link, .mbar small, .thumb-pill, .badge, .badge-req, .eb i, .btn, .book-tabs button) { text-transform: none; letter-spacing: 0; }
+html[data-look="trail"] {
+  --font-display: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --display-weight: 400; --display-weight-strong: 600; --tracking-display: -0.025em;
+  --fg: #1c1b19; --fg-2: #2b2a27; --muted: #64625d; --muted-2: #4a4945; --meta: #7a7873;
+  --border: #e3e1db; --border-soft: #eceae5; --border-strong: #b9b6ae; --surface-tint: #f3f2ee; --surface-warm: #f3f2ee;
+  --label: 500 14px/1.3 "Figtree", Arial, sans-serif;
+  --trail-yellow: #ffb81c; --trail-ink: #121210;
+}
+html[data-look="trail"] .site-hdr { background: var(--trail-ink); border-bottom: 0; }
+html[data-look="trail"] .nav { min-height: 72px; }
+html[data-look="trail"] .nav-links a { font: 500 15px "Figtree", sans-serif; color: #e9e7e1; border: 0; }
+html[data-look="trail"] .nav-links a:hover { color: #fff; }
+/* Home: the header sits on the photo; the hero is a tall full-bleed landscape with the copy at the bottom */
+html[data-look="trail"] body:not([data-event]) .site-hdr { position: absolute; top: 0; left: 0; right: 0; z-index: 5; background: linear-gradient(180deg, rgba(0, 0, 0, 0.45), transparent); }
+html[data-look="trail"] .hero { background: var(--trail-ink); }
+html[data-look="trail"] .hero-photo { width: 100%; -webkit-mask-image: none; mask-image: none; background-position: 60% 60%; }
+html[data-look="trail"] .hero-photo::after { background: linear-gradient(0deg, rgba(10, 10, 9, 0.78), rgba(10, 10, 9, 0.1) 55%, rgba(10, 10, 9, 0.25)); }
+html[data-look="trail"] .hero-copy { padding: 300px 0 72px; max-width: 720px; }
+html[data-look="trail"] .hero h1 { font-size: clamp(44px, 5.6vw, 76px); line-height: 1.02; letter-spacing: -0.03em; font-weight: 400; }
+html[data-look="trail"] .hero h1 b { color: #fff; font-weight: 600; }
+html[data-look="trail"] .hero .eyebrow { color: var(--trail-yellow); font-weight: 600; }
+html[data-look="trail"] .hero .lede { color: #e9e7e1; font-size: 18px; }
+html[data-look="trail"] h2 { font-size: clamp(34px, 4vw, 52px); line-height: 1.06; }
+html[data-look="trail"] .btn { border-radius: 999px; font: 600 15px/1 "Figtree", sans-serif; min-height: 48px; padding: 0 26px; }
+html[data-look="trail"] .btn-sm { min-height: 42px; padding: 0 20px; }
+html[data-look="trail"] .btn-red { background: var(--trail-ink); }
+html[data-look="trail"] .btn-red:hover { background: #3a3935; }
+html[data-look="trail"] .hero .btn-red, html[data-look="trail"] .cta-band .btn-white { background: #fff; color: var(--trail-ink); }
+html[data-look="trail"] .hero .btn-red:hover, html[data-look="trail"] .cta-band .btn-white:hover { background: #e9e7e1; }
+html[data-look="trail"] .btn-outline { box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6); background: rgba(255, 255, 255, 0.06); backdrop-filter: blur(6px); }
+html[data-look="trail"] .btn-quiet { box-shadow: inset 0 0 0 1px var(--border-strong); }
+html[data-look="trail"] .btn-quiet:hover { background: var(--surface-tint); color: var(--fg); }
+html[data-look="trail"] .book-go.btn-red { background: var(--accent); }
+html[data-look="trail"] .book-go.btn-red:hover { background: var(--accent-hover); }
+html[data-look="trail"] .section-hd .eyebrow { color: var(--muted); font-weight: 600; }
+html[data-look="trail"] .section-sub { color: var(--muted); }
+html[data-look="trail"] .section + .section { border-top: 0; }
+html[data-look="trail"] .event-list { gap: 24px; }
+html[data-look="trail"] .event-card { border-radius: 14px; overflow: hidden; border-color: var(--border); transition: box-shadow 200ms var(--ease-standard); }
+html[data-look="trail"] .event-card:hover { border-color: var(--border-strong); box-shadow: 0 10px 30px rgba(28, 27, 25, 0.08); }
+html[data-look="trail"] .event-ttl { padding: 24px 26px 0; }
+html[data-look="trail"] .event-name { font: 400 clamp(28px, 2.8vw, 34px)/1.08 "Figtree", sans-serif; letter-spacing: -0.02em; }
+html[data-look="trail"] .event-when { color: var(--muted); font-weight: 600; }
+html[data-look="trail"] .thumb-pill { right: 14px; top: 14px; border-radius: 999px; background: rgba(18, 18, 16, 0.72); backdrop-filter: blur(6px); color: #fff; font: 600 13px/1 "Figtree", sans-serif; padding: 8px 12px; }
+html[data-look="trail"] .thumb-pill::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--trail-yellow); margin-right: 7px; vertical-align: 1px; }
+html[data-look="trail"] .eb { border-left: 0; border-radius: 12px; background: var(--surface-tint); }
+html[data-look="trail"] .eb i, html[data-look="trail"] .badge { border-radius: 999px; }
+html[data-look="trail"] #run-groups { background: var(--surface-tint); }
+html[data-look="trail"] .levels { gap: 20px; }
+html[data-look="trail"] .level-card { background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 28px; }
+html[data-look="trail"] .level-card .h3d { font-weight: 500; border-bottom-color: var(--border); }
+html[data-look="trail"] .step-cap { border-radius: 4px; }
+html[data-look="trail"] .step-block { border-radius: 6px 6px 0 0; }
+html[data-look="trail"] .level-list b, html[data-look="trail"] .rg b { font-weight: 600; font-size: 19px; }
+html[data-look="trail"] .cta-band { background: var(--trail-ink); }
+html[data-look="trail"] .cta-band::before { opacity: 0.75; filter: saturate(0.7); }
+html[data-look="trail"] .cta-band::after { background: linear-gradient(90deg, var(--trail-ink) 20%, rgba(18, 18, 16, 0.5) 62%, rgba(18, 18, 16, 0.1)); }
+html[data-look="trail"] .cta-band .eyebrow { color: var(--trail-yellow); }
+html[data-look="trail"] .site-ftr { background: var(--trail-ink); color: #a9a69e; }
+html[data-look="trail"] .site-ftr .ftr-cols { border-bottom-color: rgba(255, 255, 255, 0.12); }
+html[data-look="trail"] .ev-media .thumb { border-radius: 14px; }
+html[data-look="trail"] .ev-title h1 { font-size: clamp(36px, 4vw, 52px); line-height: 1.04; }
+html[data-look="trail"] .ev-title h1 b { color: var(--fg); }
+html[data-look="trail"] .event-main h2 { font-size: clamp(28px, 3vw, 36px); }
+html[data-look="trail"] .facts { background: var(--surface-tint); border-radius: 14px; padding: 8px 22px; border-top: 0; }
+html[data-look="trail"] .facts li:last-child { border-bottom: 0; }
+html[data-look="trail"] .facts a, html[data-look="trail"] .venue a { font: 600 15px "Figtree", sans-serif; }
+html[data-look="trail"] .toc a { font-size: 15px; font-weight: 500; }
+html[data-look="trail"] .toc a:hover { border-bottom-color: var(--fg); }
+html[data-look="trail"] .book { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: 0 12px 40px rgba(28, 27, 25, 0.07); }
+html[data-look="trail"] .book-hd { background: #fff; color: var(--fg); border-bottom: 1px solid var(--border); padding: 20px 24px; }
+html[data-look="trail"] .book-hd span { font: 600 15px "Figtree", sans-serif; }
+html[data-look="trail"] .book-hd b { font: 400 26px/1 "Figtree", sans-serif; letter-spacing: -0.02em; }
+html[data-look="trail"] .book h3 { font: 600 15px "Figtree", sans-serif; color: var(--fg); }
+html[data-look="trail"] .book-tabs { background: var(--surface-tint); border-radius: 999px; padding: 4px; box-shadow: none; }
+html[data-look="trail"] .book-tabs button { border-radius: 999px; font: 600 14px "Figtree", sans-serif; }
+html[data-look="trail"] .book-tabs button[aria-pressed="true"] { background: #fff; color: var(--fg); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12); }
+html[data-look="trail"] .book-opt { margin-bottom: 8px; border-radius: 12px; }
+html[data-look="trail"] .book-opt:has(input:checked) { border-color: var(--fg); }
+html[data-look="trail"] .book-note, html[data-look="trail"] .book-opt .tip, html[data-look="trail"] .book-field input { border-radius: 12px; }
+html[data-look="trail"] .book-total b { font: 400 34px/1 "Figtree", sans-serif; letter-spacing: -0.02em; }
+@media (max-width: 899px) {
+  html[data-look="kit"] .hero-photo, html[data-look="trail"] .hero-photo { top: 0; background-size: cover; background-position: 62% 50%; }
+  html[data-look="kit"] .hero-copy { padding: 220px 0 48px; }
+  html[data-look="kit"] .hero-photo::after { background: linear-gradient(0deg, rgba(0, 0, 0, 0.85) 35%, rgba(0, 0, 0, 0.1) 75%); }
+  html[data-look="trail"] .hero-copy { padding: 260px 0 48px; }
+  html[data-look="trail"] .hero-photo::after { background: linear-gradient(0deg, rgba(10, 10, 9, 0.9) 35%, rgba(10, 10, 9, 0.15) 75%, rgba(10, 10, 9, 0.35)); }
+}
