@@ -108,11 +108,11 @@
       act = `<a class="btn btn-quiet btn-sm" href="${ev.page}#book">Join waitlist</a><span class="event-price is-struck">from $${from}</span>`;
     }
     return `<article class="event-card${st === "sold" ? " is-sold" : ""}">` +
-      `<a href="${ev.page}" tabindex="-1" aria-hidden="true">${thumb(ev, now, st)}</a>` +
-      `<div class="body"><span class="event-when">${ev.dateShort} · ${ev.formatLabel}</span>` +
+      `<a class="event-media" href="${ev.page}" tabindex="-1" aria-hidden="true">${thumb(ev, now, st)}</a>` +
+      `<div class="event-ttl"><span class="event-when">${ev.dateShort} · ${ev.formatLabel}</span>` +
       `<h3 class="event-name"><a href="${ev.page}">${ev.title}</a></h3>` +
-      `<span class="event-meta">${ev.track} · ${ev.city}</span>${mid}` +
-      `<div class="event-actions">${act}</div></div></article>`;
+      `<span class="event-meta">${ev.track} · ${ev.city}</span></div>` +
+      `<div class="event-more">${mid}<div class="event-actions">${act}</div></div></article>`;
   };
 
   // Step graphic: rises from lowest to highest; the group color is the cap.
@@ -313,8 +313,8 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       m.setAttribute("aria-expanded", String(open));
     }));
 
-    // Carry the preview date across pages.
-    const carried = ["today"].filter(k => params.get(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
+    // Carry the preview date and the design option across pages.
+    const carried = ["today", "look"].filter(k => params.get(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
     const withParams = (href, extra = []) => {
       const [path, hash] = href.split("#");
       const q = [...carried.filter(c => !extra.some(x => x.split("=")[0] === c.split("=")[0])), ...extra].filter(x => !/=$/.test(x));
@@ -338,13 +338,14 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       const on = cur(key) === val;
       return `<a href="${withParams(here, extra)}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
     };
+    const looks = `<b style="margin-left:12px">Option</b>${[["", "A · Precision"], ["b", "B · Porsche"], ["c", "C · Hybrid"]].map(([v, l]) => link(l, "look", v)).join("")}`;
     const states = document.body.dataset.event
       ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";
     const bar = document.createElement("nav");
     bar.className = "proto-bar";
     bar.setAttribute("aria-label", "Prototype pages");
-    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${withParams(p)}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
+    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${withParams(p)}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${looks}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
     document.body.prepend(bar);
     const exit = document.createElement("button");
     exit.type = "button";

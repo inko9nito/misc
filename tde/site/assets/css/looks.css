@@ -1,0 +1,184 @@
+/* Design options for review (issue #29). Option A (Precision) is tde.css itself.
+ *   <html data-look="b">  B · Porsche: rounded photo tiles with text on the image, gray surfaces,
+ *                          4px sentence-case buttons, semibold tight headings (Inter Tight).
+ *   <html data-look="c">  C · Hybrid: Option A's type and labels with Porsche containers: light hero,
+ *                          photos inset in rounded white cards, pill buttons.
+ * When one is chosen, it gets folded into tokens.css and tde.css and this file goes away.
+ */
+@font-face { font-family: "Inter Tight"; src: url(../fonts/inter-tight.woff2) format("woff2-variations"), url(../fonts/inter-tight.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
+
+/* =====================================================================
+ * B · Porsche
+ * ===================================================================== */
+html[data-look="b"] {
+  --font-display: "Inter Tight", Arial, sans-serif;
+  --font-body: "Inter Tight", Arial, sans-serif;
+  --display-weight: 600; --display-weight-strong: 600; --tracking-display: -0.025em;
+  --fg: #010205; --fg-2: #2b2c30; --muted: #535457; --muted-2: #45464a; --meta: #6b6d70;
+  --border: #d8d8db; --border-soft: #e5e5e8; --border-strong: #6b6d70; --surface-tint: #eeeff2; --surface-warm: #f5f5f7;
+  --radius-sm: 4px; --radius-md: 4px; --radius-lg: 12px; --radius-xl: 16px;
+  --label: 500 14px/1.3 "Inter Tight", Arial, sans-serif;
+}
+html[data-look="b"] body { font-size: 16.5px; }
+/* Labels are sentence case in this option */
+html[data-look="b"] :is(.eyebrow, .label, .event-when, .crumb, .nav-links a, .toc a, .facts a, .kv dt, .book h3, .book-hd span, .credit th, .level-card .count, .sched-day, .venue a, .ftr-cols h3, .book-total span, .arrow-link, .mbar small, .thumb-pill, .badge, .badge-req, .eb i) { text-transform: none; letter-spacing: 0; }
+html[data-look="b"] .nav-links a { font: 400 15px "Inter Tight", sans-serif; }
+html[data-look="b"] .event-when { font-weight: 600; }
+/* Buttons: 4px, 54px, sentence case, 2px outlines */
+html[data-look="b"] .btn { border-radius: 4px; font: 600 16px/1 "Inter Tight", sans-serif; text-transform: none; letter-spacing: 0; min-height: 54px; padding: 0 26px; }
+html[data-look="b"] .btn-sm { min-height: 48px; padding: 0 22px; font-size: 15px; }
+html[data-look="b"] .btn-quiet { box-shadow: inset 0 0 0 2px var(--fg); }
+html[data-look="b"] .btn-outline { box-shadow: inset 0 0 0 2px #fff; }
+html[data-look="b"] .btn[aria-disabled="true"] { box-shadow: none; }
+/* Home hero: an inset, rounded panel */
+html[data-look="b"] .hero { margin: 16px max(2vw, 12px) 0; border-radius: 16px; }
+html[data-look="b"] .hero h1 { font-size: clamp(40px, 5.4vw, 72px); line-height: 1.02; letter-spacing: -0.035em; }
+html[data-look="b"] .hero .eyebrow { margin-bottom: 18px; }
+html[data-look="b"] h2 { font-size: clamp(30px, 3.6vw, 46px); line-height: 1.08; }
+/* Event tiles: the photo is the tile; text sits on it */
+html[data-look="b"] .event-list { gap: 32px 24px; }
+html[data-look="b"] .event-card { grid-template-areas: "m" "x"; grid-template-rows: auto 1fr; }
+html[data-look="b"] .event-media, html[data-look="b"] .event-ttl { grid-area: m; }
+html[data-look="b"] .event-more { grid-area: x; }
+html[data-look="b"] .event-media .thumb { border-radius: 12px; aspect-ratio: 3 / 2; }
+html[data-look="b"] .event-media .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(1, 2, 5, 0.82) 0, rgba(1, 2, 5, 0.35) 38%, transparent 62%); }
+html[data-look="b"] .event-media .thumb-stamp { display: none; }
+html[data-look="b"] .thumb-track { bottom: auto; top: 10%; right: 4%; width: 26%; opacity: 0.6; }
+html[data-look="b"] .thumb-pill { left: 14px; right: auto; top: 14px; border-radius: 4px; font: 600 13px/1 "Inter Tight", sans-serif; padding: 8px 10px; }
+html[data-look="b"] .event-ttl { align-self: end; z-index: 1; padding: 22px 24px; color: #fff; pointer-events: none; }
+html[data-look="b"] .event-ttl a { pointer-events: auto; }
+html[data-look="b"] .event-ttl .event-when { color: rgba(255, 255, 255, 0.85); font-size: 14px; }
+html[data-look="b"] .event-name { font: 600 clamp(26px, 2.6vw, 32px)/1.1 "Inter Tight", sans-serif; letter-spacing: -0.02em; margin: 6px 0 4px; }
+html[data-look="b"] .event-ttl .event-meta { color: rgba(255, 255, 255, 0.85); }
+html[data-look="b"] .event-more { padding-top: 4px; }
+html[data-look="b"] .eb { border-left: 0; border-radius: 4px; }
+html[data-look="b"] .eb i { border-radius: 4px; font: 600 12.5px/1 "Inter Tight", sans-serif; }
+html[data-look="b"] .badge { border-radius: 4px; font: 600 13px/1.3 "Inter Tight", sans-serif; }
+html[data-look="b"] .badge-req { border-radius: 4px; font: 600 12px/1.3 "Inter Tight", sans-serif; }
+/* Photo band as an inset rounded panel */
+html[data-look="b"] .cta-band { margin: 0 max(2vw, 12px); border-radius: 16px; }
+/* Run groups: white cards on a gray surface */
+html[data-look="b"] #run-groups { background: var(--surface-tint); border-top: 0; margin-top: 96px; }
+html[data-look="b"] .levels { gap: 24px; }
+html[data-look="b"] .level-card { background: #fff; border-radius: 12px; padding: 28px; }
+html[data-look="b"] .level-card .h3d { border-bottom: 0; padding-bottom: 0; font-weight: 600; }
+html[data-look="b"] .steps { border-bottom-width: 1px; border-bottom-color: var(--border); }
+html[data-look="b"] .step-cap { border-radius: 3px; }
+html[data-look="b"] .step-block { border-radius: 4px 4px 0 0; }
+html[data-look="b"] .level-list i { border-radius: 2px; }
+html[data-look="b"] .level-list b, html[data-look="b"] .rg b { font-weight: 600; font-size: 19px; }
+html[data-look="b"] .ftr-cols h3 { font-weight: 600; font-size: 15px; }
+/* Event page: the banner is a rounded photo with the title on it */
+html[data-look="b"] .ev-head { display: grid; grid-template-areas: "crumb" "media"; }
+html[data-look="b"] .crumb { grid-area: crumb; font-size: 15px; }
+html[data-look="b"] .ev-media, html[data-look="b"] .ev-title { grid-area: media; }
+html[data-look="b"] .ev-media .thumb { border-radius: 16px; aspect-ratio: 4 / 3; background-size: cover; }
+html[data-look="b"] .ev-media .thumb::after { content: ""; position: absolute; inset: 0; background: linear-gradient(0deg, rgba(1, 2, 5, 0.85) 0, rgba(1, 2, 5, 0.4) 40%, transparent 65%); }
+html[data-look="b"] .ev-media .thumb-stamp { display: none; }
+html[data-look="b"] .ev-media .thumb-track { top: 8%; width: 28%; }
+html[data-look="b"] .ev-media .thumb-pill { left: 18px; top: 18px; }
+html[data-look="b"] .ev-title { align-self: end; z-index: 1; margin: 0; padding: 28px 30px; color: #fff; }
+html[data-look="b"] .ev-title .eyebrow { color: rgba(255, 255, 255, 0.8); }
+html[data-look="b"] .ev-title h1 { font-size: clamp(32px, 3.6vw, 48px); line-height: 1.04; letter-spacing: -0.03em; }
+html[data-look="b"] .ev-title h1 b { font-weight: 600; }
+html[data-look="b"] .ev-when { color: rgba(255, 255, 255, 0.88); font-size: 17px; }
+html[data-look="b"] .facts { border: 0; background: var(--surface-tint); border-radius: 12px; padding: 4px 22px; }
+html[data-look="b"] .facts li { border-bottom-color: #dcdce0; }
+html[data-look="b"] .facts li:last-child { border-bottom: 0; }
+html[data-look="b"] .facts a { font-weight: 600; text-decoration: underline; }
+html[data-look="b"] .toc { gap: 8px; border: 0; padding: 4px; background: var(--surface-tint); border-radius: 4px; }
+html[data-look="b"] .toc a { padding: 10px 14px; border-radius: 4px; border: 0; margin: 0; font-size: 15px; color: var(--fg); }
+html[data-look="b"] .toc a:hover { background: #fff; }
+html[data-look="b"] :is(.kv, .rg, .sched, .checklist) { border-top-color: var(--border); }
+html[data-look="b"] .credit th { border-bottom-color: var(--fg); }
+html[data-look="b"] .ev-questions { border-top-color: var(--border); }
+html[data-look="b"] .event-main h2 { font-size: clamp(28px, 3vw, 36px); }
+html[data-look="b"] .sched time { font: 600 19px/1.2 "Inter Tight", sans-serif; }
+/* Booking card: rounded container, segmented control, rounded options */
+html[data-look="b"] .book { border: 1px solid var(--border); border-radius: 16px; }
+html[data-look="b"] .book-hd { background: none; color: var(--fg); padding: 22px 22px 0; }
+html[data-look="b"] .book-hd span { font: 600 22px/1.2 "Inter Tight", sans-serif; }
+html[data-look="b"] .book-hd b { font: 400 16px "Inter Tight", sans-serif; color: var(--muted); }
+html[data-look="b"] .book h3 { font: 600 15px "Inter Tight", sans-serif; color: var(--fg); }
+html[data-look="b"] .book-tabs { background: var(--surface-tint); box-shadow: none; padding: 4px; border-radius: 4px; }
+html[data-look="b"] .book-tabs button { border-radius: 4px; font: 500 15px "Inter Tight", sans-serif; text-transform: none; letter-spacing: 0; }
+html[data-look="b"] .book-tabs button[aria-pressed="true"] { background: #fff; color: var(--fg); box-shadow: 0 1px 2px rgba(1, 2, 5, 0.12); }
+html[data-look="b"] .book-opt { margin-bottom: 8px; border-radius: 4px; border-color: var(--border-strong); }
+html[data-look="b"] .book-note, html[data-look="b"] .book-opt .tip { border-radius: 4px; }
+html[data-look="b"] .book-field input { border-radius: 4px; border: 2px solid var(--border-strong); }
+html[data-look="b"] .book-total { border-top-color: var(--border); }
+html[data-look="b"] .book-total b { font: 600 32px/1 "Inter Tight", sans-serif; letter-spacing: -0.02em; }
+html[data-look="b"] .mbar b { font: 600 20px/1 "Inter Tight", sans-serif; }
+html[data-look="b"] .mbar { border-top-color: var(--border); }
+@media (max-width: 899px) {
+  html[data-look="b"] .ev-media .thumb { aspect-ratio: 4 / 5; }
+  html[data-look="b"] .ev-title { padding: 22px; }
+  html[data-look="b"] .hero-copy { padding: 44px 0 210px; }
+}
+
+/* =====================================================================
+ * C · Hybrid
+ * ===================================================================== */
+html[data-look="c"] { --radius-lg: 12px; --radius-xl: 16px; }
+/* Pill buttons, caps labels kept */
+html[data-look="c"] .btn { border-radius: 999px; min-height: 50px; padding: 0 28px; }
+html[data-look="c"] .btn-sm { min-height: 46px; }
+/* Light hero with a rounded photo */
+html[data-look="c"] .hero { background: var(--surface-warm); background-image: none; color: var(--fg); }
+html[data-look="c"] .hero-photo { top: 48px; bottom: 48px; right: max(4vw, 20px); width: min(50%, 660px); border-radius: 16px; -webkit-mask-image: none; mask-image: none; background-position: 55% 55%; }
+html[data-look="c"] .hero-photo::after { background: linear-gradient(180deg, transparent 60%, rgba(13, 8, 25, 0.25)); }
+html[data-look="c"] .hero-copy { max-width: 440px; padding: 104px 0 104px; }
+html[data-look="c"] .hero .eyebrow { color: var(--accent); }
+html[data-look="c"] .hero h1 { font-size: clamp(42px, 4.6vw, 64px); }
+html[data-look="c"] .hero h1 b { color: var(--accent); }
+html[data-look="c"] .hero .lede { color: var(--muted-2); }
+html[data-look="c"] .hero .btn-outline { color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); background: none; }
+html[data-look="c"] .hero .btn-outline:hover { background: var(--fg); color: #fff; }
+/* Event tiles: photo inset in a rounded white card */
+html[data-look="c"] .event-list { gap: 28px; }
+html[data-look="c"] .event-card { border: 1px solid var(--border); border-radius: 18px; padding: 10px; background: #fff; }
+html[data-look="c"] .event-media .thumb { border-radius: 12px; }
+html[data-look="c"] .thumb-pill { right: 12px; top: 12px; border-radius: 999px; padding: 8px 12px; }
+html[data-look="c"] .event-ttl { padding: 20px 14px 0; }
+html[data-look="c"] .event-more { padding: 0 14px 12px; }
+html[data-look="c"] .eb { border-radius: 10px; border-left: 0; }
+html[data-look="c"] .eb i, html[data-look="c"] .badge { border-radius: 999px; }
+/* Photo band and run groups as rounded containers */
+html[data-look="c"] .cta-band { margin: 0 max(4vw, 20px); border-radius: 20px; }
+html[data-look="c"] #run-groups { border-top: 0; }
+html[data-look="c"] .levels { gap: 24px; }
+html[data-look="c"] .level-card { border: 1px solid var(--border); border-radius: 18px; padding: 30px; }
+html[data-look="c"] .level-card .h3d { border-bottom-color: var(--border); }
+html[data-look="c"] .step-cap { border-radius: 3px; }
+html[data-look="c"] .step-block { border-radius: 6px 6px 0 0; }
+html[data-look="c"] .level-list i { border-radius: 2px; }
+/* Event page: the head spans the page, title left and a rounded photo right, on a light surface */
+html[data-look="c"] .event-layout { grid-template-areas: "head head" "main aside"; padding-top: 0; }
+html[data-look="c"] .ev-head {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "crumb crumb" "title media";
+  column-gap: 56px; align-items: center; padding: 32px 0 48px; margin-bottom: 48px; border-bottom: 1px solid var(--border);
+}
+html[data-look="c"] .crumb { grid-area: crumb; margin-bottom: 28px; }
+html[data-look="c"] .ev-media { grid-area: media; }
+html[data-look="c"] .ev-media .thumb { border-radius: 16px; }
+html[data-look="c"] .ev-title { grid-area: title; margin: 0; }
+html[data-look="c"] .ev-title h1 { font-size: clamp(38px, 4.4vw, 60px); }
+html[data-look="c"] .ev-title h1 b { display: block; }
+html[data-look="c"] .toc { gap: 8px; border: 0; padding: 4px 0; }
+html[data-look="c"] .toc a { border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; margin: 0; }
+html[data-look="c"] .toc a:hover { border-color: var(--fg); }
+html[data-look="c"] .facts { border-top: 0; }
+html[data-look="c"] .book { border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
+html[data-look="c"] .book-tabs { border-radius: 999px; overflow: hidden; }
+html[data-look="c"] .book-opt { margin-bottom: 8px; border-radius: 12px; }
+html[data-look="c"] .book-note, html[data-look="c"] .book-opt .tip, html[data-look="c"] .book-field input { border-radius: 10px; }
+html[data-look="c"] .book-row .btn { min-height: 48px; }
+@media (max-width: 899px) {
+  html[data-look="c"] .hero-photo { top: auto; bottom: 28px; left: max(4vw, 20px); right: max(4vw, 20px); width: auto; height: 230px; background-size: cover; background-position: 50% 60%; }
+  html[data-look="c"] .hero-photo::after { background: none; }
+  html[data-look="c"] .hero-copy { padding: 48px 0 290px; }
+  html[data-look="c"] .ev-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "crumb" "media" "title"; row-gap: 24px; padding-top: 24px; margin-bottom: 32px; }
+  html[data-look="c"] .crumb { margin-bottom: 0; }
+  html[data-look="c"] .event-layout { grid-template-areas: "head" "main" "aside"; }
+}
+html[data-look="b"] .thumb-pill, html[data-look="b"] .thumb-track { z-index: 1; }

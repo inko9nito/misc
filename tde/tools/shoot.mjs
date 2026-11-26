@@ -1,6 +1,6 @@
 // Full-page screenshots of the TDE site for review on a phone.
 // Usage: node tde/tools/shoot.mjs [outDir] [--today=2026-11-26] [--only=index,event-dec-12]
-//        [--ds=bmwm|ferrari|porsche] [--type=foundation|saira] [--devices=phone,desktop]
+//        [--look=b|c] [--devices=phone,desktop]
 // Needs Playwright with Chromium (preinstalled in Claude Code cloud sessions).
 // Phone: 390×844 at 2×, split into parts so no image is taller than 8000px.
 // Desktop: 1280 wide at 1×. The prototype bar and the phone booking bar are hidden.
@@ -18,10 +18,10 @@ const out = resolve(args.find(a => !a.startsWith("--")) || join(here, "../screen
 const opt = k => (args.find(a => a.startsWith(`--${k}=`)) || "").split("=")[1];
 const today = opt("today") || "2026-11-26";
 const only = opt("only") ? opt("only").split(",") : null;
-const ds = opt("ds"), type = opt("type");
+const look = opt("look");
 const devices = opt("devices") ? opt("devices").split(",") : ["phone", "desktop"];
-const look = `${ds ? `&ds=${ds}` : ""}${ds && type ? `&type=${type}` : ""}`;
-const tag = ds ? `${ds}${type === "saira" ? "-saira" : ""}-` : "";
+const lookQ = look ? `&look=${look}` : "";
+const tag = look ? `${look}-` : "";
 
 const shots = [
   ["index", "index.html"],
@@ -48,7 +48,7 @@ for (const [dev, viewport, scale] of [["phone", { width: 390, height: 844 }, 2],
   const page = await ctx.newPage();
   page.on("pageerror", e => console.error("PAGE ERROR", e.message));
   for (const [name, file, q] of shots) {
-    const url = `${origin}/${file}?clean&today=${today}${look}${q ? `&${q}` : ""}`;
+    const url = `${origin}/${file}?clean&today=${today}${lookQ}${q ? `&${q}` : ""}`;
     await page.goto(url, { waitUntil: "load" });
     await page.addStyleTag({ content: ".mbar{display:none!important}body.has-mbar{padding-bottom:0!important}" });
     await page.evaluate(() => document.fonts.ready);
