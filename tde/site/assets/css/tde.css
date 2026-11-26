@@ -174,10 +174,11 @@ body.fs .proto-exit { display: inline-flex; }
 
 /* ---------- Event cards: photo-led tiles, two across ---------- */
 .event-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 480px), 1fr)); gap: 56px 40px; }
-.event-card { display: grid; grid-template-rows: auto auto 1fr; color: var(--fg); }
+.event-card { display: grid; grid-template-rows: auto auto 1fr; color: var(--fg); border: 1px solid var(--border); background: var(--surface); transition: border-color var(--motion-fast) var(--ease-standard); }
+.event-card:hover { border-color: var(--fg); }
 .event-media { display: block; }
-.event-ttl { padding-top: 22px; }
-.event-more { display: flex; flex-direction: column; }
+.event-ttl { padding: 24px 26px 0; }
+.event-more { display: flex; flex-direction: column; padding: 0 26px 26px; }
 .event-when { display: block; font: var(--label); text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--accent); }
 .event-name { display: block; font: 300 clamp(30px, 3vw, 38px)/1.05 var(--font-display); letter-spacing: -0.02em; margin: 10px 0 6px; }
 .event-name a { text-decoration: none; }

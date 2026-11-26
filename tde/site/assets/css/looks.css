@@ -1,8 +1,6 @@
 /* Design options for review (issue #29). Option A (Precision) is tde.css itself.
  *   <html data-look="b">  B · Porsche: rounded photo tiles with text on the image, gray surfaces,
  *                          4px sentence-case buttons, semibold tight headings (Inter Tight).
- *   <html data-look="c">  C · Hybrid: Option A's type and labels with Porsche containers: light hero,
- *                          photos inset in rounded white cards, pill buttons.
  * When one is chosen, it gets folded into tokens.css and tde.css and this file goes away.
  */
 @font-face { font-family: "Inter Tight"; src: url(../fonts/inter-tight.woff2) format("woff2-variations"), url(../fonts/inter-tight.woff2) format("woff2"); font-weight: 100 900; font-display: swap; }
@@ -50,7 +48,10 @@ html[data-look="b"] .event-ttl a { pointer-events: auto; }
 html[data-look="b"] .event-ttl .event-when { color: rgba(255, 255, 255, 0.85); font-size: 14px; }
 html[data-look="b"] .event-name { font: 600 clamp(26px, 2.6vw, 32px)/1.1 "Inter Tight", sans-serif; letter-spacing: -0.02em; margin: 6px 0 4px; }
 html[data-look="b"] .event-ttl .event-meta { color: rgba(255, 255, 255, 0.85); }
-html[data-look="b"] .event-more { padding-top: 4px; }
+html[data-look="b"] .event-card { border: 1px solid var(--border); border-radius: 16px; padding: 8px; background: #fff; }
+html[data-look="b"] .event-card:hover { border-color: var(--border-strong); }
+html[data-look="b"] .event-media .thumb { border-radius: 10px; }
+html[data-look="b"] .event-more { padding: 4px 12px 12px; }
 html[data-look="b"] .eb { border-left: 0; border-radius: 4px; }
 html[data-look="b"] .eb i { border-radius: 4px; font: 600 12.5px/1 "Inter Tight", sans-serif; }
 html[data-look="b"] .badge { border-radius: 4px; font: 600 13px/1.3 "Inter Tight", sans-serif; }
@@ -116,69 +117,4 @@ html[data-look="b"] .mbar { border-top-color: var(--border); }
   html[data-look="b"] .hero-copy { padding: 44px 0 210px; }
 }
 
-/* =====================================================================
- * C · Hybrid
- * ===================================================================== */
-html[data-look="c"] { --radius-lg: 12px; --radius-xl: 16px; }
-/* Pill buttons, caps labels kept */
-html[data-look="c"] .btn { border-radius: 999px; min-height: 50px; padding: 0 28px; }
-html[data-look="c"] .btn-sm { min-height: 46px; }
-/* Light hero with a rounded photo */
-html[data-look="c"] .hero { background: var(--surface-warm); background-image: none; color: var(--fg); }
-html[data-look="c"] .hero-photo { top: 48px; bottom: 48px; right: max(4vw, 20px); width: min(50%, 660px); border-radius: 16px; -webkit-mask-image: none; mask-image: none; background-position: 55% 55%; }
-html[data-look="c"] .hero-photo::after { background: linear-gradient(180deg, transparent 60%, rgba(13, 8, 25, 0.25)); }
-html[data-look="c"] .hero-copy { max-width: 440px; padding: 104px 0 104px; }
-html[data-look="c"] .hero .eyebrow { color: var(--accent); }
-html[data-look="c"] .hero h1 { font-size: clamp(42px, 4.6vw, 64px); }
-html[data-look="c"] .hero h1 b { color: var(--accent); }
-html[data-look="c"] .hero .lede { color: var(--muted-2); }
-html[data-look="c"] .hero .btn-outline { color: var(--fg); box-shadow: inset 0 0 0 1px var(--fg); background: none; }
-html[data-look="c"] .hero .btn-outline:hover { background: var(--fg); color: #fff; }
-/* Event tiles: photo inset in a rounded white card */
-html[data-look="c"] .event-list { gap: 28px; }
-html[data-look="c"] .event-card { border: 1px solid var(--border); border-radius: 18px; padding: 10px; background: #fff; }
-html[data-look="c"] .event-media .thumb { border-radius: 12px; }
-html[data-look="c"] .thumb-pill { right: 12px; top: 12px; border-radius: 999px; padding: 8px 12px; }
-html[data-look="c"] .event-ttl { padding: 20px 14px 0; }
-html[data-look="c"] .event-more { padding: 0 14px 12px; }
-html[data-look="c"] .eb { border-radius: 10px; border-left: 0; }
-html[data-look="c"] .eb i, html[data-look="c"] .badge { border-radius: 999px; }
-/* Photo band and run groups as rounded containers */
-html[data-look="c"] .cta-band { margin: 0 max(4vw, 20px); border-radius: 20px; }
-html[data-look="c"] #run-groups { border-top: 0; }
-html[data-look="c"] .levels { gap: 24px; }
-html[data-look="c"] .level-card { border: 1px solid var(--border); border-radius: 18px; padding: 30px; }
-html[data-look="c"] .level-card .h3d { border-bottom-color: var(--border); }
-html[data-look="c"] .step-cap { border-radius: 3px; }
-html[data-look="c"] .step-block { border-radius: 6px 6px 0 0; }
-html[data-look="c"] .level-list i { border-radius: 2px; }
-/* Event page: the head spans the page, title left and a rounded photo right, on a light surface */
-html[data-look="c"] .event-layout { grid-template-areas: "head head" "main aside"; padding-top: 0; }
-html[data-look="c"] .ev-head {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); grid-template-areas: "crumb crumb" "title media";
-  column-gap: 56px; align-items: center; padding: 32px 0 48px; margin-bottom: 48px; border-bottom: 1px solid var(--border);
-}
-html[data-look="c"] .crumb { grid-area: crumb; margin-bottom: 28px; }
-html[data-look="c"] .ev-media { grid-area: media; }
-html[data-look="c"] .ev-media .thumb { border-radius: 16px; }
-html[data-look="c"] .ev-title { grid-area: title; margin: 0; }
-html[data-look="c"] .ev-title h1 { font-size: clamp(38px, 4.4vw, 60px); }
-html[data-look="c"] .ev-title h1 b { display: block; }
-html[data-look="c"] .toc { gap: 8px; border: 0; padding: 4px 0; }
-html[data-look="c"] .toc a { border: 1px solid var(--border); border-radius: 999px; padding: 10px 16px; margin: 0; }
-html[data-look="c"] .toc a:hover { border-color: var(--fg); }
-html[data-look="c"] .facts { border-top: 0; }
-html[data-look="c"] .book { border: 1px solid var(--border); border-radius: 18px; overflow: hidden; }
-html[data-look="c"] .book-tabs { border-radius: 999px; overflow: hidden; }
-html[data-look="c"] .book-opt { margin-bottom: 8px; border-radius: 12px; }
-html[data-look="c"] .book-note, html[data-look="c"] .book-opt .tip, html[data-look="c"] .book-field input { border-radius: 10px; }
-html[data-look="c"] .book-row .btn { min-height: 48px; }
-@media (max-width: 899px) {
-  html[data-look="c"] .hero-photo { top: auto; bottom: 28px; left: max(4vw, 20px); right: max(4vw, 20px); width: auto; height: 230px; background-size: cover; background-position: 50% 60%; }
-  html[data-look="c"] .hero-photo::after { background: none; }
-  html[data-look="c"] .hero-copy { padding: 48px 0 290px; }
-  html[data-look="c"] .ev-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "crumb" "media" "title"; row-gap: 24px; padding-top: 24px; margin-bottom: 32px; }
-  html[data-look="c"] .crumb { margin-bottom: 0; }
-  html[data-look="c"] .event-layout { grid-template-areas: "head" "main" "aside"; }
-}
 html[data-look="b"] .thumb-pill, html[data-look="b"] .thumb-track { z-index: 1; }
