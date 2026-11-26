@@ -46,6 +46,7 @@ const browser = await chromium.launch();
 for (const [dev, viewport, scale] of [["phone", { width: 390, height: 844 }, 2], ["desktop", { width: 1280, height: 860 }, 1]].filter(d => devices.includes(d[0]))) {
   const ctx = await browser.newContext({ viewport, deviceScaleFactor: scale, reducedMotion: "reduce", isMobile: dev === "phone", hasTouch: dev === "phone" });
   const page = await ctx.newPage();
+  page.on("pageerror", e => console.error("PAGE ERROR", e.message));
   for (const [name, file, q] of shots) {
     const url = `${origin}/${file}?clean&today=${today}${look}${q ? `&${q}` : ""}`;
     await page.goto(url, { waitUntil: "load" });

@@ -130,7 +130,7 @@
 
   const levelCard = (fk, v) => {
     const f = D.formats[fk];
-    return `<div class="level-card"><h3 class="h3d">${f.label}</h3><p class="count">${f.groups.length} groups</p>${steps(f.groups, v)}` +
+    return `<div class="level-card"><h3 class="h3d">${f.label}<span class="count">${f.groups.length} groups</span></h3>${steps(f.groups, v)}` +
       `<ul class="level-list">${f.groups.map(k => `<li><i style="--c:${D.groups[k].color}"></i><div><b>${D.groups[k].name}</b><span>${D.groups[k].desc}</span></div></li>`).join("")}</ul></div>`;
   };
 
@@ -149,9 +149,10 @@
     let top = "";
     if (st === "open") top = ebBox(ev, now, true);
     if (soon) top = `<div class="book-state">${soonBadge(ev, now)}</div>`;
-    if (sold) top = `<div class="book-state"><span class="badge badge-sold">${I.ban}Sold out</span><p>Join the waitlist and TDE will email you if a spot opens.</p></div>`;
+    if (sold) top = `<div class="book-state"><p>Join the waitlist and TDE will email you if a spot opens.</p></div>`;
 
-    form.innerHTML = `${top}
+    const head = sold ? ["Sold out", ev.dateShort] : [`Book · ${ev.dateShort}`, `from $${fromPrice(ev, st)}`];
+    form.innerHTML = `<div class="book-hd"><span>${head[0]}</span><b>${head[1]}</b></div><div class="book-bd">${top}
 <h3>Run group</h3>
 <div class="book-tabs" role="group" aria-label="Have you driven with TDE before?"><button type="button" data-m="new">New to TDE</button><button type="button" data-m="ret">Returning driver</button></div>
 <div class="book-list" role="radiogroup" aria-label="Run group"></div>
@@ -168,7 +169,7 @@
 ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</button>`
   : soon ? `<button class="btn book-go" type="submit" aria-disabled="true">Registration opens ${ev.regOpensShort}, 10 am</button>`
   : `<button class="btn btn-red book-go" type="submit">Reserve my spot</button>`}
-<p class="book-msg done" aria-live="polite">${sold ? "Or call" : "Questions? Call"} <a href="tel:${D.tel}">${D.phone}</a>${sold ? " to ask about cancellations." : ""}</p>`;
+<p class="book-msg done" aria-live="polite">${sold ? "Or call" : "Questions? Call"} <a href="tel:${D.tel}">${D.phone}</a>${sold ? " to ask about cancellations." : ""}</p></div>`;
 
     const q = s => form.querySelector(s);
     const list = () => (S.mode === "new" ? NEW : RET);
@@ -282,9 +283,14 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       open: `<b>Registration open</b><span>Opened ${ev.regOpensShort} · from $${from}</span>`,
       ebx: `<b>Registration open</b><span>Opened ${ev.regOpensShort} · from $${from}</span>`,
       soon: `<b>Registration opens ${ev.regOpensLabel}</b><span>in ${plural(Math.max(daysUntil(ev.regOpens, now), 1), "day")} · from $${from}</span>`,
-      sold: `<b>Sold out</b><span>Join the waitlist, or call <a href="tel:${D.tel}" style="margin:0;font-size:inherit">${D.phone}</a> about cancellations</span>`
+      sold: `<b>Sold out</b><span>Join the waitlist, or call <a href="tel:${D.tel}" style="margin:0;font:inherit;text-transform:none;letter-spacing:0;font-weight:500">${D.phone}</a> about cancellations</span>`
     }[st];
     slot("eb").outerHTML = st === "open" ? ebBox(ev, now) : "";
+    const sp = slot("spec-price"), spn = slot("spec-price-note");
+    if (sp) {
+      sp.innerHTML = st === "sold" ? "<b>Sold</b> out" : `from <b>$${from}</b>`;
+      spn.textContent = { open: `Early-bird until ${ev.earlyBirdShort}`, ebx: "Entry", soon: `Opens ${ev.regOpensShort}, 10 am`, sold: "Waitlist open" }[st];
+    }
     mountBooking($("#book"), ev, now, st);
 
     const bar = $(".mbar");
@@ -307,8 +313,8 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
       m.setAttribute("aria-expanded", String(open));
     }));
 
-    // Carry preview settings (today, foundation, heading type) across pages.
-    const carried = ["today", "ds", "type"].filter(k => params.get(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
+    // Carry the preview date across pages.
+    const carried = ["today"].filter(k => params.get(k)).map(k => `${k}=${encodeURIComponent(params.get(k))}`);
     const withParams = (href, extra = []) => {
       const [path, hash] = href.split("#");
       const q = [...carried.filter(c => !extra.some(x => x.split("=")[0] === c.split("=")[0])), ...extra].filter(x => !/=$/.test(x));
@@ -328,20 +334,17 @@ ${sold ? `<button class="btn btn-quiet book-go" type="submit">Join waitlist</but
     const cur = k => params.get(k) || "";
     const link = (label, key, val) => {
       const extra = [`${key}=${val}`];
-      if (key === "ds" && !val) extra.push("type=");
       if (key !== "state" && cur("state")) extra.push(`state=${cur("state")}`);
-      const on = cur(key) === val || (key === "type" && !cur("type") && val === "foundation");
+      const on = cur(key) === val;
       return `<a href="${withParams(here, extra)}"${on ? ' aria-current="page"' : ""}>${label}</a>`;
     };
     const states = document.body.dataset.event
       ? `<b style="margin-left:12px">State</b>${[["", "Live"], ["soon", "Not open"], ["ebx", "Early-bird over"], ["sold", "Sold out"]].map(([s, l]) => link(l, "state", s)).join("")}`
       : "";
-    const foundations = `<b style="margin-left:12px">Foundation</b>${[["", "Current"], ["bmwm", "BMW M"], ["ferrari", "Ferrari"], ["porsche", "Porsche"]].map(([v, l]) => link(l, "ds", v)).join("")}`;
-    const types = cur("ds") ? `<b style="margin-left:12px">Headings</b>${link("Foundation", "type", "foundation")}${link("Saira", "type", "saira")}` : "";
     const bar = document.createElement("nav");
     bar.className = "proto-bar";
     bar.setAttribute("aria-label", "Prototype pages");
-    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${withParams(p)}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${foundations}${types}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
+    bar.innerHTML = `<div class="in"><b>TDE v1</b>${pages.map(([p, l]) => `<a href="${withParams(p)}"${p === here ? ' aria-current="page"' : ""}>${l}</a>`).join("")}${states}<button type="button" class="proto-fs">${I.full}Full screen</button></div>`;
     document.body.prepend(bar);
     const exit = document.createElement("button");
     exit.type = "button";

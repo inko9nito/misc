@@ -4,63 +4,60 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TDE design system</title>
-<meta name="description" content="Tokens, type and components of The Drivers Edge redesign, rendered from the site's own CSS and JS.">
-<meta name="theme-color" content="#24104e">
+<meta name="description" content="Tokens, type and components of The Drivers Edge redesign, rendered from the site’s own CSS and JS.">
+<meta name="theme-color" content="#0d0819">
+<link rel="preload" href="assets/fonts/barlow-latin-300-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/barlow-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/saira-italic.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="assets/fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/css/tokens.css">
 <link rel="stylesheet" href="assets/css/tde.css">
-<link rel="stylesheet" href="assets/css/foundations.css">
-<script>(p=>{const e=document.documentElement,d=p.get("ds"),t=p.get("type");if(d)e.dataset.ds=d;if(d&&t)e.dataset.type=t})(new URLSearchParams(location.search))</script>
 <style>
 /* Page-only layout for the reference. Components themselves come from tde.css. */
-.ds-intro { padding-top: 48px; padding-bottom: 8px; }
-.ds-intro h1 { font-size: clamp(34px, 4.4vw, 52px); line-height: 1.02; }
-.ds-intro p { color: var(--muted-2); font-size: 17px; max-width: 64ch; margin-top: 14px; }
-.ds-toc { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 18px; }
-.ds-toc a { font-size: 14.5px; font-weight: 600; color: var(--muted-2); text-decoration: none; padding: 8px 12px; border-radius: 8px; background: var(--surface-tint); }
-.ds-sec { padding: 52px 0; border-top: 1px solid var(--border-soft); }
-.ds-sec:first-of-type { border-top: 0; }
-.ds-sec > .wrap > h2 + p { color: var(--muted-2); max-width: 64ch; margin: -12px 0 22px; }
-.ds-h { font: 700 13px var(--font-body); color: var(--meta); text-transform: uppercase; letter-spacing: 0.6px; margin: 30px 0 12px; display: flex; align-items: center; gap: 10px; }
-.ds-h::after { content: ""; flex: 1; border-top: 1px dashed var(--border-strong); }
-.ds-panel { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; background: var(--surface); }
-.ds-dark { border-radius: var(--radius-lg); padding: 28px; color: #fff; overflow: hidden; }
-.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.sw { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: #fff; }
-.sw i { display: block; height: 64px; background: var(--c); }
-.sw div { padding: 10px 12px 12px; }
-.sw b { display: block; font-size: 14.5px; }
-.sw code { font: 600 12.5px var(--font-mono); color: var(--muted-2); }
-.sw span { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
-.type-row { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 18px; align-items: baseline; padding: 16px 0; border-bottom: 1px solid var(--border-soft); }
-.type-row:last-child { border-bottom: 0; }
-.type-row small { font-size: 13px; color: var(--muted); line-height: 1.45; }
-.type-row small b { display: block; color: var(--fg); font-size: 14px; }
-@media (max-width: 700px) { .type-row { grid-template-columns: minmax(0, 1fr); gap: 6px; } }
+.ds-intro { background-color: var(--brand-purple-deep); background-image: var(--carbon); color: #fff; }
+.ds-intro .wrap { padding-top: 72px; padding-bottom: 64px; }
+.ds-intro .eyebrow { color: var(--on-dark-muted); margin-bottom: 18px; }
+.ds-intro h1 { font-size: clamp(44px, 6vw, 80px); line-height: 0.96; letter-spacing: -0.03em; }
+.ds-intro p { color: var(--on-dark-2); font-size: 19px; max-width: 60ch; margin-top: 22px; line-height: 1.5; }
+.ds-toc { display: flex; flex-wrap: wrap; gap: 4px 24px; margin-top: 30px; }
+.ds-toc a { font: var(--label); text-transform: uppercase; letter-spacing: var(--tracking-label); color: #fff; text-decoration: none; padding: 8px 0; border-bottom: 2px solid transparent; }
+.ds-toc a:hover { border-bottom-color: var(--accent); }
+.ds-sec { padding: 88px 0; border-top: 1px solid var(--border-soft); }
+.ds-sec .section-hd { margin-bottom: 36px; }
+.ds-h { font: var(--label); text-transform: uppercase; letter-spacing: var(--tracking-label); color: var(--muted); margin: 40px 0 14px; padding-bottom: 10px; border-bottom: 1px solid var(--fg); }
+.ds-dark { padding: 32px; color: #fff; background: var(--brand-purple-night); }
+.ds-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 12px; }
+.sw { background: #fff; border: 1px solid var(--border); }
+.sw i { display: block; height: 72px; background: var(--c); }
+.sw div { padding: 12px 14px 14px; }
+.sw b { display: block; font-weight: 500; font-size: 16px; }
+.sw code { font: 500 12.5px var(--font-mono); color: var(--muted-2); }
+.sw span { display: block; font-size: 14px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+.type-row { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; align-items: baseline; padding: 22px 0; border-bottom: 1px solid var(--border); }
+.type-row small { font-size: 14px; color: var(--muted); line-height: 1.45; }
+.type-row small b { display: block; color: var(--fg); font-weight: 500; font-size: 15px; }
+@media (max-width: 700px) { .type-row { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
 .ds-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.ds-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 20px; align-items: start; }
-.ds-label { font: 700 14px var(--font-body); margin: 0 0 8px; }
-.ds-label span { font-weight: 500; color: var(--muted); }
-.ds-states { display: grid; gap: 30px; max-width: 900px; }
-.ds-steps { display: grid; gap: 26px; }
-.ds-steps .ds-two { gap: 18px; }
-.ds-steps .ds-panel { padding: 14px 16px 16px; }
-.ds-steps .ds-panel > span { display: block; font: italic 800 15px var(--font-display); color: var(--muted); }
-.ds-live { display: inline-block; margin-left: 8px; font: 700 12px var(--font-body); color: #fff; background: var(--success); border-radius: var(--radius-pill); padding: 3px 9px; vertical-align: 2px; }
-.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 20px; }
-.rules ul { margin: 0; padding-left: 20px; display: grid; gap: 8px; font-size: 15.5px; color: var(--fg-2); }
-.rules h3 { font: 700 16px var(--font-body); margin-bottom: 12px; }
-.spacing { display: grid; gap: 8px; }
-.spacing div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 13.5px; color: var(--muted); }
-.spacing i { display: block; height: 12px; width: var(--w); background: var(--brand-purple); border-radius: 3px; }
-.radii { display: flex; flex-wrap: wrap; gap: 14px; }
-.radii div { width: 96px; height: 72px; border: 2px solid var(--brand-purple); background: var(--surface-tint); display: flex; align-items: flex-end; padding: 6px 8px; font-size: 12.5px; color: var(--muted-2); }
+.ds-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 40px; align-items: start; }
+.ds-label { font: var(--label); text-transform: uppercase; letter-spacing: var(--tracking-label); margin: 0 0 12px; }
+.ds-label span { color: var(--muted); }
+.ds-states { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 400px), 1fr)); gap: 56px 40px; }
+.ds-steps { display: grid; gap: 36px; }
+.ds-steps .ds-two { gap: 24px; }
+.ds-live { display: inline-block; margin-left: 10px; font: 600 10.5px/1 var(--font-body); letter-spacing: 0.1em; color: #fff; background: var(--success); padding: 4px 7px; vertical-align: 1px; }
+.rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 40px; }
+.rules ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--fg); }
+.rules li { padding: 14px 0; border-bottom: 1px solid var(--border); font-size: 17px; color: var(--fg-2); }
+.rules h3 { font: 300 32px/1 var(--font-display); margin-bottom: 18px; }
+.spacing { display: grid; gap: 10px; }
+.spacing div { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 12px; align-items: center; font-size: 14px; color: var(--muted); }
+.spacing i { display: block; height: 10px; width: var(--w); background: var(--fg); }
+.ds-book { max-width: 420px; }
+.ds-book .book { position: static; }
 </style>
 </head>
 <body>
 
-<header class="site-hdr carbon">
+<header class="site-hdr">
   <div class="wrap">
     <nav class="nav" aria-label="Main">
       <a class="logo" href="index.html" aria-label="The Drivers Edge, High Performance Driving Events, home"><span class="wm">THEDRIVERS<em>EDGE</em></span><span class="tg">HIGH<b>PERFORMANCE</b>DRIVING<b>EVENTS</b></span></a>
@@ -72,131 +69,120 @@
         <a href="#">Gift cards</a>
         <a href="#">Sign in</a>
       </div>
-      <button type="button" class="nav-menu" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <button type="button" class="nav-menu" aria-label="Menu" aria-expanded="false" aria-controls="nav-links"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 7h18M3 12h18M3 17h18"/></svg></button>
     </nav>
   </div>
 </header>
 
 <main>
-  <div class="wrap ds-intro">
-    <h1>Design system</h1>
-    <p>The TDE look, written down. Keep TDE’s identity (the wordmark, deep purple carbon and red) loud in the header and hero, and keep everything below calm and readable on white. Every sample on this page is rendered by the site’s own <code>tokens.css</code>, <code>tde.css</code> and <code>tde.js</code>.</p>
-    <nav class="ds-toc" aria-label="Sections"><a href="#brand">Brand</a><a href="#color">Color</a><a href="#groups">Run-group colors</a><a href="#type">Type</a><a href="#space">Space &amp; shape</a><a href="#buttons">Buttons &amp; badges</a><a href="#cards">Event card</a><a href="#steps">Run groups</a><a href="#booking">Booking card</a><a href="#rules">Rules</a></nav>
-  </div>
+  <section class="ds-intro" aria-labelledby="ds-h">
+    <div class="wrap">
+      <p class="eyebrow">TDE design system · v1</p>
+      <h1 id="ds-h">Precision, <b>in TDE purple</b></h1>
+      <p>Built on the BMW M foundation from Open Design Agent Kit: square geometry, light large display type, spaced uppercase labels, spec cells and photography on dark bands. Carried in TDE’s own purple, red and racing wordmark, with no BMW marks. Every sample here is rendered by the site’s own CSS and JS.</p>
+      <nav class="ds-toc" aria-label="Sections"><a href="#brand">Brand</a><a href="#color">Color</a><a href="#groups">Run-group colors</a><a href="#type">Type</a><a href="#space">Space</a><a href="#buttons">Buttons</a><a href="#cards">Event card</a><a href="#steps">Run groups</a><a href="#booking">Booking</a><a href="#rules">Rules</a></nav>
+    </div>
+  </section>
 
   <section class="ds-sec" id="brand" aria-labelledby="brand-h"><div class="wrap">
-    <h2 id="brand-h">Brand</h2>
-    <p>TDE’s real logo is a bold wide italic “THEDRIVERS” in white with “EDGE” in red, over the tagline. Here it’s recreated in CSS (Saira italic 850, 125% wide) until TDE sends the logo file.</p>
-    <div class="ds-dark carbon" style="border-bottom:3px solid var(--accent)">
-      <span class="logo" style="transform:scale(1.6);transform-origin:left center;margin:10px 0"><span class="wm">THEDRIVERS<em>EDGE</em></span><span class="tg">HIGH<b>PERFORMANCE</b>DRIVING<b>EVENTS</b></span></span>
-    </div>
-    <p class="ds-h">Ticker: the only other uppercase display text, besides date stamps</p>
-    <div class="ticker" aria-hidden="true" style="border-radius:var(--radius-md)"><span><span>31 YEARS ON TRACK</span><span>NOVICE TO ADVANCED</span><span>CERTIFIED IN-CAR INSTRUCTION</span><span>CLASSROOM FOR EVERY GROUP</span><span>YOUR OWN CAR</span><span>31 YEARS ON TRACK</span><span>NOVICE TO ADVANCED</span></span></div>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">01 · Brand</p><h2 id="brand-h">Wordmark and spec strip</h2>
+    <p class="section-sub">TDE’s wordmark stays in Saira wide italic, recreated in CSS until TDE sends the logo file. Saira appears only in the wordmark and the date stamps on photos. TDE’s ticker facts become a spec strip.</p></div>
+    <div class="ds-dark"><span class="logo" style="transform:scale(1.7);transform-origin:left center;margin:14px 0"><span class="wm">THEDRIVERS<em>EDGE</em></span><span class="tg">HIGH<b>PERFORMANCE</b>DRIVING<b>EVENTS</b></span></span></div>
+    <div class="specs-dark"><div style="padding:0 32px"><dl class="specs">
+      <div><dd><b>31</b> years</dd><dt>On track in Texas</dt></div><div><dd><b>Every</b> level</dd><dt>Novice to advanced</dt></div><div><dd><b>In-car</b></dd><dt>Certified coaching</dt></div><div><dd><b>Classroom</b></dd><dt>For every group</dt></div><div><dd><b>Your</b> car</dd><dt>Bring your own</dt></div>
+    </dl></div></div>
   </div></section>
 
   <section class="ds-sec" id="color" aria-labelledby="color-h"><div class="wrap">
-    <h2 id="color-h">Color</h2>
-    <p>Purple and red carry the brand. Everything below the hero sits on white. Selection and UI states use dark ink, never orange.</p>
-    <p class="ds-h">Brand</p>
-    <div class="ds-grid" id="sw-brand"></div>
-    <p class="ds-h">Text and lines</p>
-    <div class="ds-grid" id="sw-ink"></div>
-    <p class="ds-h">Status</p>
-    <div class="ds-grid" id="sw-status"></div>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">02 · Color</p><h2 id="color-h">Purple chrome, white reading, red action</h2>
+    <p class="section-sub">Dark purple carries the header, hero, photo bands and footer. Everything you read sits on white. Red is for the main action and labels that need attention. Selection is ink, never orange.</p></div>
+    <p class="ds-h">Brand</p><div class="ds-grid" id="sw-brand"></div>
+    <p class="ds-h">Ink and lines</p><div class="ds-grid" id="sw-ink"></div>
+    <p class="ds-h">Status</p><div class="ds-grid" id="sw-status"></div>
   </div></section>
 
   <section class="ds-sec" id="groups" aria-labelledby="groups-h"><div class="wrap">
-    <h2 id="groups-h">Run-group colors</h2>
-    <p>Brighter than the brand purple, so Purple never reads as decoration. Always pair a group color with its name. One event shows one set, never both.</p>
-    <p class="ds-h">1-day events</p>
-    <div class="ds-grid" id="sw-one"></div>
-    <p class="ds-h">2-day events</p>
-    <div class="ds-grid" id="sw-two"></div>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">03 · Run groups</p><h2 id="groups-h">Run-group colors</h2>
+    <p class="section-sub">Brighter than the brand purple, so Purple never reads as decoration. Always paired with the group’s name. One event shows one set, never both.</p></div>
+    <p class="ds-h">1-day events</p><div class="ds-grid" id="sw-one"></div>
+    <p class="ds-h">2-day events</p><div class="ds-grid" id="sw-two"></div>
   </div></section>
 
   <section class="ds-sec" id="type" aria-labelledby="type-h"><div class="wrap">
-    <h2 id="type-h">Type</h2>
-    <p>Headings use the racing font in sentence case: Saira italic, 850, about 112% wide. Everything else is Inter. Don’t put the racing font on card details.</p>
-    <div class="ds-panel">
-      <div class="type-row"><small><b>Display / hero</b>Saira italic 850 · 38–64px · 1.0</small><h1 style="font-size:clamp(34px,5vw,56px);line-height:1">Teaching the art of <em style="color:var(--accent)">high-performance</em> driving</h1></div>
-      <div class="type-row"><small><b>Section heading</b>Saira italic 850 · 28–38px · 1.05</small><h2 style="margin:0">Upcoming events</h2></div>
-      <div class="type-row"><small><b>Event-page heading</b>Saira italic 850 · 27px · 1.1</small><h2 style="margin:0;font-size:var(--text-2xl)">About this event</h2></div>
-      <div class="type-row"><small><b>Card heading</b>Saira italic 800 · 19px</small><h3 class="h3d">1-day events</h3></div>
-      <div class="type-row"><small><b>Event name</b>Inter 700 · 19px</small><span class="event-name">Saturday Track</span></div>
-      <div class="type-row"><small><b>Reading text</b>Inter 400 · 17.5px · 1.65</small><p style="font-size:var(--text-lg);line-height:var(--leading-read);color:var(--fg-2)">A lot of information, but easy to take in: generous spacing, short lines, hairline dividers.</p></div>
-      <div class="type-row"><small><b>Body</b>Inter 400 · 16px · 1.55</small><p>Bring your own car; a certified coach rides with you until you’re ready to go solo.</p></div>
-      <div class="type-row"><small><b>Date line</b>Inter 600 · 13px · red</small><span class="event-when">Sat, Dec 12 · 1-day</span></div>
-      <div class="type-row"><small><b>Fine print</b>Inter 400 · 13.5px · meta</small><p class="note" style="margin:0">All times Central.</p></div>
-      <div class="type-row"><small><b>Date stamp</b>Saira italic 850 · uppercase · on images only</small><div class="thumb" style="aspect-ratio:auto;height:96px;max-width:320px;border-radius:var(--radius-md);background:var(--brand-purple-night)"><span class="thumb-stamp"><small>2-day · Sat–Sun</small>Feb 6–7</span></div></div>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">04 · Type</p><h2 id="type-h">Light and large, <b>one strong phrase</b></h2>
+    <p class="section-sub">One family, Barlow, a free DIN-style grotesk. Display is Light (300) with the key phrase in SemiBold (600). Labels are small spaced capitals. Sentence case everywhere else.</p></div>
+    <div>
+      <div class="type-row"><small><b>Hero</b>Barlow 300 / 600 · 46–88px · 0.96</small><h1 style="font-size:clamp(40px,5.4vw,72px);line-height:.96;letter-spacing:-.03em">Teaching the art of <b style="color:var(--accent)">high-performance</b> driving</h1></div>
+      <div class="type-row"><small><b>Section heading</b>Barlow 300 · 34–52px · 1.0</small><h2 style="margin:0">Upcoming events</h2></div>
+      <div class="type-row"><small><b>Event title</b>Barlow 300 · 30–38px</small><span class="event-name" style="margin:0">Saturday Track</span></div>
+      <div class="type-row"><small><b>Spec value</b>Barlow 300 / 600 · 26–36px</small><dl class="specs" style="display:block"><div style="padding:0;border:0"><dd><b>5</b> sessions</dd></div></dl></div>
+      <div class="type-row"><small><b>Item title</b>Barlow 500 · 21–24px</small><span class="h3d">1-day events</span></div>
+      <div class="type-row"><small><b>Reading text</b>Barlow 400 · 18px · 1.6</small><p style="font-size:var(--text-lg);line-height:var(--leading-read);color:var(--fg-2)">A lot of information, made easy: generous spacing, short lines, hairline rules.</p></div>
+      <div class="type-row"><small><b>Label</b>Barlow 600 · 12px · caps · 0.12em</small><span class="eyebrow" style="color:var(--accent)">Sat, Dec 12 · 1-day</span></div>
+      <div class="type-row"><small><b>Date stamp</b>Saira italic 850 · on photos only</small><div class="thumb" style="aspect-ratio:auto;height:96px;max-width:320px;background:var(--brand-purple-night)"><span class="thumb-stamp"><small>2-day · Sat–Sun</small>Feb 6–7</span></div></div>
     </div>
   </div></section>
 
   <section class="ds-sec" id="space" aria-labelledby="space-h"><div class="wrap">
-    <h2 id="space-h">Space &amp; shape</h2>
-    <p>Approachable, not intimidating: event-page sections are 44px apart with 40px padding and a hairline between them. Touch targets are at least 44px.</p>
-    <div class="ds-two">
-      <div class="ds-panel spacing" id="spacing"></div>
-      <div class="ds-panel"><div class="radii"><div style="border-radius:var(--radius-sm)">6 · tags</div><div style="border-radius:var(--radius-md)">10 · buttons</div><div style="border-radius:var(--radius-lg)">16 · cards</div><div style="border-radius:var(--radius-xl)">18 · panels</div><div style="border-radius:var(--radius-pill);justify-content:center">pill</div></div></div>
-    </div>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">05 · Space and shape</p><h2 id="space-h">Square, ruled, generous</h2>
+    <p class="section-sub">No rounded corners. Structure comes from 1px rules: an ink rule opens a block, hairlines separate rows. Bands are 112px apart on desktop, 64px on phones. Touch targets are at least 44px.</p></div>
+    <div class="spacing" id="spacing" style="max-width:520px"></div>
   </div></section>
 
   <section class="ds-sec" id="buttons" aria-labelledby="buttons-h"><div class="wrap">
-    <h2 id="buttons-h">Buttons &amp; badges</h2>
-    <p>One red button per view is the main action. The early-bird box is identical on the card, the event page and the booking card.</p>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">06 · Buttons and status</p><h2 id="buttons-h">Buttons, early-bird, badges</h2>
+    <p class="section-sub">One red button per view is the main action. Secondary actions are outlined in ink. The early-bird row is identical on the card, the event page and the booking card.</p></div>
     <p class="ds-h">On white</p>
-    <div class="ds-row"><a class="btn btn-red" href="#buttons">Reserve my spot</a><a class="btn btn-red btn-sm" href="#buttons">View &amp; book</a><a class="btn btn-quiet btn-sm" href="#buttons">View details</a><button class="btn btn-sm" type="button" aria-disabled="true">Registration opens Nov 3, 10 am</button></div>
+    <div class="ds-row"><a class="btn btn-red" href="#buttons">Reserve my spot</a><a class="btn btn-quiet btn-sm" href="#buttons">View details</a><button class="btn btn-sm" type="button" aria-disabled="true">Registration opens Nov 3, 10 am</button><a class="arrow-link" href="#buttons">More events</a></div>
     <p class="ds-h">On purple</p>
-    <div class="ds-dark carbon ds-row"><a class="btn btn-red" href="#buttons">See upcoming events</a><a class="btn btn-outline" href="#buttons">How we place you</a><a class="btn btn-white" href="#buttons">See Dec 12</a></div>
+    <div class="ds-dark ds-row"><a class="btn btn-red" href="#buttons">See upcoming events</a><a class="btn btn-outline" href="#buttons">How we place you</a><a class="btn btn-white" href="#buttons">See Dec 12</a></div>
     <p class="ds-h">Early-bird and status</p>
     <div style="max-width:720px" id="ds-eb"></div>
-    <div class="ds-row" style="margin-top:6px" id="ds-badges"></div>
+    <div class="ds-row" style="margin-top:4px" id="ds-badges"></div>
   </div></section>
 
   <section class="ds-sec" id="cards" aria-labelledby="cards-h"><div class="wrap">
-    <h2 id="cards-h">Event card</h2>
-    <p>Thumbnail on the left, body on the right; stacked on phones. The thumbnail is the same component as the event-page banner. States come from the dates, except sold out, which needs a flag from the booking system.</p>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">07 · Event card</p><h2 id="cards-h">Photo-led event tiles</h2>
+    <p class="section-sub">The photo leads; the details sit below on white. The photo is the same component as the event-page banner. States come from the dates, except sold out, which needs a flag from TDE’s booking system.</p></div>
     <div class="ds-states" id="ds-states"></div>
-    <p class="ds-h">Event-page banner</p>
-    <div class="ds-two" id="ds-banners"></div>
   </div></section>
 
   <section class="ds-sec" id="steps" aria-labelledby="steps-h"><div class="wrap">
-    <h2 id="steps-h">Run groups</h2>
-    <p>Shows what the levels are, that you progress, and which is higher. A step graphic on top, then a full-width list: color bar, name, one sentence.</p>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">08 · Run groups</p><h2 id="steps-h">How we place you</h2>
+    <p class="section-sub">What the levels are, that you progress, and which is higher: a step graphic, then a ruled list with a color bar, the name and one sentence.</p></div>
     <div class="levels" id="ds-levels"></div>
-    <p class="levels-note">Everyone starts on the first step. You move up when a TDE instructor signs you off.</p>
     <p class="ds-h">Open decision: step style</p>
-    <p style="color:var(--muted-2);margin:-4px 0 16px">Vera picks one; it becomes the only style and this block goes away. Set it in <code>data.js</code> as <code>stepStyle</code>.</p>
+    <p style="color:var(--muted-2);margin:0 0 24px">Pick one; it becomes the only style and this block goes away. Set it in <code>data.js</code> as <code>stepStyle</code>.</p>
     <div class="ds-steps" id="ds-steps"></div>
   </div></section>
 
   <section class="ds-sec" id="booking" aria-labelledby="booking-h"><div class="wrap">
-    <h2 id="booking-h">Booking card</h2>
-    <p>Only this event’s groups are listed; the info icon shows the other format’s equivalents. The solo checkbox appears only for returning drivers choosing a solo group.</p>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">09 · Booking</p><h2 id="booking-h">Booking card</h2>
+    <p class="section-sub">Only this event’s groups are listed; the info icon shows the other format’s equivalents. The solo checkbox appears only for returning drivers choosing a solo group.</p></div>
     <div class="ds-two">
-      <div><p class="ds-label">1-day <span>· Dec 12</span></p><form class="book" id="book-ds-1" style="position:static" novalidate></form></div>
-      <div><p class="ds-label">2-day <span>· Feb 6–7</span></p><form class="book" id="book-ds-2" style="position:static" novalidate></form></div>
+      <div class="ds-book"><p class="ds-label">1-day <span>· Dec 12</span></p><form class="book" id="book-ds-1" novalidate></form></div>
+      <div class="ds-book"><p class="ds-label">2-day <span>· Feb 6–7</span></p><form class="book" id="book-ds-2" novalidate></form></div>
     </div>
   </div></section>
 
   <section class="ds-sec" id="rules" aria-labelledby="rules-h"><div class="wrap">
-    <h2 id="rules-h">Rules</h2>
+    <div class="section-hd"><p class="eyebrow" style="color:var(--accent)">10 · Rules</p><h2 id="rules-h">Do and don’t</h2></div>
     <div class="rules">
-      <div class="ds-panel"><h3>Do</h3><ul>
-        <li>Keep the wordmark, purple carbon and red; modernize how they’re used.</li>
-        <li>Put everything below the hero on white.</li>
-        <li>Use the racing font for headings only, in sentence case.</li>
-        <li>Use real track images and real car photos.</li>
-        <li>Match the card thumbnail to the event-page banner.</li>
+      <div><h3>Do</h3><ul>
+        <li>Keep TDE’s wordmark, purple and red.</li>
+        <li>Put everything people read on white.</li>
+        <li>Lead with real car photos and real track outlines.</li>
+        <li>Set headings light and large, with one strong phrase at most.</li>
+        <li>Use square corners and 1px rules for structure.</li>
         <li>Pair every group color with its name.</li>
       </ul></div>
-      <div class="ds-panel"><h3>Don’t</h3><ul>
+      <div><h3>Don’t</h3><ul>
+        <li>Copy BMW: no tricolor stripe, no BMW type, no all-caps headlines.</li>
         <li>Show the 1-day and 2-day color sets on the same event.</li>
         <li>Number the run groups or call them levels.</li>
-        <li>Use orange for UI or selection states.</li>
+        <li>Use orange for UI or selection.</li>
         <li>Draw made-up track shapes.</li>
-        <li>Use all caps for headings, or the racing font on card details.</li>
-        <li>Squeeze text into narrow columns, or add tables, gauges or facts nobody asked for.</li>
+        <li>Add rounded corners, drop shadows or gradients on UI.</li>
       </ul></div>
     </div>
   </div></section>
@@ -204,10 +190,16 @@
 
 <footer class="site-ftr">
   <div class="wrap">
-    <span>Get your life on track · <a href="tel:+19033033000">903.303.3000</a></span>
-    <a href="#">Charity fund</a>
-    <a href="event-dec-12.html#cancellation">Cancellation policy</a>
-    <a href="#">Privacy</a>
+    <div class="ftr-cols">
+      <div class="ftr-brand">
+        <a class="logo" href="index.html" aria-label="The Drivers Edge, home"><span class="wm">THEDRIVERS<em>EDGE</em></span><span class="tg">HIGH<b>PERFORMANCE</b>DRIVING<b>EVENTS</b></span></a>
+        <p>Teaching the art of high-performance driving in Texas for 31 years.</p>
+      </div>
+      <div><h3>Drive</h3><ul><li><a href="index.html#events">Upcoming events</a></li><li><a href="index.html#new-drivers">New drivers</a></li><li><a href="index.html#run-groups">Run groups</a></li></ul></div>
+      <div><h3>Prepare</h3><ul><li><a href="#">Rules &amp; forms</a></li><li><a href="#">Tech inspection</a></li><li><a href="#">FAQ</a></li></ul></div>
+      <div><h3>TDE</h3><ul><li><a href="tel:+19033033000">903.303.3000</a></li><li><a href="#">Gift cards</a></li><li><a href="#">Charity fund</a></li></ul></div>
+    </div>
+    <div class="ftr-base"><span>Get your life on track.</span><span><a href="event-dec-12.html#cancellation">Cancellation policy</a> · <a href="#">Privacy</a></span></div>
   </div>
 </footer>
 
@@ -218,24 +210,24 @@
   const D = window.TDE_DATA, T = window.TDE, $ = s => document.querySelector(s);
   const sw = ([name, token, hex, role]) => `<div class="sw"><i style="--c:var(${token})"></i><div><b>${name}</b><code>${hex}</code><span>${role}</span></div></div>`;
   $("#sw-brand").innerHTML = [
-    ["Brand purple", "--brand-purple", "#24104e", "Header, hero, new-driver band"],
-    ["Deep purple", "--brand-purple-deep", "#160935", "Headings and ink"],
-    ["Night", "--brand-purple-night", "#0f0a1e", "Darkest surfaces"],
-    ["Brand red", "--brand-red", "#d11f1f", "Main buttons, countdown, date bars"],
+    ["Night", "--brand-purple-night", "#0d0819", "Header, spec strip, photo bands, footer"],
+    ["Deep purple", "--brand-purple-deep", "#160935", "Hero and event-page bands, with carbon"],
+    ["Brand purple", "--brand-purple", "#24104e", "Accents on dark"],
+    ["Brand red", "--brand-red", "#d11f1f", "Main buttons, countdown, labels"],
     ["Red hover", "--accent-hover", "#b01818", "Button hover"],
-    ["Red on dark", "--brand-red-on-dark", "#ff3b3b", "Red text on purple, focus ring"]
+    ["Red on dark", "--brand-red-on-dark", "#ff3b3b", "The strong phrase in the hero"]
   ].map(sw).join("");
   $("#sw-ink").innerHTML = [
-    ["Ink", "--fg", "#160935", "Headings, labels"],
-    ["Reading ink", "--fg-2", "#2e2645", "Long text"],
-    ["Muted", "--muted", "#5d5868", "Secondary text"],
-    ["Meta", "--meta", "#76708a", "Fine print"],
-    ["Line", "--border", "#e6e0f0", "Card borders"],
-    ["Hairline", "--border-soft", "#eee9f5", "Dividers"]
+    ["Ink", "--fg", "#12101a", "Text, rules that open a block, selection"],
+    ["Reading ink", "--fg-2", "#2b2833", "Long text"],
+    ["Muted", "--muted", "#575463", "Secondary text, labels"],
+    ["Meta", "--meta", "#6e6b78", "Fine print"],
+    ["Line", "--border", "#dcdbe2", "Hairlines between rows"],
+    ["Tint", "--surface-tint", "#f1f0f4", "Notes and tips"]
   ].map(sw).join("");
   $("#sw-status").innerHTML = [
-    ["Early-bird", "--earlybird-bg", "#fff6d6 / #4d3600", "The early-bird box, one style everywhere"],
-    ["Registration soon", "--soon-bg", "#ece6fb / #2a1660", "Registration-not-open badge"],
+    ["Early-bird", "--earlybird-bg", "#fff6d6 / #4d3600", "The early-bird row"],
+    ["Registration soon", "--soon-bg", "#ece6fb / #2a1660", "Not-open badge"],
     ["Sold out", "--sold-bg", "#e9e6ee / #3b3546", "Sold-out badge"],
     ["Required", "--required-bg", "#fde4e4 / #9b1515", "Required schedule items"]
   ].map(sw).join("");
@@ -243,7 +235,7 @@
   const grp = k => sw([D.groups[k].name, `--group-${k}`, hex[k] + (k === "yellow" ? " · dark text" : ""), D.groups[k].short]);
   $("#sw-one").innerHTML = D.formats.one.groups.map(grp).join("");
   $("#sw-two").innerHTML = D.formats.two.groups.map(grp).join("");
-  $("#spacing").innerHTML = [4, 8, 12, 16, 24, 32, 40, 48, 64].map(n => `<div><span>${n}px</span><i style="--w:${n * 3}px"></i></div>`).join("");
+  $("#spacing").innerHTML = [4, 8, 12, 16, 24, 32, 48, 64, 112].map(n => `<div><span>${n}px</span><i style="--w:${n * 3}px"></i></div>`).join("");
 
   const [dec, feb] = D.events;
   const open = T.preview(dec, "open");
@@ -251,27 +243,22 @@
   const soon = T.preview(dec, "soon");
   $("#ds-badges").innerHTML = T.card(soon.ev, soon.now, "soon").match(/<span class="badge badge-soon">.*?<\/span>/)[0] +
     `<span class="badge badge-sold"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/></svg>Sold out</span>` +
-    `<span class="badge-req" style="margin:10px 0 0">Required</span>`;
+    `<span class="badge-req" style="margin:16px 0 0">Required</span>`;
 
   $("#ds-states").innerHTML = [
     ["Open, early-bird running", "open", dec],
-    ["Open, early-bird over", "ebx", dec, "regular price, no early-bird box"],
-    ["Registration not open yet", "soon", dec, "opening date and countdown"],
-    ["Sold out", "sold", dec, "muted photo, waitlist"],
-    ["2-day, early-bird running", "open", feb]
-  ].map(([label, st, ev, note]) => {
+    ["Open, early-bird over", "ebx", dec],
+    ["Registration not open", "soon", dec],
+    ["Sold out", "sold", dec]
+  ].map(([label, st, ev]) => {
     const p = T.preview(ev, st);
-    return `<div><p class="ds-label">${label}${note ? ` <span>· ${note}</span>` : ""}</p><div class="event-list">${T.card(p.ev, p.now, p.state)}</div></div>`;
-  }).join("");
-  $("#ds-banners").innerHTML = [[dec, "open"], [feb, "open"], [dec, "sold"]].map(([ev, st]) => {
-    const p = T.preview(ev, st);
-    return T.thumb(p.ev, p.now, p.state, true);
+    return `<div><p class="ds-label">${label}</p>${T.card(p.ev, p.now, p.state)}</div>`;
   }).join("");
 
   $("#ds-levels").innerHTML = ["one", "two"].map(k => T.levelCard(k)).join("");
-  const styles = [["a", "Vera’s sketch: hatched outline, floating color bar"], ["b", "Carbon podiums in the brand purple, color cap on top"], ["c", "Tinted podiums, solid color band"], ["d", "Stacked blocks: each level adds one"], ["e", "3D podium: colored top face, shaded front"]];
+  const styles = [["a", "Your sketch: hatched outline, floating color bar"], ["b", "Carbon podiums, color cap on top"], ["c", "Tinted podiums, solid color band"], ["d", "Stacked blocks: each level adds one"], ["e", "3D podium: colored top face"]];
   $("#ds-steps").innerHTML = styles.map(([v, l]) =>
-    `<div><p class="ds-label">${v.toUpperCase()} · ${l}${v === D.stepStyle ? '<span class="ds-live">Live</span>' : ""}</p><div class="ds-two">${["one", "two"].map(k => `<div class="ds-panel"><span>${D.formats[k].label}</span>${T.steps(D.formats[k].groups, v)}</div>`).join("")}</div></div>`).join("");
+    `<div><p class="ds-label">${v.toUpperCase()} <span>· ${l}</span>${v === D.stepStyle ? '<span class="ds-live">LIVE</span>' : ""}</p><div class="ds-two">${["one", "two"].map(k => `<div>${T.steps(D.formats[k].groups, v)}</div>`).join("")}</div></div>`).join("");
 
   T.mountBooking($("#book-ds-1"), open.ev, open.now, "open");
   const o2 = T.preview(feb, "open");

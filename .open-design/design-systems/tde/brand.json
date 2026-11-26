@@ -11,7 +11,7 @@
   },
   "descriptor": {
     "moods": [
-      "bold",
+      "precise",
       "motorsport",
       "confident",
       "approachable"
@@ -31,79 +31,81 @@
   "marks": [],
   "fonts": [
     {
+      "family": "Barlow",
+      "weights": [
+        300,
+        400,
+        500,
+        600,
+        700
+      ],
+      "source": "google",
+      "stylesheet": "https://fonts.google.com/specimen/Barlow",
+      "licence": "free"
+    },
+    {
       "family": "Saira",
       "weights": [
+        500,
         800,
         850
       ],
       "source": "google",
       "stylesheet": "https://fonts.google.com/specimen/Saira",
       "licence": "free"
-    },
-    {
-      "family": "Inter",
-      "weights": [
-        400,
-        500,
-        600,
-        700,
-        800
-      ],
-      "source": "google",
-      "stylesheet": "https://fonts.google.com/specimen/Inter",
-      "licence": "free"
     }
   ],
   "components": {
     "button.primary": {
-      "height": 48,
-      "paddingX": 22,
-      "fontWeight": 700,
-      "fontSize": 15,
-      "textTransform": "none",
+      "height": 52,
+      "paddingX": 32,
+      "fontWeight": 600,
+      "fontSize": 13,
+      "textTransform": "uppercase",
       "borderWidth": 0,
-      "radius": 10,
+      "radius": 0,
       "background": "#d11f1f",
       "color": "#ffffff"
     },
     "button.secondary": {
-      "height": 44,
-      "paddingX": 18,
-      "fontWeight": 700,
-      "fontSize": 15,
-      "textTransform": "none",
-      "borderWidth": 1.5,
-      "borderColor": "#cfc8e2",
-      "radius": 10,
-      "background": "#ffffff",
-      "color": "#160935"
+      "height": 46,
+      "paddingX": 24,
+      "fontWeight": 600,
+      "fontSize": 13,
+      "textTransform": "uppercase",
+      "borderWidth": 1,
+      "borderColor": "#12101a",
+      "radius": 0,
+      "background": "transparent",
+      "color": "#12101a"
     },
     "input": {
-      "height": 46,
-      "paddingX": 12,
+      "height": 48,
+      "paddingX": 14,
       "fontSize": 16,
-      "borderWidth": 1.5,
-      "borderColor": "#d9d3ea",
-      "radius": 10,
+      "borderWidth": 1,
+      "borderColor": "#12101a",
+      "radius": 0,
       "background": "#ffffff",
-      "focus": "#24104e"
+      "focus": "#12101a"
     },
     "card": {
-      "borderWidth": 1,
-      "borderColor": "#e6e0f0",
-      "radius": 16,
+      "borderWidth": 0,
+      "radius": 0,
       "background": "#ffffff"
     },
     "nav": {
-      "background": "#24104e",
+      "height": 68,
+      "background": "#0d0819",
       "color": "#ffffff",
       "sticky": false
     },
     "badge": {
-      "fontWeight": 700,
-      "fontSize": 12.5,
-      "radius": 999,
-      "paddingY": 6,
+      "fontWeight": 600,
+      "fontSize": 11.5,
+      "textTransform": "uppercase",
+      "radius": 0,
+      "paddingY": 8,
       "paddingX": 11
     }
   },
@@ -115,7 +117,7 @@
   },
   "imagery": {
     "hero": "photo",
-    "imageRadius": 16,
+    "imageRadius": 0,
     "aspectRatios": [
       "900/516"
     ],
@@ -127,5 +129,15 @@
   },
   "motion": {
     "reducedMotion": true
+  },
+  "foundation": {
+    "id": "bmw-m",
+    "source": "open-design-agent-kit",
+    "chosen": "2026-11-26",
+    "alternativesConsidered": [
+      "ferrari",
+      "tesla",
+      "porsche-inspired"
+    ]
   }
 }
